@@ -40,53 +40,47 @@ using namespace std;
  * 4. rocnik : 180
  */
 
+/*
+ * deklarace funkce znamka. Tato funkce vypocita znamku na zaklade 
+ * maximalniho a skutecne dosazeneho poctu bodu
+ * max    : maximalni mozny pocet bodu
+ * actual : skutecne dosazeny pocet bodu
+ * vraci znamku 1-5 viz komentar.
+ */
+int znamka(int max, int actual);
+
 int main(int argc, char** argv) 
 {
-	float a,b,c,d,e,f,g,h,i,j,k;
-	
-	
+	float max,s1;
 	cout<<"Pro tridu P1 zadej maximalni pocet bodu z testu (Maximalne 75)";
-	cin>>a;
+	cin>>max;
 	cout<<"1.Student:";
-	cin>>b;
-	if(b/a*100>=90) && (b/a*100<=100)
-		cout<<"Jednicka";
-	else if(b/a*100>=70) && (b/a*100<=70)
-		cout<<"Dvojka";
-	cout<<"2.Student:";
-	cin>>c;	
+	cin>>s1;
+    
+	cout << znamka(max,s1);
 
-	cout<<"3.Student:";
-	cin>>d;
-
-
-	cout<<"4.Student:";
-	cin>>e;
-
-
-	cout<<"5.Student:";
-	cin>>f;
-
-
-	cout<<"6.Student:";
-	cin>>g;
-
-
-	cout<<"7.Student:";
-	cin>>h;
-
-
-	cout<<"8.Student:";
-	cin>>i;
-
-
-	cout<<"9.Student:";
-	cin>>j;
-
-
-	cout<<"10.Student:";
-	cin>>k;
-	
 	return 0;
+}
+
+/*
+ * Implementace funcke znamka
+ * Prikaz return ukonci provadeni funkce.
+ * Priklad : percent = 35
+ *   1. podminka je false -> nevola se return, jde se dal
+ *   2. podminka je false -> nevola se return a jde se dal
+ *   3. podminka je false -> nevola se return a jde se dal
+ *   4. podminka je true -> vola se return a vrati se 4
+ *   
+ */
+int znamka(int max, int actual) {
+	int percent = actual*100/max;
+    cout << "\nprocenta=";
+	cout << percent;
+	cout << "%\n";
+	if (percent > 90) return 1;
+	if (percent > 70) return 2;
+	if (percent > 50) return 3;
+	if (percent > 30) return 4;
+	return 5;
 }
 
