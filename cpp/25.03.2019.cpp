@@ -59,22 +59,37 @@ int pocet_studentu(string trida);
  */
 int max_bodu(string trida);
 
+/*
+ * Pro ucely otestovani existuje trida TRIDA1
+ * pocet_studentu = 4
+ * max_bodu = 100
+ *
+ */
 int main(int argc, char** argv) 
 {
-	int soucet_znamek_trida=0,pocet_dvojek=0;
+	int soucet_znamek_trida=0,pocet_studentu_trida=0,max_bodu_trida=0,pocet_dvojek=0;
 	float prumer_znamek=0.0;
 	string trida;
-	
+
 	cout<<"Zadej tridu (P1,P2,P3,P4) : ";
 	cin>>trida;
-	cout<<"Pocet studentu ve tride : "<<trida<<" = "<< pocet_studentu(trida)<<"\n";
-	cout<<"Maximalni pocet bodu ve tride "<<trida<<" = "<< max_bodu(trida)<<"\n";
 	
-	for (int student=1; student<=pocet_studentu(trida); student++) {
+	//globalni promenna aby se nevolala znovu dana funkce
+	pocet_studentu_trida = pocet_studentu(trida);
+	max_bodu_trida=max_bodu(trida);
+	
+	if (pocet_studentu_trida == 0) {
+		cout<<"CHYBA : Neexistujici trida '"<<trida<<"'! Konec.\n";
+		return 1;
+	}
+	cout<<"Pocet studentu ve tride : "<<trida<<" = "<< pocet_studentu_trida<<"\n";
+	cout<<"Maximalni pocet bodu ve tride "<<trida<<" = "<< max_bodu_trida<<"\n";
+	
+	for (int student=1; student<=pocet_studentu_trida; student++) {
 		int znamka_studenta,pocet_bodu_studenta;
 		cout<<"\nZadej body pro "<<student<<". studenta : ";
 		cin>>pocet_bodu_studenta;
-		znamka_studenta = znamka(max_bodu(trida),pocet_bodu_studenta);
+		znamka_studenta = znamka(max_bodu_trida,pocet_bodu_studenta);
 		cout<<"Znamka "<<student<<". studenta = "<<znamka_studenta<<"\n";
 		//pokud je znamka 0 byl zadan vetsi pocet bodu nez je maximum - opakuj zadani pro stejneho studenta
 		if (znamka_studenta == 0) student--;
@@ -90,7 +105,7 @@ int main(int argc, char** argv)
 	
 	//Vypocet prumeru je mimo zadani
 	//prumer je desetinne cislo
-	prumer_znamek = 1.0*soucet_znamek_trida/pocet_studentu(trida);
+	prumer_znamek = 1.0*soucet_znamek_trida/pocet_studentu_trida;
 	cout<<"Prumer znamek ve tride "<<trida<<" = "<<prumer_znamek<<"\n";
 
 	return 0;
@@ -126,10 +141,11 @@ int znamka(int max, int actual) {
  * https://www.geeksforgeeks.org/stdstringcompare-in-c/
  */
 int pocet_studentu(string trida) {
-	if (trida.compare("P1")==0) return 4;
+	if (trida.compare("P1")==0) return 30;
 	if (trida.compare("P2")==0) return 28;
 	if (trida.compare("P3")==0) return 28;
 	if (trida.compare("P4")==0) return 37;
+	if (trida.compare("TRIDA1")==0) return 4;
 	return 0;
 }
 
@@ -141,6 +157,7 @@ int max_bodu(string trida) {
 	if (trida.compare("P2")==0) return 120;
 	if (trida.compare("P3")==0) return 150;
 	if (trida.compare("P4")==0) return 170;
+	if (trida.compare("TRIDA1")==0) return 100;
 	return 0;
 }
 
