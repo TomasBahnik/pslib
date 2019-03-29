@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 		int znamka_studenta,pocet_bodu_studenta;
 		cout<<"\nZadej body pro "<<student<<". studenta : ";
 		cin>>pocet_bodu_studenta;
-		//TODO doplnit kontrolu actual<=max_bodu(trida);
+		//TODO doplnit kontrolu zda zadany pocet_bodu_studenta<=max_bodu(trida);
 		znamka_studenta = znamka(max_bodu(trida),pocet_bodu_studenta);
 		if (znamka_studenta == 2) pocet_dvojek += 1;
 		cout<<"Znamka "<<student<<". studenta = "<<znamka_studenta<<"\n";
