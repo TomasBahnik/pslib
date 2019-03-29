@@ -87,8 +87,12 @@ int main(int argc, char** argv)
 	
 	for (int student=1; student<=pocet_studentu_trida; student++) {
 		int znamka_studenta,pocet_bodu_studenta;
-		cout<<"\nZadej body pro "<<student<<". studenta : ";
+		cout<<"\nPocet bodu pro "<<student<<". studenta (cele cislo mensi nez " <<max_bodu_trida<<") : ";
 		cin>>pocet_bodu_studenta;
+		if (cin.fail()) {
+			cout<<"CHYBA : Pocet bodu neni cele cislo. Davej pozor! Konec.\n";
+			return 1;
+		}
 		znamka_studenta = znamka(max_bodu_trida,pocet_bodu_studenta);
 		cout<<"Znamka "<<student<<". studenta = "<<znamka_studenta<<"\n";
 		//pokud je znamka 0 byl zadan vetsi pocet bodu nez je maximum - opakuj zadani pro stejneho studenta
