@@ -74,23 +74,24 @@ int main(int argc, char** argv)
 		int znamka_studenta,pocet_bodu_studenta;
 		cout<<"\nZadej body pro "<<student<<". studenta : ";
 		cin>>pocet_bodu_studenta;
-		//TODO doplnit kontrolu zda zadany pocet_bodu_studenta<=max_bodu(trida);
 		znamka_studenta = znamka(max_bodu(trida),pocet_bodu_studenta);
-		if (znamka_studenta == 2) pocet_dvojek += 1;
 		cout<<"Znamka "<<student<<". studenta = "<<znamka_studenta<<"\n";
-		
+		//pokud je znamka 0 byl zadan vetsi pocet bodu nez je maximum - opakuj zadani pro stejneho studenta
+		if (znamka_studenta == 0) student--;
+		if (znamka_studenta == 2) pocet_dvojek += 1;
+				
 		//soucet znamek je pro vypocet prumeru za celou tridu - mimo zadani
 		soucet_znamek_trida += znamka_studenta;
 		//a = a + b lze zapsat jako a += b (obvykly zpusob)
 		//soucet_znamek_trida = soucet_znamek_trida + znamka_studenta;
 		//cout<<"Soucet znamek ve tride = "<<soucet_znamek_trida<<"\n";
 	}
-	cout<<"\nPocet 2 ve tride = "<<pocet_dvojek<<"\n";
+	cout<<"\nPocet 2 ve tride "<<trida<<" = "<<pocet_dvojek<<"\n";
 	
 	//Vypocet prumeru je mimo zadani
 	//prumer je desetinne cislo
 	prumer_znamek = 1.0*soucet_znamek_trida/pocet_studentu(trida);
-	cout<<"Prumer znamek ve tride = "<<trida<<" = "<<prumer_znamek<<"\n";
+	cout<<"Prumer znamek ve tride "<<trida<<" = "<<prumer_znamek<<"\n";
 
 	return 0;
 }
@@ -106,6 +107,10 @@ int main(int argc, char** argv)
  *   
  */
 int znamka(int max, int actual) {
+	if (actual > max) {
+		cout<<"CHYBA : Aktualni pocet bodu "<<actual<<" je vetsi nez "<<max<<"\n";
+		return 0;
+	}
 	float percent = 100.0*actual/max;
 	//pouze pro odladeni
     //cout << "procenta = "<< percent<<"%\n";
@@ -121,7 +126,7 @@ int znamka(int max, int actual) {
  * https://www.geeksforgeeks.org/stdstringcompare-in-c/
  */
 int pocet_studentu(string trida) {
-	if (trida.compare("P1")==0) return 30;
+	if (trida.compare("P1")==0) return 4;
 	if (trida.compare("P2")==0) return 28;
 	if (trida.compare("P3")==0) return 28;
 	if (trida.compare("P4")==0) return 37;
