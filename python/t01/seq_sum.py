@@ -1,7 +1,7 @@
 # nums = list(map(int, input().split()))
 import sys
 
-nums = [20, -7, -7, -2, 0, 1, 3, 5, 5, 10]
+nums = [-109, -101, 20, -7, -7, -2, 0, 1, 3, 5, 5, 10, 23, 37, 271, 4, 3, 11, 541, 67, 79, 83, 433, 227]
 
 PRIMES_100 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103,
               107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223,
@@ -11,7 +11,10 @@ PRIMES_100 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61
 
 
 def is_prime_100(x):
-    return x in PRIMES_100
+    if abs(x) in PRIMES_100:
+        return True
+    else:
+        return False
 
 
 # keep only absolute value primes in original array
@@ -24,17 +27,31 @@ def filter_primes(a):
     return r
 
 
-nums_primes = filter_primes(nums)
+def seq_is_broken(current, previous):
+    if previous is None:
+        return True
+    d = is_prime_100(previous) and not is_prime_100(current)
+    if d:  # not prime
+        return True
+    if current < previous:  # decreasing
+        return True
+    return False
+
 
 seq = []
-seq += [nums_primes[0]]
 seqs = []
+seq += [nums[0]]
 # find longest non-decreasing AND not interrupted sequence
-# keep only primes so we do not need check for them
-for i in range(1, len(nums_primes)):
-    if nums_primes[i] < nums_primes[i - 1]:  # decreasing
-        del seq[i - 1]
-    else:  # non decreasing >=
-        seq += [nums_primes[i]]
-print(seq)
+for i in range(1, len(nums)):
+    p = seq[-1] if len(seq) > 0 else None
+    c = nums[i]
+    if seq_is_broken(c, p):
+        seqs += [seq]
+        seq = []
+        if is_prime_100(c):
+            seq += [c]
+    if p is not None and c >= p and is_prime_100(c):  # non-decreasing
+        seq += [c]
+seqs += [seq]  # add last seq
+print(seqs)
 sys.exit(0)
