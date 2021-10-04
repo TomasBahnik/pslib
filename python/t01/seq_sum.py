@@ -18,17 +18,7 @@ def is_prime_100(x):
         return False
 
 
-# keep only absolute value primes in original array
-# TODO keep track of non primes - interrupted sequences
-def filter_primes(a):
-    r = []
-    for n in a:
-        if is_prime_100(abs(n)):
-            r += [n]
-    return r
-
-
-def seq_is_broken(current, previous):
+def seq_is_interrupted(current, previous):
     if previous is None:
         return True
     d = is_prime_100(previous) and not is_prime_100(current)
@@ -44,14 +34,14 @@ def add_seq(ss, s):
         ss += [s]
 
 
-seq = []
+seq = [] # empty array/list
 seqs = []
-seq += [nums[0]]
+seq += [nums[0]] # start at leftmost element => for cycle below starts at 1 not 0
 # find longest non-decreasing AND not interrupted sequence
 for i in range(1, len(nums)):
     p = seq[-1] if len(seq) > 0 else None
     c = nums[i]
-    if seq_is_broken(c, p):
+    if seq_is_interrupted(c, p):
         add_seq(seqs, seq)
         seq = []
         if is_prime_100(c):
