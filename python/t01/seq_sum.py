@@ -30,11 +30,15 @@ def is_seq_interrupted(current, previous):
     return False
 
 
-def add_seq(ss, s):
+def add_seq(ss, s, sus, les):
     if len(ss) == 0 or len(s) >= len(ss[-1]):
         ss += [s]
+        sus += [sum(s)]
+        les += [len(s)]
 
 
+sums = []
+lengths = []
 seq = []  # empty array/list
 seqs = []
 seq += [nums[0]]  # start at leftmost element => for cycle below starts at 1 not 0
@@ -44,13 +48,17 @@ for i in range(1, len(nums)):
     p = seq[-1] if len(seq) > 0 else None
     c = nums[i]
     if is_seq_interrupted(c, p):
-        add_seq(seqs, seq)
+        add_seq(seqs, seq, sums, lengths)
         seq = []
         if is_num_prime(c):
             seq += [c]
     # add to already started sequence non-decreasing prime
     if p is not None and c >= p and is_num_prime(c):
         seq += [c]
-add_seq(seqs, seq)  # add last seq
-print(seqs)
+add_seq(seqs, seq, sums, lengths)  # add last seq
+max_sum_idx = sums.index(max(sums))
+max_seq = seqs[max_sum_idx]
+print("max sum sequence : {}, sum {}, length {}: ".format(max_seq, sum(max_seq), len(max_seq)))
+print(sums)
+print(lengths)
 sys.exit(0)
