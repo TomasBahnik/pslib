@@ -1,7 +1,8 @@
 # nums = list(map(int, input().split()))
 import sys
 
-nums = [-109, -101, 20, -7, -7, -2, 0, 1, 3, 5, 5, 10, 23, 37, 271, 4, 3, 11, 541, 67, 79, 83, 433, 227]
+nums = [149, 439, 457, 509, 521, -109, -101, 20, -7, -7, -2, 0, 1, 3, 5, 5, 10, 23, 37, 271, 4, 3, 11, 541, 67, 79,
+        83, 433, 227, 137, 149, 439, 457, 509]
 
 PRIMES_100 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103,
               107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223,
@@ -38,6 +39,11 @@ def seq_is_broken(current, previous):
     return False
 
 
+def add_seq(ss, s):
+    if len(ss) == 0 or len(s) >= len(ss[-1]):
+        ss += [s]
+
+
 seq = []
 seqs = []
 seq += [nums[0]]
@@ -46,12 +52,12 @@ for i in range(1, len(nums)):
     p = seq[-1] if len(seq) > 0 else None
     c = nums[i]
     if seq_is_broken(c, p):
-        seqs += [seq]
+        add_seq(seqs, seq)
         seq = []
         if is_prime_100(c):
             seq += [c]
     if p is not None and c >= p and is_prime_100(c):  # non-decreasing
         seq += [c]
-seqs += [seq]  # add last seq
+add_seq(seqs, seq)  # add last seq
 print(seqs)
 sys.exit(0)
