@@ -1,8 +1,10 @@
 # nums = list(map(int, input().split()))
 import sys
 
-nums = [149, 439, 457, 509, 521, -109, -101, 20, -7, -7, -2, 0, 1, 3, 5, 5, 10, 23, 37, 271, 4, 3, 11, 541, 67, 79,
-        83, 433, 227, 137, 149, 439, 457, 509]
+# nums = [149, 439, 457, 509, 521, -109, -101, 20, -7, -7, -2, 0, 1, 3, 5, 5, 10, 23, 37, 271, 4, 3, 11, 541, 67, 79,
+#         83, 433, 227, 137, 149, 439, 457, 509]
+
+nums = [20, -7, -7, -2, 0, 1, 3, 5, 5, 10]
 # first 100 primes
 PRIMES_100 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103,
               107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223,
@@ -56,9 +58,19 @@ for i in range(1, len(nums)):
     if p is not None and c >= p and is_num_prime(c):
         seq += [c]
 add_seq(seqs, seq, sums, lengths)  # add last seq
-max_sum_idx = sums.index(max(sums))
-max_seq = seqs[max_sum_idx]
-print("max sum sequence : {}, sum {}, length {}: ".format(max_seq, sum(max_seq), len(max_seq)))
-print(sums)
+
+max_length = max(lengths)
+
+max_length_idx = []
+for i in range(len(lengths)):
+    if lengths[i] == max_length:
+        max_length_idx += [i]
+
+max_length_seqs = []
+for j in max_length_idx:
+    max_length_seqs += [seqs[j]]
+
+print(max_length_seqs)
 print(lengths)
+print(sums)
 sys.exit(0)
