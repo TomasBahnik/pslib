@@ -1,7 +1,7 @@
 # nums = list(map(int, input().split()))
 import sys
 
-# nums = [149, 439, 457, 509, 521, -109, -101, 20, -7, -7, -2, 0, 1, 3, 5, 5, 10, 23, 37, 271, 4, 3, 11, 541, 67, 79,
+# nums = [149, 439, 457, 509, 521, 541, -109, -101, 20, -7, -7, -2, 0, 1, 3, 5, 5, 10, 23, 37, 271, 4, 3, 11, 541, 67, 79,
 #         83, 433, 227, 137, 149, 439, 457, 509]
 
 nums = [20, -7, -7, -2, 0, 1, 3, 5, 5, 10]
@@ -70,7 +70,9 @@ max_length_seqs = []
 for j in max_length_idx:
     max_length_seqs += [seqs[j]]
 
-print(max_length_seqs)
-print(lengths)
-print(sums)
+print("{} longest sequences : {} of length {} ".format(len(max_length_seqs), max_length_seqs, max_length))
+print("All sequences : {}".format(seqs))
+print("Lengths of all sequences : {}".format(lengths))
+print("Sums of all sequences : {}".format(sums))
+
 sys.exit(0)
