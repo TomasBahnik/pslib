@@ -1,3 +1,6 @@
+import sys
+
+
 def sum_seq(power, limit):
     ret_val = 0
     if limit >= 0:
@@ -9,3 +12,43 @@ def sum_seq(power, limit):
             print('{}^{} = {}'.format(i, power, i ** power))
             ret_val += i ** power
     return ret_val
+
+
+# https://cw.fel.cvut.cz/wiki/courses/b3b33alp/cviceni/kratka_videa/c03
+# 0 and 1 are not primes
+def prime(a):
+    a = abs(a)
+    if a in [0, 1]:
+        return False
+    r = True
+    for d in range(2, round(a ** 0.5) + 1):
+        if a % d == 0:
+            r = False
+            break
+    return r
+
+
+# first 100 primes
+PRIMES_100 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103,
+              107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223,
+              227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313, 317, 331, 337, 347,
+              349, 353, 359, 367, 373, 379, 383, 389, 397, 401, 409, 419, 421, 431, 433, 439, 443, 449, 457, 461, 463,
+              467, 479, 487, 491, 499, 503, 509, 521, 523, 541]
+
+
+def is_num_prime(x):
+    """ Decides if the abs(x) is prime number based on presence in first 100 primes. """
+    if abs(x) in PRIMES_100:
+        return True
+    else:
+        return False
+
+
+nums = [20, -7, -7, -2, 0, 1, 3, 5, 5, 10]
+if __name__ == '__main__':
+    for n in nums:
+        v1 = is_num_prime(n)
+        v2 = prime(n)
+        if not (v1 == v2):
+            print("{} : {} vs {}".format(n, v1, v2))
+    sys.exit(0)
