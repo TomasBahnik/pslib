@@ -12,8 +12,8 @@ including the famous RSA cryptosystem.
 Euclid’s algorithm is an iterative computation based on the following observation for positive integers p and q::
 
 ```text
-if p is greater than q, then if q divides p, the gcd of p and q is q; otherwise, the gcd of p and q is the same as
-the gcd of and q and p % q
+if p > q, then if q divides p, the gcd of p and q is q; otherwise, the gcd of p and q is the same as
+the gcd of q and p % q
 ```
 
 To convince yourself of this fact, first note that the gcd of p and q is the same as the gcd of q and p–q, 
