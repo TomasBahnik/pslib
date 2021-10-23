@@ -44,11 +44,61 @@ def is_num_prime(x):
         return False
 
 
+# https://cw.fel.cvut.cz/wiki/courses/b3b33alp/cviceni/t03
+def gcd1(a, b):
+    s = 0
+    while a != b:
+        # print("gcd1 {}".format(s))
+        # s += 1
+        if a > b:
+            a = a - b
+        else:
+            b = b - a
+    return a  # a == b
+
+
+def gcd2(a, b):
+    s = 0
+    while b != 0:
+        # print("gcd2 {}".format(s))
+        # s += 1
+        t = b
+        b = a % b
+        a = t
+    return a
+
+
+# Euclid algorithm see introcs/gcd/readme.md
+def gcd_euclid(a, b):
+    if b == 0:
+        return a
+    return gcd_euclid(b, a % b)
+
+
 nums = [20, -7, -7, -2, 0, 1, 3, 5, 5, 10]
-if __name__ == '__main__':
-    for n in nums:
+
+
+def test_primes(numbers):
+    for n in numbers:
         v1 = is_num_prime(n)
         v2 = prime(n)
         if not (v1 == v2):
             print("{} : {} vs {}".format(n, v1, v2))
+
+
+def test_gcd(a, b):
+    gcd_1 = gcd1(a, b)
+    gcd_2 = gcd2(a, b)
+    gcd_e = gcd_euclid(a, b)
+    print(gcd_1, gcd_2, gcd_e)
+
+
+if __name__ == '__main__':
+    # test_primes(nums)
+    a = 6997193
+    b = 18992381
+    test_gcd(a, b)
+    a = 361
+    b = 18992381
+    test_gcd(a, b)
     sys.exit(0)
