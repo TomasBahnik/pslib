@@ -18,6 +18,8 @@ def soudelna(a, b):
 
 
 def prepare_table(n, m):
+    if n < 2 or m < 2 or n == m:
+        return 'ERROR'
     table = []
     for i in range(n, m + 1):  # row
         row = []
@@ -33,13 +35,27 @@ def prepare_table(n, m):
 
 
 def print_table(table):
-    for row in table:
-        print(row)
+    if type(table) is str:
+        print(table)
+    elif type(table) is list:
+        i = 1
+        for row in table:
+            print('{}. {}'.format(i, row))
+            i += 1
+    else:
+        print('Unknown type {}'.format(type(table)))
 
 
 if __name__ == '__main__':
-    i = 1
-    for row in prepare_table(2, 10):
-        print('{}. {}'.format(i, row))
-        i += 1
+    vstup = [2, 10]
+    print(vstup)
+    print_table(prepare_table(min(vstup), max(vstup)))
+
+    vstup = [11, 10]
+    print(vstup)
+    print_table(prepare_table(min(vstup), max(vstup)))
+
+    vstup = [2, 1]
+    print(vstup)
+    print_table(prepare_table(min(vstup), max(vstup)))
     sys.exit(0)
