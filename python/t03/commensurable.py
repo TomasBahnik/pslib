@@ -3,7 +3,7 @@
 # table  n x m : min(a,b) <= m,n, <= max(a,b)
 import sys
 
-from common.functions import gcd_euclid, prime
+from common.functions import prime, gcd2
 
 soudelna_symbol = 'x'
 prvocisla_symbol = 'p'
@@ -12,7 +12,7 @@ separator = '|'
 
 
 def soudelna(a, b):
-    if gcd_euclid(a, b) > 1:
+    if gcd2(a, b) > 1:
         return True
     return False
 
@@ -55,7 +55,7 @@ def print_table(table):
         for i in range(0, num_rows):
             if i < num_rows - 1:
                 array_to_string(table[i], print_line=True)
-            else: # do not print last line
+            else:  # do not print last line
                 array_to_string(table[i], print_line=False)
 
     else:
@@ -71,4 +71,5 @@ if __name__ == '__main__':
     test([2, 10])
     test([11, 10])
     test([2, 1])
+    test([2, 23])
     sys.exit(0)
