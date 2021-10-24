@@ -1,10 +1,10 @@
 # vstupy
-a = int(input())
-b = int(input())
+# a = int(input())
+# b = int(input())
 
 
-# a = 2
-# b = 10
+a = 2
+b = 10
 
 
 def deli(x, y):
@@ -64,7 +64,7 @@ else:
             else:
                 tisk_symbol(m, maximum, " ")
         line = ''
-        if row <= pocet:
+        if row < pocet:
             for i in range(0, 2 * pocet - 1):
                 line += '-'
             print(line)
