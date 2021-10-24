@@ -8,6 +8,7 @@ b = int(input())
 
 
 def deli(x, y):
+    """ Return True kdyz x a y jsou soudelna cisla. """
     if x < y:
         x, y = y, x
     zb = x % y
@@ -19,6 +20,7 @@ def deli(x, y):
 
 
 def prime(a):
+    """ Return True kdyz a je prvocislo. 0 a 1 nejsou prvocisla"""
     a = abs(a)
     if a in [0, 1]:
         return False
@@ -35,16 +37,6 @@ def tisk_symbol(sloupec, posledni_sloupec, symbol):
         print(symbol)
     else:
         print(symbol, end='|')
-
-
-def row_line(pocet_sloupcu, radek):
-    line = ''
-    if radek < pocet_sloupcu - 1:
-        for i in range(0, 2 * pocet_sloupcu - 1):
-            line += '-'
-        return line
-    else:
-        return line
 
 
 if a < 2 or b < 2 or a == b:
