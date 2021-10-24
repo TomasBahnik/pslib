@@ -33,6 +33,9 @@ def prime(a):
 
 
 def tisk_symbol(sloupec, posledni_sloupec, symbol):
+    """
+    Pokud neni konec radku, tj. posledni sloupec, misto '\n' (new line) se tiskne '|' Posledni sloupec je ukoncen \n
+    """
     if sloupec == posledni_sloupec:
         print(symbol)
     else:
