@@ -34,12 +34,30 @@ def prepare_table(n, m):
     return table
 
 
+def array_to_string(array, print_line=True):
+    line = ''
+    for i in range(0, 2 * len(array) - 1):
+        line += '-'
+    a0 = str(array)
+    a1 = a0.replace('[', '').replace(']', '')
+    a2 = a1.replace(',', '|').replace('| ', '|')
+    a3 = a2.replace("'", '')
+    print_table(a3)
+    if print_line:
+        print(line)
+
+
 def print_table(table):
     if type(table) is str:
         print(table)
     elif type(table) is list:
-        for row in table:
-            print(row)
+        num_rows = len(table)
+        for i in range(0, num_rows):
+            if i < num_rows - 1:
+                array_to_string(table[i], print_line=True)
+            else: # do not print last line
+                array_to_string(table[i], print_line=False)
+
     else:
         print('Unknown type {}'.format(type(table)))
 
