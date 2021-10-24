@@ -1,10 +1,10 @@
 # vstupy
-# a = int(input())
-# b = int(input())
+a = int(input())
+b = int(input())
 
 
-a = 2
-b = 10
+# a = 2
+# b = 10
 
 
 def deli(x, y):
