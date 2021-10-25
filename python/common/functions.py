@@ -86,6 +86,15 @@ def test_primes(numbers):
             print("{} : {} vs {}".format(n, v1, v2))
 
 
+def is_seq_symmetric(current, next_element):
+    current += [next_element]
+    for i in range(1, len(current) // 2 + 1):
+        print("{} != {} : {}".format(current[i - 1], current[-i], current[i - 1] != current[-i]))
+        if current[i - 1] != current[-i]:
+            return False
+    return True
+
+
 def test_gcd(a, b):
     gcd_1 = gcd1(a, b)
     gcd_2 = gcd2(a, b)
@@ -93,12 +102,17 @@ def test_gcd(a, b):
     print(gcd_1, gcd_2, gcd_e)
 
 
+def test_symmetric(sequence, a):
+    print(is_seq_symmetric(sequence, a))
+
+
 if __name__ == '__main__':
-    # test_primes(nums)
-    a = 6997193
-    b = 18992381
-    test_gcd(a, b)
-    a = 361
-    b = 18992381
-    test_gcd(a, b)
+    s = [10, -1, 7, 78, 53, 78, 7, -1]
+    print(is_seq_symmetric(s, 11))
+    s = [10, 8, 2, 5, 8]
+    print(is_seq_symmetric(s, 10))
+    s = [10, 5, -4, 20, -4, 5]
+    print(is_seq_symmetric(s, 10))
+    s = [3, 6, 6]
+    print(is_seq_symmetric(s, 3))
     sys.exit(0)
