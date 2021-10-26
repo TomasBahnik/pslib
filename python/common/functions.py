@@ -102,12 +102,16 @@ def is_seq_symmetric(sequence):
 
 
 def symmetric_sub_seq(sequence):
-    l = len(sequence)
-    for i in range(0, l + 1):
-        for j in range(i, l):
-            sub_seq = sequence[j:l]
+    for i in range(0, len(sequence) + 1):
+        l_s = len(sequence)
+        if l_s == 0:
+            return
+        for j in range(i, l_s):
+            sub_seq = sequence[j:l_s]
             if is_seq_symmetric(sub_seq):
-                print("index {} : symmetric sub sequences : {}".format(i, sub_seq))
+                print("(index, lenght, sum) = ({},{},{}) : {}".
+                      format(j, len(sub_seq), sum(sub_seq), sub_seq))
+        sequence.pop()
 
 
 def test_gcd(a, b):
@@ -117,11 +121,23 @@ def test_gcd(a, b):
     print(gcd_1, gcd_2, gcd_e)
 
 
-def test_symmetric(sequence, a):
-    print(is_seq_symmetric_with_next(sequence, a))
+def test_symmetric(sequence):
+    print('\n{}'.format(sequence))
+    symmetric_sub_seq(sequence)
 
 
 if __name__ == '__main__':
-    s = [10, -1, 7, 78, 53, 78, 7, -1, 10]
-    symmetric_sub_seq(s)
+    s1 = [10, -1, 7, 78, 53, 78, 7, -1, 10]
+    s2 = [12, -16, -7, -18, -5, -3, 2, 8, 9, -14, -18, -9, 11, -7, -3, 4, -10, 4, -3, -7, 11, -12, -14, 5, -11, -7, 7,
+          13, 2, 19, 12, 11]
+    s3 = [-14, -8, -9, 2, -18, 12, 1, -1, -14, -14, 13, -2, 15]
+    s4 = [-4, -12, 17, 18, -8, 7]
+    s5 = [2, 2, 2, 2, 2, 2, 2, 2]
+
+    test_symmetric(s1)
+    test_symmetric(s2)
+    test_symmetric(s3)
+    test_symmetric(s4)
+    test_symmetric(s5)
+
     sys.exit(0)
