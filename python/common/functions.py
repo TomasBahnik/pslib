@@ -86,13 +86,28 @@ def test_primes(numbers):
             print("{} : {} vs {}".format(n, v1, v2))
 
 
-def is_seq_symmetric(current, next_element):
+def is_seq_symmetric_with_next(current, next_element):
     current += [next_element]
-    for i in range(1, len(current) // 2 + 1):
-        print("{} != {} : {}".format(current[i - 1], current[-i], current[i - 1] != current[-i]))
-        if current[i - 1] != current[-i]:
+    return is_seq_symmetric(current)
+
+
+def is_seq_symmetric(sequence):
+    if len(sequence) == 0:  # empty list is not symmetric
+        return False
+    for i in range(1, len(sequence) // 2 + 1):
+        # print("{} != {} : {}".format(current[i - 1], current[-i], current[i - 1] != current[-i]))
+        if sequence[i - 1] != sequence[-i]:
             return False
     return True
+
+
+def symmetric_sub_seq(sequence):
+    l = len(sequence)
+    for i in range(0, l + 1):
+        for j in range(i, l):
+            sub_seq = sequence[j:l]
+            if is_seq_symmetric(sub_seq):
+                print("index {} : symmetric sub sequences : {}".format(i, sub_seq))
 
 
 def test_gcd(a, b):
@@ -103,16 +118,10 @@ def test_gcd(a, b):
 
 
 def test_symmetric(sequence, a):
-    print(is_seq_symmetric(sequence, a))
+    print(is_seq_symmetric_with_next(sequence, a))
 
 
 if __name__ == '__main__':
-    s = [10, -1, 7, 78, 53, 78, 7, -1]
-    print(is_seq_symmetric(s, 11))
-    s = [10, 8, 2, 5, 8]
-    print(is_seq_symmetric(s, 10))
-    s = [10, 5, -4, 20, -4, 5]
-    print(is_seq_symmetric(s, 10))
-    s = [3, 6, 6]
-    print(is_seq_symmetric(s, 3))
+    s = [10, -1, 7, 78, 53, 78, 7, -1, 10]
+    symmetric_sub_seq(s)
     sys.exit(0)
