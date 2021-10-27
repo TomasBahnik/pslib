@@ -86,6 +86,36 @@ def test_primes(numbers):
             print("{} : {} vs {}".format(n, v1, v2))
 
 
+def is_seq_symmetric_with_next(current, next_element):
+    current += [next_element]
+    return is_seq_symmetric(current)
+
+
+def is_seq_symmetric(sequence):
+    if len(sequence) == 0:  # empty list is not symmetric
+        return False
+    for i in range(1, len(sequence) // 2 + 1):
+        # print("{} != {} : {}".format(current[i - 1], current[-i], current[i - 1] != current[-i]))
+        if sequence[i - 1] != sequence[-i]:
+            return False
+    return True
+
+
+def symmetric_sub_seq(sequence):
+    for i in range(0, len(sequence) + 1):
+        l_s = len(sequence)  # sequence is modified by poping last item at the end
+        if l_s == 0:
+            return
+        for j in range(i, l_s):
+            sub_seq = sequence[j:l_s]
+            print("{}:{} sub sequence {}".format(j, l_s, sub_seq))
+            if is_seq_symmetric(sub_seq):
+                print("symmetric sub sequence : {}".format(sub_seq))
+                print("(index, lenght, sum) = ({},{},{})".
+                      format(j, len(sub_seq), sum(sub_seq)))
+        sequence.pop()
+
+
 def test_gcd(a, b):
     gcd_1 = gcd1(a, b)
     gcd_2 = gcd2(a, b)
@@ -93,12 +123,23 @@ def test_gcd(a, b):
     print(gcd_1, gcd_2, gcd_e)
 
 
+def test_symmetric(sequence):
+    print('\ninput={}'.format(sequence))
+    symmetric_sub_seq(sequence)
+
+
 if __name__ == '__main__':
-    # test_primes(nums)
-    a = 6997193
-    b = 18992381
-    test_gcd(a, b)
-    a = 361
-    b = 18992381
-    test_gcd(a, b)
+    s1 = [10, -1, 7, 78, 53, 78, 7, -1, 10]
+    s2 = [12, -16, -7, -18, -5, -3, 2, 8, 9, -14, -18, -9, 11, -7, -3, 4, -10, 4, -3, -7, 11, -12, -14, 5, -11, -7, 7,
+          13, 2, 19, 12, 11]
+    s3 = [-14, -8, -9, 2, -18, 12, 1, -1, -14, -14, 13, -2, 15]
+    s4 = [-4, -12, 17, 18, -8, 7]
+    s5 = [2, 2, 2, 2, 2, 2, 2, 2]
+
+    test_symmetric(s1)
+    test_symmetric(s2)
+    test_symmetric(s3)
+    test_symmetric(s4)
+    test_symmetric(s5)
+
     sys.exit(0)
