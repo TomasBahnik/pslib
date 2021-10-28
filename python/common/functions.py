@@ -136,10 +136,10 @@ if __name__ == '__main__':
     s4 = [-4, -12, 17, 18, -8, 7]
     s5 = [2, 2, 2, 2, 2, 2, 2, 2]
 
-    test_symmetric(s1)
     test_symmetric(s2)
-    test_symmetric(s3)
-    test_symmetric(s4)
-    test_symmetric(s5)
+    # test_symmetric(s1)
+    # test_symmetric(s3)
+    # test_symmetric(s4)
+    # test_symmetric(s5)
 
     sys.exit(0)
