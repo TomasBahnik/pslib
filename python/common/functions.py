@@ -107,7 +107,7 @@ def symmetric_sub_seq(sequence):
     seq_idx = -1
     for i in range(0, len(sequence) + 1):
         l_s = len(sequence)  # sequence is modified by poping last item at the end
-        if l_s == 0: # when sequence is empty print the last values = output
+        if l_s == 0:  # when sequence is empty print the last values = output
             print(seq_idx, seq_length)
             return
         for j in range(0, l_s):
@@ -151,6 +151,8 @@ if __name__ == '__main__':
     s5 = [2, 2, 2, 2, 2, 2, 2, 2]
     s6 = [22, 32, 4, 452, -1, -123, 2, 2]
     s7 = [22, 32, 4, 452, 123, 1, 2, 52]
+    s8 = [2122, 32, 4, 452, 123, 1, 2, 52]
+    s9 = [2122, 32, 4, 452, 123, 1, 1, 2, 34452]
 
     test_symmetric(s1, (0, len(s1), sum(s1)))
     test_symmetric(s2, (12, 9))
@@ -158,7 +160,8 @@ if __name__ == '__main__':
     test_symmetric(s4, (3, 1))
     test_symmetric(s5, (0, 8))
     test_symmetric(s6, (6, 2))
-    # TODO - s7 gives wrong answer
     test_symmetric(s7, (3, 1))
+    test_symmetric(s8, (0, 1))
+    test_symmetric(s9, (5, 2))
 
     sys.exit(0)
