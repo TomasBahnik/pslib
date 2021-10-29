@@ -110,7 +110,7 @@ def symmetric_sub_seq(sequence):
         if l_s == 0: # when sequence is empty print the last values = output
             print(seq_idx, seq_length)
             return
-        for j in range(i, l_s):
+        for j in range(0, l_s):
             sub_seq = sequence[j:l_s]
             # print("{}:{} sub sequence {}".format(j, l_s, sub_seq))
             if is_seq_symmetric(sub_seq):
@@ -137,8 +137,9 @@ def test_gcd(a, b):
 
 
 def test_symmetric(sequence, output):
-    print('\ninput={}\nlength={}\nexpected output={}'.format(sequence, len(sequence), output))
+    print('\ninput={}\nlength={}'.format(sequence, len(sequence)))
     symmetric_sub_seq(sequence)
+    print('expected output={}'.format(output))
 
 
 if __name__ == '__main__':
@@ -151,12 +152,12 @@ if __name__ == '__main__':
     s6 = [22, 32, 4, 452, -1, -123, 2, 2]
     s7 = [22, 32, 4, 452, 123, 1, 2, 52]
 
-    # test_symmetric(s1, (0, len(s1), sum(s1)))
-    # test_symmetric(s2, (12, 9))
-    # test_symmetric(s3, (8, 2))
-    # test_symmetric(s4, (3, 1))
-    # test_symmetric(s5, (0, 8))
-    # test_symmetric(s6, (6, 2))
+    test_symmetric(s1, (0, len(s1), sum(s1)))
+    test_symmetric(s2, (12, 9))
+    test_symmetric(s3, (8, 2))
+    test_symmetric(s4, (3, 1))
+    test_symmetric(s5, (0, 8))
+    test_symmetric(s6, (6, 2))
     # TODO - s7 gives wrong answer
     test_symmetric(s7, (3, 1))
 
