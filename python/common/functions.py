@@ -102,17 +102,29 @@ def is_seq_symmetric(sequence):
 
 
 def symmetric_sub_seq(sequence):
+    max_length = 0
+    seq_sum = -1
+    seq_idx = -1
     for i in range(0, len(sequence) + 1):
         l_s = len(sequence)  # sequence is modified by poping last item at the end
         if l_s == 0:
+            print(seq_idx, max_length)
             return
         for j in range(i, l_s):
             sub_seq = sequence[j:l_s]
-            print("{}:{} sub sequence {}".format(j, l_s, sub_seq))
+            # print("{}:{} sub sequence {}".format(j, l_s, sub_seq))
             if is_seq_symmetric(sub_seq):
-                print("symmetric sub sequence : {}".format(sub_seq))
-                print("(index, lenght, sum) = ({},{},{})".
-                      format(j, len(sub_seq), sum(sub_seq)))
+                # print("symmetric sub sequence : {}".format(sub_seq))
+                cur_length = len(sub_seq)
+                cur_sum = sum(sub_seq)
+                if cur_length > max_length:
+                    max_length = cur_length
+                    seq_sum = cur_sum
+                    seq_idx = j
+                    # print("(index, length, sum) = ({},{},{})".format(j, cur_length, cur_sum))
+                if cur_length == max_length and cur_sum > seq_sum:
+                    seq_sum = cur_sum
+                    seq_idx = j
         sequence.pop()
 
 
@@ -123,8 +135,8 @@ def test_gcd(a, b):
     print(gcd_1, gcd_2, gcd_e)
 
 
-def test_symmetric(sequence):
-    print('\ninput={}'.format(sequence))
+def test_symmetric(sequence, output):
+    print('\ninput={}\noutput={}'.format(sequence, output))
     symmetric_sub_seq(sequence)
 
 
@@ -136,10 +148,10 @@ if __name__ == '__main__':
     s4 = [-4, -12, 17, 18, -8, 7]
     s5 = [2, 2, 2, 2, 2, 2, 2, 2]
 
-    test_symmetric(s2)
-    # test_symmetric(s1)
-    # test_symmetric(s3)
-    # test_symmetric(s4)
-    # test_symmetric(s5)
+    test_symmetric(s1, (0, len(s1), sum(s1)))
+    test_symmetric(s2, (12, 9))
+    test_symmetric(s3, (8, 2))
+    test_symmetric(s4, (3, 1))
+    test_symmetric(s5, (0, 8))
 
     sys.exit(0)
