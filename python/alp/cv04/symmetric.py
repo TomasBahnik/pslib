@@ -1,23 +1,34 @@
 from alp.common.funkce import sym
 
 
-# from common.functions import symmetric_sub_seq
+# from alp.common.funkce import poslup
+
 
 def poslup(pole):
+    delka = 1
     for i in range(0, len(pole) + 1):
         l_p = len(pole)
         if l_p == 0:
             return
         for j in range(i, l_p):
             pod_pole = pole[j:l_p]
-            #print(i)
+            # print(i)
             if sym(pod_pole):
-                return True
+                for p in range(0, len(pod_pole) + 1):
+                    n = 0
+                    if p > n:
+                        n = p
+                        if delka < n:
+                            delka = n
+                            if p == len(pod_pole):
+                                print(j, delka)
+
         pole.pop()
 
 
 s3 = [-14, -8, -9, 2, -18, 12, 1, -1, -14, -14, 13, -2, 15]
 poslup(s3)
+# s3 = [14, 2, 14]
 
 # def test_sym():
 #     x = []
