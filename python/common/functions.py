@@ -102,13 +102,13 @@ def is_seq_symmetric(sequence):
 
 
 def symmetric_sub_seq(sequence):
-    max_length = 0
+    seq_length = 0
     seq_sum = -1
     seq_idx = -1
     for i in range(0, len(sequence) + 1):
         l_s = len(sequence)  # sequence is modified by poping last item at the end
-        if l_s == 0:
-            print(seq_idx, max_length)
+        if l_s == 0: # when sequence is empty print the last values = output
+            print(seq_idx, seq_length)
             return
         for j in range(i, l_s):
             sub_seq = sequence[j:l_s]
@@ -117,14 +117,15 @@ def symmetric_sub_seq(sequence):
                 # print("symmetric sub sequence : {}".format(sub_seq))
                 cur_length = len(sub_seq)
                 cur_sum = sum(sub_seq)
-                if cur_length > max_length:
-                    max_length = cur_length
-                    seq_sum = cur_sum
+                if cur_length > seq_length:
                     seq_idx = j
-                    # print("(index, length, sum) = ({},{},{})".format(j, cur_length, cur_sum))
-                if cur_length == max_length and cur_sum > seq_sum:
+                    print("length increased {} -> {} index = {}".format(seq_length, cur_length, seq_idx))
+                    seq_length = cur_length
                     seq_sum = cur_sum
+                if cur_length == seq_length and cur_sum > seq_sum:
                     seq_idx = j
+                    print("sum increased {} -> {}. index = {}".format(seq_sum, cur_sum, seq_idx))
+                    seq_sum = cur_sum
         sequence.pop()
 
 
@@ -136,7 +137,7 @@ def test_gcd(a, b):
 
 
 def test_symmetric(sequence, output):
-    print('\ninput={}\noutput={}'.format(sequence, output))
+    print('\ninput={}\nlength={}\nexpected output={}'.format(sequence, len(sequence), output))
     symmetric_sub_seq(sequence)
 
 
