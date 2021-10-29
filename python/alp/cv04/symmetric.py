@@ -26,7 +26,10 @@ def poslup(pole):
         pole.pop()
 
 
-s3 = [-14, -8, -9, 2, -18, 12, 1, -1, -14, -14, 13, -2, 15]
+# pro načtení a převedení vstupu na pole celých čísel můžete použít příkaz
+# https://cw.fel.cvut.cz/wiki/courses/b3b33alp/cviceni/t01
+s3 = list(map(int, input().split()))
+# s3 = [-14, -8, -9, 2, -18, 12, 1, -1, -14, -14, 13, -2, 15]
 poslup(s3)
 # s3 = [14, 2, 14]
 
