@@ -148,11 +148,16 @@ if __name__ == '__main__':
     s3 = [-14, -8, -9, 2, -18, 12, 1, -1, -14, -14, 13, -2, 15]
     s4 = [-4, -12, 17, 18, -8, 7]
     s5 = [2, 2, 2, 2, 2, 2, 2, 2]
+    s6 = [22, 32, 4, 452, -1, -123, 2, 2]
+    s7 = [22, 32, 4, 452, 123, 1, 2, 52]
 
-    test_symmetric(s1, (0, len(s1), sum(s1)))
-    test_symmetric(s2, (12, 9))
-    test_symmetric(s3, (8, 2))
-    test_symmetric(s4, (3, 1))
-    test_symmetric(s5, (0, 8))
+    # test_symmetric(s1, (0, len(s1), sum(s1)))
+    # test_symmetric(s2, (12, 9))
+    # test_symmetric(s3, (8, 2))
+    # test_symmetric(s4, (3, 1))
+    # test_symmetric(s5, (0, 8))
+    # test_symmetric(s6, (6, 2))
+    # TODO - s7 gives wrong answer
+    test_symmetric(s7, (3, 1))
 
     sys.exit(0)
