@@ -153,6 +153,8 @@ if __name__ == '__main__':
     s7 = [22, 32, 4, 452, 123, 1, 2, 52]
     s8 = [2122, 32, 4, 452, 123, 1, 2, 52]
     s9 = [2122, 32, 4, 452, 123, 1, 1, 2, 34452]
+    # (0,4) or (9 4) or (15, 4) equal length and sum
+    s10 = [2122, 1, 2, 2, 1, 32, 4, 452, 123, 1, 1, 2, 2, 1, 34452, 2, 1, 1, 2]
 
     test_symmetric(s1, (0, len(s1), sum(s1)))
     test_symmetric(s2, (12, 9))
@@ -163,5 +165,6 @@ if __name__ == '__main__':
     test_symmetric(s7, (3, 1))
     test_symmetric(s8, (0, 1))
     test_symmetric(s9, (5, 2))
+    test_symmetric(s10, (0, 4, 10, 4))
 
     sys.exit(0)
