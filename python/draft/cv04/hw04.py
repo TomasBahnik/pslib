@@ -1,3 +1,5 @@
+import sys
+
 from common.functions import symmetric_sub_seq
 
 # test sequences
@@ -55,3 +57,4 @@ if __name__ == '__main__':
     test_symmetric(s8, expected_output_8)
     test_symmetric(s9, expected_output_9)
     test_symmetric(s10, expected_output_10)
+    sys.exit(0)
