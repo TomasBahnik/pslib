@@ -37,7 +37,7 @@ expected_output_9 = (5, 2)
 
 # ambiguous output (0,4) or (9 4) or (15, 4) equal length and sum
 s10 = [2122, 1, 2, 2, 1, 32, 4, 452, 123, 1, 1, 2, 2, 1, 34452, 2, 1, 1, 2]
-expected_output_10 = (0, 4, 10, 4, 15, 4)
+expected_output_10 = (1, 4, 10, 4, 15, 4)
 
 
 def test_symmetric(sequence, output):
