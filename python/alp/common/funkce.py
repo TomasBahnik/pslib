@@ -17,7 +17,7 @@ def sym(pole):
         # print("hodnota {} = {}".format(pole[i], pole[-(i + 1)]))
     return True
 
-def poslup(pole):
+def posloup(pole):
     """nalezne nejdelsi posloupnost a jeji index"""
     for i in range(0, len(pole) + 1):
         l_p = len(pole)

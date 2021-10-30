@@ -1,10 +1,35 @@
-from alp.common.funkce import sym
-
-
+# from alp.common.funkce import sym
 # from alp.common.funkce import poslup
 
+def sym(x):
+    """nalezne symetrickou posloupnost"""
+    if len(x) == 0:
+        return False
+    for i in range(0, len(x) // 2):
+        if x[i] != x[- (1 + i)]:
+            # print("{} != {}".format(i, -(i + 1)))
+            # print("{} != {}".format(pole[i], pole[-(i + 1)]))
+            return False
+        # print("index {} = {}".format(i, -(i + 1)))
+        # print("hodnota {} = {}".format(pole[i], pole[-(i + 1)]))
+    return True
 
-def poslup(pole):
+
+def ind_delk(z):
+    delka = 1
+    if sym(z):
+        for p in range(0, len(z) + 1):
+            n = 0
+            if p > n:
+                n = p
+                if delka < n:
+                    delka = n
+                    if p != len(z):
+                        return False
+        return True
+
+
+def posloup(pole):
     delka = 1
     for i in range(0, len(pole) + 1):
         l_p = len(pole)
@@ -12,27 +37,19 @@ def poslup(pole):
             return
         for j in range(i, l_p):
             pod_pole = pole[j:l_p]
-            # print(i)
             if sym(pod_pole):
-                for p in range(0, len(pod_pole) + 1):
-                    n = 0
-                    if p > n:
-                        n = p
-                        if delka < n:
-                            delka = n
-                            if p == len(pod_pole):
-                                print(j, delka)
+                if ind_delk(pod_pole):
+                    print(j, delka)
 
         pole.pop()
 
 
 # pro načtení a převedení vstupu na pole celých čísel můžete použít příkaz
 # https://cw.fel.cvut.cz/wiki/courses/b3b33alp/cviceni/t01
-s3 = list(map(int, input().split()))
-# s3 = [-14, -8, -9, 2, -18, 12, 1, -1, -14, -14, 13, -2, 15]
-poslup(s3)
-# s3 = [14, 2, 14]
-
+# s3 = list(map(int, input().split()))
+s3 = [-14, -8, -9, 2, -18, 12, 1, -1, -14, -14, 13, -2, 15]
+# s3 = [1, 14, 2, 14, 4]
+posloup(s3)
 # def test_sym():
 #     x = []
 #     print("vstup {}: je symetricka {}".format(x, sym(x)))
