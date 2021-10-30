@@ -39,6 +39,9 @@ expected_output_9 = (5, 2)
 s10 = [2122, 1, 2, 2, 1, 32, 4, 452, 123, 1, 1, 2, 2, 1, 34452, 2, 1, 1, 2]
 expected_output_10 = (1, 4, 10, 4, 15, 4)
 
+s11 = []
+expected_output_11 = (-1, 0)  # initials values
+
 
 def test_symmetric(sequence, output):
     print('\ninput={}\nlength={}'.format(sequence, len(sequence)))
@@ -57,4 +60,5 @@ if __name__ == '__main__':
     test_symmetric(s8, expected_output_8)
     test_symmetric(s9, expected_output_9)
     test_symmetric(s10, expected_output_10)
+    test_symmetric(s11, expected_output_10)
     sys.exit(0)
