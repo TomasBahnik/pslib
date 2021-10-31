@@ -29,7 +29,7 @@ def last_cross_missing(sequence):
         return False
 
 
-def sub_seq_of_length(sequence, length=5):
+def sub_seq_of_length(sequence, row, length=5):
     """ sub sequences of given length """
     l_s = len(sequence)  # sequence is modified by poping last item at the end
     if l_s <= length:  # l_s - length <= 0
@@ -38,12 +38,13 @@ def sub_seq_of_length(sequence, length=5):
     for j in range(0, l_s - length + 1):  # j <= l_s - length
         sub_seq = sequence[j:j + length]
         if last_cross_missing(sub_seq):
-            print(sub_seq)
+            print("indexes {}{} , sub seq {}".format(sub_seq.index(empty), row, sub_seq))
 
 
+# TODO for transposed row <-> column and len - row
 def search_rows(matrix):
-    for row in matrix:
-        sub_seq_of_length(row)
+    for row in range(0, len(matrix)):
+        sub_seq_of_length(matrix[row], row)
 
 
 def transpose_matrix(matrix):
