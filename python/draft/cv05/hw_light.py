@@ -47,6 +47,10 @@ def search_rows(matrix):
         sub_seq_of_length(matrix[row], row)
 
 
+def column(matrix, i):
+    return [row[i] for row in matrix]
+
+
 def transpose_matrix(matrix):
     matrix_transposed = []
     l = len(matrix)
