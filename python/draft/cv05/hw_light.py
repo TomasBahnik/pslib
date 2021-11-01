@@ -32,15 +32,15 @@ def last_cross_missing(sequence):
 
 def sub_seq_of_length(sequence, length=5):
     """ sub sequences of given length """
-    l_s = len(sequence)  # sequence is modified by poping last item at the end
-    if l_s <= length:  # l_s - length <= 0
+    l_s = len(sequence)
+    if l_s < length:  # l_s - length < 0
         print("ERROR length of sequence < = length. Length = {}, seq length={}".format(length, l_s))
         return
     for j in range(0, l_s - length + 1):  # j <= l_s - length
         sub_seq = sequence[j:j + length]
         if last_cross_missing(sub_seq):
             empty_idx = sub_seq.index(empty)
-            # print("indexes {} , sub seq {}".format(empty_idx, sub_seq))
+            print("Win for cross : index {} , sub seq {}".format(empty_idx, sub_seq))
             return empty_idx
 
 
@@ -96,6 +96,7 @@ def diagonals(matrix, s, down=True):
                 if i - j == s:  # difference of indexes is equal and can be negative zero (main diag) or positive
                     # print("{} : [{},{}]".format(s, i, j))
                     seq.append(matrix[i][j])
+    sub_seq_of_length(seq)
     return seq
 
 
