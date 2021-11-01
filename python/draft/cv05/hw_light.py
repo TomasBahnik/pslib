@@ -29,7 +29,7 @@ def last_cross_missing(sequence):
         return False
 
 
-def sub_seq_of_length(sequence, row, length=5):
+def sub_seq_of_length(sequence, length=5):
     """ sub sequences of given length """
     l_s = len(sequence)  # sequence is modified by poping last item at the end
     if l_s <= length:  # l_s - length <= 0
@@ -38,17 +38,34 @@ def sub_seq_of_length(sequence, row, length=5):
     for j in range(0, l_s - length + 1):  # j <= l_s - length
         sub_seq = sequence[j:j + length]
         if last_cross_missing(sub_seq):
-            print("indexes {}{} , sub seq {}".format(sub_seq.index(empty), row, sub_seq))
+            empty_idx = sub_seq.index(empty)
+            # print("indexes {} , sub seq {}".format(empty_idx, sub_seq))
+            return empty_idx
 
 
-# TODO for transposed row <-> column and len - row
 def search_rows(matrix):
-    for row in range(0, len(matrix)):
-        sub_seq_of_length(matrix[row], row)
+    for row_idx in range(0, len(matrix)):
+        empty_idx = sub_seq_of_length(matrix[row_idx])
+        if empty_idx is not None:
+            print("indexes {} {}".format(row_idx, empty_idx))
 
 
 def column(matrix, i):
     return [row[i] for row in matrix]
+
+
+def search_for_piskvorka(matrix, row=True):
+    for idx in range(0, len(matrix)):
+        empty_idx = sub_seq_of_length(matrix[idx]) if row else sub_seq_of_length(column(matrix, idx))
+        if empty_idx is not None:
+            print("indexes {} {}".format(idx, empty_idx))
+
+
+def search_columns(matrix):
+    for col_idx in range(0, len(matrix)):
+        empty_idx = sub_seq_of_length(column(matrix, col_idx))
+        if empty_idx is not None:
+            print("indexes {} {}".format(col_idx, empty_idx))
 
 
 def transpose_matrix(matrix):
@@ -65,9 +82,14 @@ def transpose_matrix(matrix):
 if __name__ == '__main__':
     file_with_matrix = sys.argv[1]
     matrix = load_matrix(file_with_matrix)
-    t_m = transpose_matrix(matrix)
-    print("Search matrix ...")
-    search_rows(matrix)
-    print("Search transposed matrix ...")
-    search_rows(t_m)
+
+    print("Search matrix rows ...")
+    search_for_piskvorka(matrix)
+
+    print("Search matrix columns ...")
+    search_for_piskvorka(matrix, row=False)
+
+    # print("Search transposed matrix ...")
+    # t_m = transpose_matrix(matrix)
+    # search_rows(t_m)
     sys.exit(0)
