@@ -79,17 +79,33 @@ def transpose_matrix(matrix):
     return matrix_transposed
 
 
-if __name__ == '__main__':
-    file_with_matrix = sys.argv[1]
-    matrix = load_matrix(file_with_matrix)
+def diagonals(matrix, s, down=True):
+    r1 = range(0, len(matrix)) if down else reversed(range(0, len(matrix)))
+    r2 = range(0, len(matrix)) if down else reversed(range(0, len(matrix)))
+    for i in r1:
+        for j in r2:
+            if (i + j) == s:
+                print("{} : [{},{}]".format(s, i, j))
 
+
+def test_diagonals(matrix, down=True):
+    l = len(matrix)
+    r = range(0, 2 * l - 1) if down else reversed(range(0, 2 * l - 1))
+    print("matrix length = {}".format(l))
+    for k in r:
+        diagonals(matrix, k, down)
+
+
+def test_search(matrix):
     print("Search matrix rows ...")
     search_for_piskvorka(matrix)
-
     print("Search matrix columns ...")
     search_for_piskvorka(matrix, row=False)
 
-    # print("Search transposed matrix ...")
-    # t_m = transpose_matrix(matrix)
-    # search_rows(t_m)
+
+if __name__ == '__main__':
+    file_with_matrix = sys.argv[1]
+    matrix = load_matrix(file_with_matrix)
+    test_diagonals(matrix, down=True)
+    # test_search(matrix)
     sys.exit(0)
