@@ -80,20 +80,31 @@ def transpose_matrix(matrix):
 
 
 def diagonals(matrix, s, down=True):
-    r1 = range(0, len(matrix)) if down else reversed(range(0, len(matrix)))
-    r2 = range(0, len(matrix)) if down else reversed(range(0, len(matrix)))
-    for i in r1:
-        for j in r2:
-            if (i + j) == s:
-                print("{} : [{},{}]".format(s, i, j))
+    r1 = range(0, len(matrix))
+    r2 = range(0, len(matrix))
+    if down:
+        for i in r1:
+            for j in r2:
+                if (i + j) == s:  # sum of indexes is equal
+                    print("{} : [{},{}]".format(s, i, j))
+    else:
+        for i in r1:
+            for j in r2:
+                if i - j == s:  # difference of indexes is equal and can be negative zero (main diag) or positive
+                    print("{} : [{},{}]".format(s, i, j))
 
 
 def test_diagonals(matrix, down=True):
     l = len(matrix)
-    r = range(0, 2 * l - 1) if down else reversed(range(0, 2 * l - 1))
+    r_down = range(0, 2 * l - 1)
+    r_up = range(-l + 1, l)
     print("matrix length = {}".format(l))
-    for k in r:
-        diagonals(matrix, k, down)
+    if down:
+        for k in r_down:
+            diagonals(matrix, k, down)
+    else:
+        for k in r_up:
+            diagonals(matrix, k, down)
 
 
 def test_search(matrix):
@@ -107,5 +118,6 @@ if __name__ == '__main__':
     file_with_matrix = sys.argv[1]
     matrix = load_matrix(file_with_matrix)
     test_diagonals(matrix, down=True)
+    test_diagonals(matrix, down=False)
     # test_search(matrix)
     sys.exit(0)
