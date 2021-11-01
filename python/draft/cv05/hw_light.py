@@ -22,7 +22,8 @@ def last_cross_missing(sequence):
     cnt_cross = sequence.count(cross)
     # len must be 5 = 4 crosses (1) and 1 empty (0) and sum must be 4
     # search all sub sequences of length 5
-    if s != 4: return False
+    if s != 4:
+        return False
     if cnt_empty == 1 and cnt_cross == 4:
         return True
     else:
@@ -82,16 +83,20 @@ def transpose_matrix(matrix):
 def diagonals(matrix, s, down=True):
     r1 = range(0, len(matrix))
     r2 = range(0, len(matrix))
+    seq = []  # for each s new seq
     if down:
         for i in r1:
             for j in r2:
                 if (i + j) == s:  # sum of indexes is equal
-                    print("{} : [{},{}]".format(s, i, j))
+                    # print("{} : [{},{}]".format(s, i, j))
+                    seq.append(matrix[i][j])
     else:
         for i in r1:
             for j in r2:
                 if i - j == s:  # difference of indexes is equal and can be negative zero (main diag) or positive
-                    print("{} : [{},{}]".format(s, i, j))
+                    # print("{} : [{},{}]".format(s, i, j))
+                    seq.append(matrix[i][j])
+    return seq
 
 
 def test_diagonals(matrix, down=True):
@@ -101,10 +106,12 @@ def test_diagonals(matrix, down=True):
     print("matrix length = {}".format(l))
     if down:
         for k in r_down:
-            diagonals(matrix, k, down)
+            seq = diagonals(matrix, k, down)
+            print("{} : {}".format(k, seq))
     else:
         for k in r_up:
-            diagonals(matrix, k, down)
+            seq = diagonals(matrix, k, down)
+            print("{} : {}".format(k, seq))
 
 
 def test_search(matrix):
@@ -117,7 +124,9 @@ def test_search(matrix):
 if __name__ == '__main__':
     file_with_matrix = sys.argv[1]
     matrix = load_matrix(file_with_matrix)
+    print("Search matrix diagonals down ...")
     test_diagonals(matrix, down=True)
+    print("Search matrix diagonals up ...")
     test_diagonals(matrix, down=False)
     # test_search(matrix)
     sys.exit(0)
