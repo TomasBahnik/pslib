@@ -136,5 +136,16 @@ def test_gcd(a, b):
     print(gcd_1, gcd_2, gcd_e)
 
 
+def transpose_matrix(matrix):
+    matrix_transposed = []
+    l = len(matrix)
+    for row in range(0, l):
+        r_t = []
+        for column in range(0, l):
+            r_t += [matrix[column][row]]
+        matrix_transposed += [r_t]
+    return matrix_transposed
+
+
 if __name__ == '__main__':
     sys.exit(0)

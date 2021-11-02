@@ -34,13 +34,13 @@ def sub_seq_of_length(sequence, length=5):
     """ sub sequences of given length """
     l_s = len(sequence)
     if l_s < length:  # l_s - length < 0
-        print("ERROR length of sequence < = length. Length = {}, seq length={}".format(length, l_s))
+        # print("ERROR length of sequence < = length. Length = {}, seq length={}".format(length, l_s))
         return
     for j in range(0, l_s - length + 1):  # j <= l_s - length
         sub_seq = sequence[j:j + length]
         if last_cross_missing(sub_seq):
             empty_idx = sub_seq.index(empty)
-            print("Win for cross : index {} , sub seq {}".format(empty_idx, sub_seq))
+            print("Win for cross : index {} , sub seq = {} from seq = {}".format(empty_idx, sub_seq, sequence))
             return empty_idx
 
 
@@ -69,17 +69,6 @@ def search_columns(matrix):
             print("indexes {} {}".format(col_idx, empty_idx))
 
 
-def transpose_matrix(matrix):
-    matrix_transposed = []
-    l = len(matrix)
-    for row in range(0, l):
-        r_t = []
-        for column in range(0, l):
-            r_t += [matrix[column][row]]
-        matrix_transposed += [r_t]
-    return matrix_transposed
-
-
 def diagonals(matrix, s, down=True):
     r1 = range(0, len(matrix))
     r2 = range(0, len(matrix))
@@ -104,18 +93,18 @@ def test_diagonals(matrix, down=True):
     l = len(matrix)
     r_down = range(0, 2 * l - 1)
     r_up = range(-l + 1, l)
-    print("matrix length = {}".format(l))
+    # print("matrix length = {}".format(l))
     if down:
         for k in r_down:
             seq = diagonals(matrix, k, down)
-            print("{} : {}".format(k, seq))
+            # print("{} : {}".format(k, seq))
     else:
         for k in r_up:
             seq = diagonals(matrix, k, down)
-            print("{} : {}".format(k, seq))
+            # print("{} : {}".format(k, seq))
 
 
-def test_search(matrix):
+def test_rows_columns(matrix):
     print("Search matrix rows ...")
     search_for_piskvorka(matrix)
     print("Search matrix columns ...")
@@ -125,6 +114,7 @@ def test_search(matrix):
 if __name__ == '__main__':
     file_with_matrix = sys.argv[1]
     matrix = load_matrix(file_with_matrix)
+    test_rows_columns(matrix)
     print("Search matrix diagonals down ...")
     test_diagonals(matrix, down=True)
     print("Search matrix diagonals up ...")
