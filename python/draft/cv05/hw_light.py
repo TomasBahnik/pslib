@@ -39,16 +39,11 @@ def sub_seq_of_length(sequence, length=5):
     for j in range(0, l_s - length + 1):  # j <= l_s - length
         sub_seq = sequence[j:j + length]
         if last_cross_missing(sub_seq):
-            empty_idx = sub_seq.index(empty)
-            print("Win for cross : index {} , sub seq = {} from seq = {}".format(empty_idx, sub_seq, sequence))
+            # add j because we need empty idx counted from the original sequence
+            empty_idx = sub_seq.index(empty) + j
+            print("Win for cross : empty_idx {} from {}, piskvorka = {} ".
+                  format(empty_idx, sequence, sub_seq))
             return empty_idx
-
-
-def search_rows(matrix):
-    for row_idx in range(0, len(matrix)):
-        empty_idx = sub_seq_of_length(matrix[row_idx])
-        if empty_idx is not None:
-            print("indexes {} {}".format(row_idx, empty_idx))
 
 
 def column(matrix, i):
@@ -56,17 +51,17 @@ def column(matrix, i):
 
 
 def search_for_piskvorka(matrix, row=True):
-    for idx in range(0, len(matrix)):
+    l = len(matrix)
+    for idx in range(0, l):
         empty_idx = sub_seq_of_length(matrix[idx]) if row else sub_seq_of_length(column(matrix, idx))
         if empty_idx is not None:
-            print("indexes {} {}".format(idx, empty_idx))
-
-
-def search_columns(matrix):
-    for col_idx in range(0, len(matrix)):
-        empty_idx = sub_seq_of_length(column(matrix, col_idx))
-        if empty_idx is not None:
-            print("indexes {} {}".format(col_idx, empty_idx))
+            if not row:
+                cross_col_idx = idx
+                cross_row_idx = empty_idx
+            else:
+                cross_row_idx = idx
+                cross_col_idx = empty_idx
+            print("(cross_row_idx, cross_col_idx) = {} {}".format(cross_row_idx, cross_col_idx))
 
 
 def diagonals(matrix, s, down=True):
