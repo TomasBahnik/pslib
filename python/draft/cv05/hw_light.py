@@ -60,23 +60,28 @@ def search_for_piskvorka(matrix, row=True):
             print("(cross_row_idx, cross_col_idx) = {} {}".format(cross_row_idx, cross_col_idx))
 
 
-def diagonals(matrix, s, down=True):
+def diagonals(matrix, shift, down=True):
     r1 = range(0, len(matrix))
     r2 = range(0, len(matrix))
     seq = []  # for each s new seq
     if down:
         for i in r1:
             for j in r2:
-                if (i + j) == s:  # sum of indexes is equal
-                    # print("{} : [{},{}]".format(s, i, j))
+                if (i + j) == shift:  # sum of indexes is equal
+                    # print("shift={} : [{},{}]".format(shift, i, j))
                     seq.append(matrix[i][j])
     else:
         for i in r1:
             for j in r2:
-                if i - j == s:  # difference of indexes is equal and can be negative zero (main diag) or positive
-                    # print("{} : [{},{}]".format(s, i, j))
+                if i - j == shift:  # difference of indexes is equal and can be negative zero (main diag) or positive
+                    print("shift={} : [{},{}]".format(shift, i, j))
                     seq.append(matrix[i][j])
-    sub_seq_of_length(seq)
+    empty_idx = sub_seq_of_length(seq)
+    if empty_idx is not None:
+        print("shift={}, empty_idx {}, seq_diag {}".format(shift, empty_idx, seq))
+        cross_row_idx = empty_idx if down else empty_idx + shift
+        cross_col_idx = empty_idx + shift if down else empty_idx
+        print("(cross_row_idx, cross_col_idx) = {} {}".format(cross_row_idx, cross_col_idx))
     return seq
 
 
@@ -105,9 +110,9 @@ def test_rows_columns(matrix):
 if __name__ == '__main__':
     file_with_matrix = sys.argv[1]
     matrix = load_matrix(file_with_matrix)
-    test_rows_columns(matrix)
-    print("Search matrix diagonals down ...")
-    test_diagonals(matrix, down=True)
+    # test_rows_columns(matrix)
+    # print("Search matrix diagonals down ...")
+    # test_diagonals(matrix, down=True)
     print("Search matrix diagonals up ...")
     test_diagonals(matrix, down=False)
     # test_search(matrix)
