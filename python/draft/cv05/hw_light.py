@@ -63,30 +63,41 @@ def search_for_piskvorka(matrix, row=True):
 
 def diagonals(matrix, shift, down=True):
     l_m = len(matrix)
-    max_idx = l_m - 1
-    # transforms shift from <0, 2* max_idx> to interval <-max_idx, max_idx> as for down=False
-    shift_p = shift - max_idx
     r1 = range(0, l_m)
     r2 = range(0, l_m)
     seq = []  # for each s new seq
+    seq_row_start_idx = None
+    seq_col_start_idx = None
     if down:
         for i in r1:
             for j in r2:
                 if (i + j) == shift:  # sum of indexes is equal
                     # print("shift={} : [{},{}]".format(shift, i, j))
+                    if seq_row_start_idx is None:
+                        seq_row_start_idx = i
+                    if seq_col_start_idx is None:
+                        seq_col_start_idx = j
                     seq.append(matrix[i][j])
     else:
         for i in r1:
             for j in r2:
                 if i - j == shift:  # difference of indexes is equal and can be negative zero (main diag) or positive
                     # print("shift={} : [{},{}]".format(shift, i, j))
+                    if seq_row_start_idx is None:
+                        seq_row_start_idx = i
+                    if seq_col_start_idx is None:
+                        seq_col_start_idx = j
                     seq.append(matrix[i][j])
     empty_idx = sub_seq_of_length(seq)
     if empty_idx is not None:
         # print("shift={}, shift_p={}, empty_idx {}, seq_diag {}".format(shift, shift_p, empty_idx, seq))
-        cross_row_idx = empty_idx + shift_p if down else empty_idx + shift
-        cross_col_idx = max_idx - empty_idx if down else empty_idx
+        cross_row_idx = empty_idx + seq_row_start_idx
+        cross_col_idx = seq_col_start_idx - empty_idx if down else seq_col_start_idx + empty_idx
+        print("(seq_row_start_idx, seq_col_start_idx) | empty_idx) = {} {} | {}"
+              .format(seq_row_start_idx, seq_col_start_idx, empty_idx))
         print("(cross_row_idx, cross_col_idx) = {} {}".format(cross_row_idx, cross_col_idx))
+        if matrix[cross_row_idx][cross_col_idx] != 0:
+            print("ERROR !!! element at [{}][{}] is not empty = {}".format(cross_row_idx, cross_col_idx, empty))
         # print(cross_row_idx, cross_col_idx)
     return seq
 
