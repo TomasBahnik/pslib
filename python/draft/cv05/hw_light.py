@@ -55,12 +55,8 @@ def search_for_piskvorka(matrix, row=True):
     for idx in range(0, l):
         empty_idx = sub_seq_of_length(matrix[idx]) if row else sub_seq_of_length(column(matrix, idx))
         if empty_idx is not None:
-            if not row:
-                cross_col_idx = idx
-                cross_row_idx = empty_idx
-            else:
-                cross_row_idx = idx
-                cross_col_idx = empty_idx
+            cross_row_idx = idx if row else empty_idx
+            cross_col_idx = empty_idx if row else idx
             print("(cross_row_idx, cross_col_idx) = {} {}".format(cross_row_idx, cross_col_idx))
 
 
