@@ -41,8 +41,8 @@ def sub_seq_of_length(sequence, length=5):
         if last_cross_missing(sub_seq):
             # add j because we need empty idx counted from the original sequence
             empty_idx = sub_seq.index(empty) + j
-            print("Win for cross : empty_idx {} from {}, piskvorka = {} ".
-                  format(empty_idx, sequence, sub_seq))
+            print("Wining cross found for data file '{}'! : empty_idx {} from {}, piskvorka = {} ".
+                  format(sys.argv[1], empty_idx, sequence, sub_seq))
             return empty_idx
 
 
@@ -58,11 +58,16 @@ def search_for_piskvorka(matrix, row=True):
             cross_row_idx = idx if row else empty_idx
             cross_col_idx = empty_idx if row else idx
             print("(cross_row_idx, cross_col_idx) = {} {}".format(cross_row_idx, cross_col_idx))
+            # print(cross_row_idx, cross_col_idx)
 
 
 def diagonals(matrix, shift, down=True):
-    r1 = range(0, len(matrix))
-    r2 = range(0, len(matrix))
+    l_m = len(matrix)
+    max_idx = l_m - 1
+    # transforms shift from <0, 2* max_idx> to interval <-max_idx, max_idx> as for down=False
+    shift_p = shift - max_idx
+    r1 = range(0, l_m)
+    r2 = range(0, l_m)
     seq = []  # for each s new seq
     if down:
         for i in r1:
@@ -74,14 +79,15 @@ def diagonals(matrix, shift, down=True):
         for i in r1:
             for j in r2:
                 if i - j == shift:  # difference of indexes is equal and can be negative zero (main diag) or positive
-                    print("shift={} : [{},{}]".format(shift, i, j))
+                    # print("shift={} : [{},{}]".format(shift, i, j))
                     seq.append(matrix[i][j])
     empty_idx = sub_seq_of_length(seq)
     if empty_idx is not None:
-        print("shift={}, empty_idx {}, seq_diag {}".format(shift, empty_idx, seq))
-        cross_row_idx = empty_idx if down else empty_idx + shift
-        cross_col_idx = empty_idx + shift if down else empty_idx
+        # print("shift={}, shift_p={}, empty_idx {}, seq_diag {}".format(shift, shift_p, empty_idx, seq))
+        cross_row_idx = empty_idx + shift_p if down else empty_idx + shift
+        cross_col_idx = max_idx - empty_idx if down else empty_idx
         print("(cross_row_idx, cross_col_idx) = {} {}".format(cross_row_idx, cross_col_idx))
+        # print(cross_row_idx, cross_col_idx)
     return seq
 
 
@@ -110,10 +116,9 @@ def test_rows_columns(matrix):
 if __name__ == '__main__':
     file_with_matrix = sys.argv[1]
     matrix = load_matrix(file_with_matrix)
-    # test_rows_columns(matrix)
-    # print("Search matrix diagonals down ...")
-    # test_diagonals(matrix, down=True)
+    test_rows_columns(matrix)
+    print("Search matrix diagonals down ...")
+    test_diagonals(matrix, down=True)
     print("Search matrix diagonals up ...")
     test_diagonals(matrix, down=False)
-    # test_search(matrix)
     sys.exit(0)
