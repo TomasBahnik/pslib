@@ -41,8 +41,7 @@ def sub_seq_of_length(sequence, length=5):
         if last_cross_missing(sub_seq):
             # add j because we need empty idx counted from the original sequence
             empty_idx = sub_seq.index(empty) + j
-            print("Wining cross found for data file '{}'! : empty_idx {} from {}, piskvorka = {} ".
-                  format(sys.argv[1], empty_idx, sequence, sub_seq))
+            print("{} : cross at {} in {} wins! piskvorka = {} ".format(sys.argv[1], empty_idx, sequence, sub_seq))
             return empty_idx
 
 
@@ -57,8 +56,9 @@ def search_for_piskvorka(matrix, row=True):
         if empty_idx is not None:
             cross_row_idx = idx if row else empty_idx
             cross_col_idx = empty_idx if row else idx
-            print("(cross_row_idx, cross_col_idx) = {} {}".format(cross_row_idx, cross_col_idx))
-            # print(cross_row_idx, cross_col_idx)
+            # print("(cross_row_idx, cross_col_idx) = {} {}".format(cross_row_idx, cross_col_idx))
+            # Main output - just 2 indexes
+            print(cross_row_idx, cross_col_idx)
 
 
 def diagonals(matrix, shift, down=True):
@@ -91,14 +91,17 @@ def diagonals(matrix, shift, down=True):
     empty_idx = sub_seq_of_length(seq)
     if empty_idx is not None:
         # print("shift={}, shift_p={}, empty_idx {}, seq_diag {}".format(shift, shift_p, empty_idx, seq))
+        # there is no common solution for both diagonals
+        # either row OR column can grow not both in both directions !!
         cross_row_idx = empty_idx + seq_row_start_idx
         cross_col_idx = seq_col_start_idx - empty_idx if down else seq_col_start_idx + empty_idx
-        print("(seq_row_start_idx, seq_col_start_idx) | empty_idx) = {} {} | {}"
-              .format(seq_row_start_idx, seq_col_start_idx, empty_idx))
-        print("(cross_row_idx, cross_col_idx) = {} {}".format(cross_row_idx, cross_col_idx))
+        # print("(seq_row_start_idx, seq_col_start_idx) | empty_idx) = {} {} | {}"
+        #       .format(seq_row_start_idx, seq_col_start_idx, empty_idx))
+        # print("(cross_row_idx, cross_col_idx) = {} {}".format(cross_row_idx, cross_col_idx))
         if matrix[cross_row_idx][cross_col_idx] != 0:
             print("ERROR !!! element at [{}][{}] is not empty = {}".format(cross_row_idx, cross_col_idx, empty))
-        # print(cross_row_idx, cross_col_idx)
+        # Main output - just 2 indexes
+        print(cross_row_idx, cross_col_idx)
     return seq
 
 
@@ -118,9 +121,9 @@ def test_diagonals(matrix, down=True):
 
 
 def test_rows_columns(matrix):
-    print("Search matrix rows ...")
+    print("rows ...")
     search_for_piskvorka(matrix)
-    print("Search matrix columns ...")
+    print("columns ...")
     search_for_piskvorka(matrix, row=False)
 
 
@@ -128,8 +131,8 @@ if __name__ == '__main__':
     file_with_matrix = sys.argv[1]
     matrix = load_matrix(file_with_matrix)
     test_rows_columns(matrix)
-    print("Search matrix diagonals down ...")
+    print("diagonals down ...")
     test_diagonals(matrix, down=True)
-    print("Search matrix diagonals up ...")
+    print("diagonals up ...")
     test_diagonals(matrix, down=False)
     sys.exit(0)
