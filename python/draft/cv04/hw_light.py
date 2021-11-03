@@ -1,3 +1,8 @@
+# Find longest symmetric sequences of integers.
+# In case of of two such sequences select the one with larger sum
+# Case of the same length and sum is not covered in assignment. This implementation  selects
+# the one with highest index.
+# Output = the pair (index, length) of the sequence
 import sys
 
 from common.functions import symmetric_sub_seq

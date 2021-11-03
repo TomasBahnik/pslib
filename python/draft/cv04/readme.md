@@ -1,1 +1,0 @@
-Search symmetric sequences of integers
