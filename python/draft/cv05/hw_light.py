@@ -6,6 +6,10 @@ import sys
 empty = 0
 cross = 1
 circle = 2
+# how many solution is enough
+enough_num_of_solutions = 1
+# num_of_solutions <= enough_num_of_solutions
+num_of_solutions = 0
 
 
 def load_matrix(file):
@@ -41,12 +45,21 @@ def sub_seq_of_length(sequence, length=5):
         if last_cross_missing(sub_seq):
             # add j because we need empty idx counted from the original sequence
             empty_idx = sub_seq.index(empty) + j
-            print("{} : cross at {} in {} wins! piskvorka = {} ".format(sys.argv[1], empty_idx, sequence, sub_seq))
+            # print("{} : cross at {} in {} wins! piskvorka = {} ".format(sys.argv[1], empty_idx, sequence, sub_seq))
             return empty_idx
 
 
 def column(matrix, i):
     return [row[i] for row in matrix]
+
+
+def print_output(row, col):
+    global num_of_solutions
+    if num_of_solutions < enough_num_of_solutions:
+        print(row, col)
+        num_of_solutions += 1
+    else:
+        return
 
 
 def search_for_piskvorka(matrix, row=True):
@@ -58,7 +71,7 @@ def search_for_piskvorka(matrix, row=True):
             cross_col_idx = empty_idx if row else idx
             # print("(cross_row_idx, cross_col_idx) = {} {}".format(cross_row_idx, cross_col_idx))
             # Main output - just 2 indexes
-            print(cross_row_idx, cross_col_idx)
+            print_output(cross_row_idx, cross_col_idx)
 
 
 def diagonals(matrix, shift, down=True):
@@ -101,7 +114,7 @@ def diagonals(matrix, shift, down=True):
         if matrix[cross_row_idx][cross_col_idx] != 0:
             print("ERROR !!! element at [{}][{}] is not empty = {}".format(cross_row_idx, cross_col_idx, empty))
         # Main output - just 2 indexes
-        print(cross_row_idx, cross_col_idx)
+        print_output(cross_row_idx, cross_col_idx)
     return seq
 
 
@@ -121,9 +134,9 @@ def test_diagonals(matrix, down=True):
 
 
 def test_rows_columns(matrix):
-    print("rows ...")
+    # print("rows ...")
     search_for_piskvorka(matrix)
-    print("columns ...")
+    # print("columns ...")
     search_for_piskvorka(matrix, row=False)
 
 
@@ -131,8 +144,8 @@ if __name__ == '__main__':
     file_with_matrix = sys.argv[1]
     matrix = load_matrix(file_with_matrix)
     test_rows_columns(matrix)
-    print("diagonals down ...")
+    # print("diagonals down ...")
     test_diagonals(matrix, down=True)
-    print("diagonals up ...")
+    # print("diagonals up ...")
     test_diagonals(matrix, down=False)
     sys.exit(0)
