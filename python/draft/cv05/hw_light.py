@@ -85,6 +85,7 @@ def diagonals(matrix, shift, down=True):
     r1 = range(0, l_m)
     r2 = range(0, l_m)
     seq = []  # for each s new seq
+    # initialized only once for given shift
     seq_row_start_idx = None
     seq_col_start_idx = None
     if down:
