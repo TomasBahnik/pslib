@@ -1,0 +1,16 @@
+Refocus
+Members
+Commute
+Operate
+Disband
+Unlatch
+Reflect
+Verdict
+Foxhole
+Caption
+ Members Commute DisbandCaptionUnlatchReflectFoxholeRefocusVerdictOperate
+RefocusMembersUnlatch FoxholeCommute VerdictDisbandCaptionOperate Reflect
+OperateRefocusMembersReflectDisband FoxholeVerdictCaption CommuteUnlatch 
+Commute OperateUnlatchFoxholeRefocusDisbandReflectVerdict CaptionMembers 
+DisbandOperate Caption  FoxholeVerdictUnlatchRefocusCommuteMembersReflect
+ReflectFoxholeVerdict CaptionRefocusDisband CommuteUnlatchMembers Operate

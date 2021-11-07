@@ -3,21 +3,15 @@
 
 import sys
 
+from draft.cv05.shared import load_matrix, column
+
 empty = 0
 cross = 1
 circle = 2
 # how many solution is enough
-enough_num_of_solutions = 1
+enough_num_of_solutions = 10
 # num_of_solutions <= enough_num_of_solutions
 num_of_solutions = 0
-
-
-def load_matrix(file):
-    pole = []
-    with open(file, 'r') as f:
-        for line in f:
-            pole.append(list(map(int, line.split())))
-    return pole
 
 
 def last_cross_missing(sequence):
@@ -30,8 +24,7 @@ def last_cross_missing(sequence):
         return False
     if cnt_empty == 1 and cnt_cross == 4:
         return True
-    else:
-        return False
+    return False
 
 
 def sub_seq_of_length(sequence, length=5):
@@ -47,10 +40,6 @@ def sub_seq_of_length(sequence, length=5):
             empty_idx = sub_seq.index(empty) + j
             # print("{} : cross at {} in {} wins! piskvorka = {} ".format(sys.argv[1], empty_idx, sequence, sub_seq))
             return empty_idx
-
-
-def column(matrix, i):
-    return [row[i] for row in matrix]
 
 
 def print_output(row, col):
@@ -74,11 +63,29 @@ def search_for_piskvorka(matrix, row=True):
             print_output(cross_row_idx, cross_col_idx)
 
 
+def cross_diag_seq(seq, seq_row_start_idx, seq_col_start_idx, down):
+    empty_idx = sub_seq_of_length(seq)
+    if empty_idx is not None:
+        # print("shift={}, shift_p={}, empty_idx {}, seq_diag {}".format(shift, shift_p, empty_idx, seq))
+        # there is no common solution for both diagonals
+        # either row OR column can grow not both in both directions !!
+        cross_row_idx = empty_idx + seq_row_start_idx
+        cross_col_idx = seq_col_start_idx - empty_idx if down else seq_col_start_idx + empty_idx
+        # print("(seq_row_start_idx, seq_col_start_idx) | empty_idx) = {} {} | {}"
+        #       .format(seq_row_start_idx, seq_col_start_idx, empty_idx))
+        # print("(cross_row_idx, cross_col_idx) = {} {}".format(cross_row_idx, cross_col_idx))
+        if matrix[cross_row_idx][cross_col_idx] != 0:
+            print("ERROR !!! element at [{}][{}] is not empty = {}".format(cross_row_idx, cross_col_idx, empty))
+        # Main output - just 2 indexes
+        print_output(cross_row_idx, cross_col_idx)
+
+
 def diagonals(matrix, shift, down=True):
     l_m = len(matrix)
     r1 = range(0, l_m)
     r2 = range(0, l_m)
     seq = []  # for each s new seq
+    # initialized only once for given shift
     seq_row_start_idx = None
     seq_col_start_idx = None
     if down:
@@ -101,20 +108,7 @@ def diagonals(matrix, shift, down=True):
                     if seq_col_start_idx is None:
                         seq_col_start_idx = j
                     seq.append(matrix[i][j])
-    empty_idx = sub_seq_of_length(seq)
-    if empty_idx is not None:
-        # print("shift={}, shift_p={}, empty_idx {}, seq_diag {}".format(shift, shift_p, empty_idx, seq))
-        # there is no common solution for both diagonals
-        # either row OR column can grow not both in both directions !!
-        cross_row_idx = empty_idx + seq_row_start_idx
-        cross_col_idx = seq_col_start_idx - empty_idx if down else seq_col_start_idx + empty_idx
-        # print("(seq_row_start_idx, seq_col_start_idx) | empty_idx) = {} {} | {}"
-        #       .format(seq_row_start_idx, seq_col_start_idx, empty_idx))
-        # print("(cross_row_idx, cross_col_idx) = {} {}".format(cross_row_idx, cross_col_idx))
-        if matrix[cross_row_idx][cross_col_idx] != 0:
-            print("ERROR !!! element at [{}][{}] is not empty = {}".format(cross_row_idx, cross_col_idx, empty))
-        # Main output - just 2 indexes
-        print_output(cross_row_idx, cross_col_idx)
+    cross_diag_seq(seq, seq_row_start_idx, seq_col_start_idx, down)
     return seq
 
 
