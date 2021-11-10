@@ -4,6 +4,7 @@
 import sys
 
 from draft.cv05.shared import load_matrix, column
+from draft.shared.matrices import diagonals
 
 empty = 0
 cross = 1
@@ -82,37 +83,6 @@ def cross_diag_seq(seq_details):
             print("ERROR !!! element at [{}][{}] is not empty = {}".format(cross_row_idx, cross_col_idx, empty))
         # Main output - just 2 indexes
         print_output(cross_row_idx, cross_col_idx)
-
-
-def diagonals(matrix, shift, down=True):
-    l_m = len(matrix)
-    r1 = range(0, l_m)
-    r2 = range(0, l_m)
-    seq = []  # for each s new seq
-    # initialized only once for given shift
-    seq_row_start_idx = None
-    seq_col_start_idx = None
-    if down:
-        for i in r1:
-            for j in r2:
-                if (i + j) == shift:  # sum of indexes is equal
-                    # print("shift={} : [{},{}]".format(shift, i, j))
-                    if seq_row_start_idx is None:
-                        seq_row_start_idx = i
-                    if seq_col_start_idx is None:
-                        seq_col_start_idx = j
-                    seq.append(matrix[i][j])
-    else:
-        for i in r1:
-            for j in r2:
-                if i - j == shift:  # difference of indexes is equal and can be negative zero (main diag) or positive
-                    # print("shift={} : [{},{}]".format(shift, i, j))
-                    if seq_row_start_idx is None:
-                        seq_row_start_idx = i
-                    if seq_col_start_idx is None:
-                        seq_col_start_idx = j
-                    seq.append(matrix[i][j])
-    return seq, seq_row_start_idx, seq_col_start_idx, down
 
 
 def test_diagonals(matrix, down=True):
