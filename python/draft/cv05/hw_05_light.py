@@ -63,7 +63,11 @@ def search_for_piskvorka(matrix, row=True):
             print_output(cross_row_idx, cross_col_idx)
 
 
-def cross_diag_seq(seq, seq_row_start_idx, seq_col_start_idx, down):
+def cross_diag_seq(seq_details):
+    seq = seq_details[0]
+    seq_row_start_idx = seq_details[1]
+    seq_col_start_idx = seq_details[2]
+    down = seq_details[3]
     empty_idx = sub_seq_of_length(seq)
     if empty_idx is not None:
         # print("shift={}, shift_p={}, empty_idx {}, seq_diag {}".format(shift, shift_p, empty_idx, seq))
@@ -108,8 +112,7 @@ def diagonals(matrix, shift, down=True):
                     if seq_col_start_idx is None:
                         seq_col_start_idx = j
                     seq.append(matrix[i][j])
-    cross_diag_seq(seq, seq_row_start_idx, seq_col_start_idx, down)
-    return seq
+    return seq, seq_row_start_idx, seq_col_start_idx, down
 
 
 def test_diagonals(matrix, down=True):
@@ -119,11 +122,13 @@ def test_diagonals(matrix, down=True):
     # print("matrix length = {}".format(l))
     if down:
         for k in r_down:
-            seq = diagonals(matrix, k, down)
+            seq_details = diagonals(matrix, k, down)
+            cross_diag_seq(seq_details)
             # print("{} : {}".format(k, seq))
     else:
         for k in r_up:
-            seq = diagonals(matrix, k, down)
+            seq_details = diagonals(matrix, k, down)
+            cross_diag_seq(seq_details)
             # print("{} : {}".format(k, seq))
 
 
