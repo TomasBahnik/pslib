@@ -11,6 +11,8 @@ Výstup:
 Písmena, která zbudou po vynechání všech písmen vyskytujících se v zadaných slovech
 (pozor slova se mohou křížit, je důležité nalezené slovo z matice nemazat)
 Písmena tiskněte zleva doprava odshora dolů
+
+osmismerka.txt + slova.txt => odfoukali
 """
 
 import sys
