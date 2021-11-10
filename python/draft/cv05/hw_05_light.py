@@ -3,8 +3,7 @@
 
 import sys
 
-from draft.cv05.shared import load_matrix, column
-from draft.shared.matrices import diagonals
+from draft.shared.matrices import diagonals, load_matrix, column
 
 empty = 0
 cross = 1
