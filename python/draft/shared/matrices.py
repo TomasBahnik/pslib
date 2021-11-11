@@ -1,8 +1,17 @@
-def load_matrix(file):
+def load_int_matrix(file):
     pole = []
     with open(file, 'r') as f:
         for line in f:
             pole.append(list(map(int, line.split())))
+    return pole
+
+
+def load_char_matrix(file):
+    pole = []
+    with open(file, 'r') as f:
+        for line in f:
+            chars = [char for char in line.rstrip()]
+            pole.append(chars)
     return pole
 
 
@@ -22,7 +31,7 @@ def diagonals(matrix, shift, down=True):
         for i in r1:
             for j in r2:
                 if (i + j) == shift:  # sum of indexes is equal
-                    # print("shift={} : [{},{}]".format(shift, i, j))
+                    print("shift={} : [{},{}] = {}".format(shift, i, j, matrix[i][j]))
                     if seq_row_start_idx is None:
                         seq_row_start_idx = i
                     if seq_col_start_idx is None:
@@ -32,7 +41,7 @@ def diagonals(matrix, shift, down=True):
         for i in r1:
             for j in r2:
                 if i - j == shift:  # difference of indexes is equal and can be negative zero (main diag) or positive
-                    # print("shift={} : [{},{}]".format(shift, i, j))
+                    print("shift={} : [{},{}] = {}".format(shift, i, j, matrix[i][j]))
                     if seq_row_start_idx is None:
                         seq_row_start_idx = i
                     if seq_col_start_idx is None:

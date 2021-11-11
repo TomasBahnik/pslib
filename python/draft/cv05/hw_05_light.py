@@ -3,7 +3,7 @@
 
 import sys
 
-from draft.shared.matrices import diagonals, load_matrix, column
+from draft.shared.matrices import diagonals, load_int_matrix, column
 
 empty = 0
 cross = 1
@@ -110,7 +110,7 @@ def test_rows_columns(matrix):
 
 if __name__ == '__main__':
     file_with_matrix = sys.argv[1]
-    matrix = load_matrix(file_with_matrix)
+    matrix = load_int_matrix(file_with_matrix)
     test_rows_columns(matrix)
     # print("diagonals down ...")
     test_diagonals(matrix, down=True)

@@ -17,7 +17,7 @@ osmismerka.txt + slova.txt => odfoukali
 
 import sys
 
-from draft.shared.matrices import load_matrix
+from draft.shared.matrices import load_char_matrix, diagonals, column
 
 
 def test_rows_columns(matrix):
@@ -27,11 +27,15 @@ def test_rows_columns(matrix):
 
 def test_diagonals(matrix, down=True):
     print("diagonals ..")
+    diagonals(matrix, 3, down)
 
 
 if __name__ == '__main__':
     file_with_matrix = sys.argv[1]
-    matrix = load_matrix(file_with_matrix)
+    file_with_words = sys.argv[2]
+    matrix = load_char_matrix(file_with_matrix)
+    words = load_char_matrix(file_with_words)
+    print("matrix indexes : {}x{}".format(len(matrix[0]) - 1, len(column(matrix, 0)) - 1))
     test_rows_columns(matrix)
     # print("diagonals down ...")
     test_diagonals(matrix, down=True)
