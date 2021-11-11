@@ -33,7 +33,7 @@ def diagonals(matrix, shift, down=True):
         for i in r1:
             for j in r2:
                 if (i + j) == shift:  # sum of indexes is equal
-                    print("shift={} : [{},{}] = {}".format(shift, i, j, matrix[i][j]))
+                    print("index sum {} : [{},{}] = {}".format(shift, i, j, matrix[i][j]))
                     if seq_row_start_idx is None:
                         seq_row_start_idx = i
                     if seq_col_start_idx is None:
@@ -43,7 +43,7 @@ def diagonals(matrix, shift, down=True):
         for i in r1:
             for j in r2:
                 if i - j == shift:  # difference of indexes is equal and can be negative zero (main diag) or positive
-                    print("shift={} : [{},{}] = {}".format(shift, i, j, matrix[i][j]))
+                    # print("index diff={} : [{},{}] = {}".format(shift, i, j, matrix[i][j]))
                     if seq_row_start_idx is None:
                         seq_row_start_idx = i
                     if seq_col_start_idx is None:
@@ -52,11 +52,12 @@ def diagonals(matrix, shift, down=True):
     return seq, seq_row_start_idx, seq_col_start_idx, down
 
 
-def search_char_in_rows_columns(matrix, char, row=True):
+def search_word_in_rows_columns(matrix, word, row=True):
     l = len(column(matrix, 0)) if row else len(matrix[0])
     for idx in range(0, l):
         search_in = matrix[idx] if row else column(matrix, idx)
-        char_in_list(char, search_in)
+        if search_in == word:
+            print("word {} found".format(word))
 
 
 def char_in_list(char, search_in):
