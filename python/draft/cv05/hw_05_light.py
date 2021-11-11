@@ -27,7 +27,7 @@ def last_cross_missing(sequence):
     return False
 
 
-def sub_seq_of_length(sequence, length=5):
+def empty_idx_in_seq_of_length(sequence, length=5):
     """ sub sequences of given length """
     l_s = len(sequence)
     if l_s < length:  # l_s - length < 0
@@ -54,7 +54,7 @@ def print_output(row, col):
 def search_for_piskvorka(matrix, row=True):
     l = len(matrix)
     for idx in range(0, l):
-        empty_idx = sub_seq_of_length(matrix[idx]) if row else sub_seq_of_length(column(matrix, idx))
+        empty_idx = empty_idx_in_seq_of_length(matrix[idx]) if row else empty_idx_in_seq_of_length(column(matrix, idx))
         if empty_idx is not None:
             cross_row_idx = idx if row else empty_idx
             cross_col_idx = empty_idx if row else idx
@@ -68,7 +68,7 @@ def cross_diag_seq(seq_details):
     seq_row_start_idx = seq_details[1]
     seq_col_start_idx = seq_details[2]
     down = seq_details[3]
-    empty_idx = sub_seq_of_length(seq)
+    empty_idx = empty_idx_in_seq_of_length(seq)
     if empty_idx is not None:
         # print("shift={}, shift_p={}, empty_idx {}, seq_diag {}".format(shift, shift_p, empty_idx, seq))
         # there is no common solution for both diagonals
