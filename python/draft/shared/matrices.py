@@ -19,6 +19,8 @@ def column(matrix, i):
     return [row[i] for row in matrix]
 
 
+# down=True means right-top to left-bottom
+# down=False means left-top right-bottom used by hw_06_light.py
 def diagonals(matrix, shift, down=True):
     l_m = len(matrix)
     r1 = range(0, l_m)
@@ -54,7 +56,11 @@ def search_char_in_rows_columns(matrix, char, row=True):
     l = len(column(matrix, 0)) if row else len(matrix[0])
     for idx in range(0, l):
         search_in = matrix[idx] if row else column(matrix, idx)
-        found = char in search_in
-        if found:
-            position = search_in.index(char)
-            print("Char '{}' found in {} at index {}".format(char, search_in, position))
+        char_in_list(char, search_in)
+
+
+def char_in_list(char, search_in):
+    found = char in search_in
+    if found:
+        position = search_in.index(char)
+        print("Char '{}' found in {} at index {}".format(char, search_in, position))
