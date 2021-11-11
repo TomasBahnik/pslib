@@ -17,12 +17,18 @@ osmismerka.txt + slova.txt => odfoukali
 
 import sys
 
-from draft.shared.matrices import load_char_matrix, diagonals, column
+from draft.shared.matrices import load_char_matrix, diagonals, column, search_char_in_rows_columns
 
 
-def test_rows_columns(matrix):
+def test_rows_columns(matrix, words):
     print("rows ...")
+    for chars in words:
+        for char in chars:
+            search_char_in_rows_columns(matrix, char)
     print("columns ...")
+    for chars in words:
+        for char in chars:
+            search_char_in_rows_columns(matrix, char, row=False)
 
 
 def test_diagonals(matrix, down=True):
@@ -30,15 +36,24 @@ def test_diagonals(matrix, down=True):
     diagonals(matrix, 3, down)
 
 
+def empty_matrix(rows, columns):
+    r = [0] * columns
+    ret = [r] * rows
+    return ret
+
+
 if __name__ == '__main__':
     file_with_matrix = sys.argv[1]
     file_with_words = sys.argv[2]
     matrix = load_char_matrix(file_with_matrix)
     words = load_char_matrix(file_with_words)
-    print("matrix indexes : {}x{}".format(len(matrix[0]) - 1, len(column(matrix, 0)) - 1))
-    test_rows_columns(matrix)
+    matrix_columns = len(matrix[0])
+    matrix_rows = len(column(matrix, 0))
+    print("matrix rows x columns = {}x{}".format(matrix_rows, matrix_columns))
+    e_m = empty_matrix(matrix_rows, matrix_columns)
+    test_rows_columns(matrix, words)
     # print("diagonals down ...")
-    test_diagonals(matrix, down=True)
+    # test_diagonals(matrix, down=True)
     # print("diagonals up ...")
-    test_diagonals(matrix, down=False)
+    # test_diagonals(matrix, down=False)
     sys.exit(0)

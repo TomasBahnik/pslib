@@ -48,3 +48,13 @@ def diagonals(matrix, shift, down=True):
                         seq_col_start_idx = j
                     seq.append(matrix[i][j])
     return seq, seq_row_start_idx, seq_col_start_idx, down
+
+
+def search_char_in_rows_columns(matrix, char, row=True):
+    l = len(column(matrix, 0)) if row else len(matrix[0])
+    for idx in range(0, l):
+        search_in = matrix[idx] if row else column(matrix, idx)
+        found = char in search_in
+        if found:
+            position = search_in.index(char)
+            print("Char '{}' found in {} at index {}".format(char, search_in, position))
