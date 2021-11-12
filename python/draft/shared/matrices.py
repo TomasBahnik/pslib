@@ -6,6 +6,14 @@ def load_int_matrix(file):
     return pole
 
 
+def load_lines_matrix(file):
+    pole = []
+    with open(file, 'r') as f:
+        for line in f:
+            pole.append(line.rstrip())
+    return pole
+
+
 def load_char_matrix(file):
     pole = []
     with open(file, 'r') as f:
