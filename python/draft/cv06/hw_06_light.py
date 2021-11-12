@@ -71,9 +71,38 @@ def find_word(search_in, words, start_idx, rows=True, diagonal=False):
                 end_idx_col = start_idx_col
                 if start_idx_col != end_idx_col:
                     print("ERROR columns {} != {}".format(start_idx_col, end_idx_col))
+            idx_range = [start_idx_row, start_idx_col, end_idx_row, end_idx_col]
             print("word '{}' : range = [{},{}] - [{},{}], length={}, lowest_idx={}"
                   .format(word, start_idx_row, start_idx_col, end_idx_row, end_idx_col, length_of_word, lowest_idx))
-            found_words.append(word)
+            # found_words.append(word)
+            found_words.append(idx_range)
+
+
+ROWS = 0
+COLS = 1
+DIAG = 3
+
+
+def delete_range(matrix, idx_range, range_type=ROWS):
+    r_start = idx_range[0]
+    c_start = idx_range[1]
+    r_end = idx_range[2]
+    c_end = idx_range[3]
+    if range_type == ROWS:
+        for c in range(c_start, c_end + 1):
+            matrix[r_start][c] = '@'
+    elif range_type == COLS:
+        for r in range(r_start, r_end + 1):
+            matrix[r][c_start] = '@'
+    else:
+        print("diag")
+
+
+def test_delete(matrix):
+    # moniko
+    delete_range(matrix, [1, 0, 6, 0], range_type=COLS)
+    # brblalo
+    delete_range(matrix, [0, 3, 0, 9], range_type=ROWS)
 
 
 def test_rows_columns(matrix, words):
@@ -122,7 +151,7 @@ if __name__ == '__main__':
     file_with_matrix = sys.argv[1]
     file_with_words = sys.argv[2]
     matrix = load_char_matrix(file_with_matrix)
-    # TODO keep words as list of strings
+    print(matrix)
     words = load_lines_matrix(file_with_words)
     matrix_columns = len(matrix[0])
     matrix_rows = len(column(matrix, 0))
@@ -130,4 +159,5 @@ if __name__ == '__main__':
     test_rows_columns(matrix, words)
     test_diagonals(matrix, words)
     print(found_words)
+    # test_delete(matrix)
     sys.exit(0)
