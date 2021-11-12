@@ -30,7 +30,11 @@ import sys
 
 from draft.shared.matrices import load_char_matrix, diagonals, column, load_lines_matrix
 
-found_words = []
+found_word_ranges = []
+
+RANGE_TYPE_ROWS = 0
+RANGE_TYPE_COLS = 1
+RANGE_TYPE_DIAG = 2
 
 
 # TODO search for substrings in given directions
@@ -53,6 +57,7 @@ def find_word(search_in, words, start_idx, rows=True, diagonal=False):
                 end_idx_col = start_idx_col + length_of_word - 1
                 shift_start = start_idx_row - start_idx_col
                 shift_end = end_idx_row - end_idx_col
+                range_type = RANGE_TYPE_DIAG
                 if shift_start != shift_end:
                     print("ERROR diag shifts {} != {}".format(shift_start, shift_end))
             elif rows:
@@ -61,6 +66,7 @@ def find_word(search_in, words, start_idx, rows=True, diagonal=False):
                 start_idx_col = lowest_idx
                 end_idx_row = start_idx_row
                 end_idx_col = lowest_idx + length_of_word - 1
+                range_type = RANGE_TYPE_ROWS
                 if start_idx_row != end_idx_row:
                     print("ERROR rows {} != {}".format(start_idx_row, end_idx_row))
             else:  # columns
@@ -69,40 +75,39 @@ def find_word(search_in, words, start_idx, rows=True, diagonal=False):
                 start_idx_col = start_idx
                 end_idx_row = start_idx_row + length_of_word - 1
                 end_idx_col = start_idx_col
+                range_type = RANGE_TYPE_COLS
                 if start_idx_col != end_idx_col:
                     print("ERROR columns {} != {}".format(start_idx_col, end_idx_col))
-            idx_range = [start_idx_row, start_idx_col, end_idx_row, end_idx_col]
+            idx_range = [range_type, start_idx_row, start_idx_col, end_idx_row, end_idx_col]
             print("word '{}' : range = [{},{}] - [{},{}], length={}, lowest_idx={}"
                   .format(word, start_idx_row, start_idx_col, end_idx_row, end_idx_col, length_of_word, lowest_idx))
             # found_words.append(word)
-            found_words.append(idx_range)
+            found_word_ranges.append(idx_range)
 
 
-ROWS = 0
-COLS = 1
-DIAG = 3
-
-
-def delete_range(matrix, idx_range, range_type=ROWS):
-    r_start = idx_range[0]
-    c_start = idx_range[1]
-    r_end = idx_range[2]
-    c_end = idx_range[3]
-    if range_type == ROWS:
-        for c in range(c_start, c_end + 1):
-            matrix[r_start][c] = '@'
-    elif range_type == COLS:
-        for r in range(r_start, r_end + 1):
-            matrix[r][c_start] = '@'
+def delete_range(matrix, idx_range):
+    range_type = idx_range[0]
+    start_row = idx_range[1]
+    start_col = idx_range[2]
+    end_row = idx_range[3]
+    end_col = idx_range[4]
+    if range_type == RANGE_TYPE_ROWS:
+        for c in range(start_col, end_col + 1):
+            matrix[start_row][c] = ''
+    elif range_type == RANGE_TYPE_COLS:
+        for r in range(start_row, end_row + 1):
+            matrix[r][start_col] = ''
     else:
-        print("diag")
+        s = end_row - start_row
+        for r in range(0, s + 1):
+            matrix[start_row + r][start_col + r] = ''
 
 
 def test_delete(matrix):
     # moniko
-    delete_range(matrix, [1, 0, 6, 0], range_type=COLS)
+    delete_range(matrix, [RANGE_TYPE_COLS, 1, 0, 6, 0])
     # brblalo
-    delete_range(matrix, [0, 3, 0, 9], range_type=ROWS)
+    delete_range(matrix, [RANGE_TYPE_ROWS, 0, 3, 0, 9])
 
 
 def test_rows_columns(matrix, words):
@@ -158,6 +163,9 @@ if __name__ == '__main__':
     print("matrix rows x columns = {}x{}".format(matrix_rows, matrix_columns))
     test_rows_columns(matrix, words)
     test_diagonals(matrix, words)
-    print(found_words)
-    # test_delete(matrix)
+    print(found_word_ranges)
+    for found_range in found_word_ranges:
+        delete_range(matrix, found_range)
+    for row in matrix:
+        print(''.join(row))
     sys.exit(0)
