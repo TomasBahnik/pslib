@@ -37,30 +37,56 @@ found_words = []
 #  and for substring start index end index or length
 #  for diagonals and columns ensure the search in right direction
 #  left -> right, top -> down, left-top -> right-bottom
-def find_word(search_in, words, start_idx, diagonal=False):
-    # TODO no need to use list for rows, only for columns and diagonals
+def find_word(search_in, words, start_idx, rows=True, diagonal=False):
+    # convert list to string
     search_in_str = ''.join(search_in)
     for word in words:
         lowest_idx = search_in_str.find(word)
         if lowest_idx != -1:
             # shift to right for diag to get actual start position of word
             start_idx = start_idx if not diagonal else start_idx + lowest_idx
-            print("word '{}' : lowest_idx = {},  start at = [{},{}]"
-                  .format(word, lowest_idx, start_idx, lowest_idx))
+            length_of_word = len(word)
+            if diagonal:
+                start_idx_row = start_idx
+                start_idx_col = lowest_idx
+                end_idx_row = start_idx_row + length_of_word - 1
+                end_idx_col = start_idx_col + length_of_word - 1
+                shift_start = start_idx_row - start_idx_col
+                shift_end = end_idx_row - end_idx_col
+                if shift_start != shift_end:
+                    print("ERROR diag shifts {} != {}".format(shift_start, shift_end))
+            elif rows:
+                # valid for rows, for columns interchange
+                start_idx_row = start_idx
+                start_idx_col = lowest_idx
+                end_idx_row = start_idx_row
+                end_idx_col = lowest_idx + length_of_word - 1
+                if start_idx_row != end_idx_row:
+                    print("ERROR rows {} != {}".format(start_idx_row, end_idx_row))
+            else:  # columns
+                # valid for columns
+                start_idx_row = lowest_idx
+                start_idx_col = start_idx
+                end_idx_row = start_idx_row + length_of_word - 1
+                end_idx_col = start_idx_col
+                if start_idx_col != end_idx_col:
+                    print("ERROR columns {} != {}".format(start_idx_col, end_idx_col))
+            print("word '{}' : range = [{},{}] - [{},{}], length={}, lowest_idx={}"
+                  .format(word, start_idx_row, start_idx_col, end_idx_row, end_idx_col, length_of_word, lowest_idx))
             found_words.append(word)
 
 
 def test_rows_columns(matrix, words):
-    print("rows ...")
+    print("\nrows ...")
     l = len(column(matrix, 0))
     for idx in range(0, l):
         search_in = matrix[idx]
         find_word(search_in, words, idx)
-    print("columns ...")
+    print("\ncolumns ...")
     l = len(matrix[0])
     for idx in range(0, l):
         search_in = column(matrix, idx)
-        find_word(search_in, words, idx)
+        find_word(search_in, words, idx, rows=False)
 
 
 def test_diagonals(matrix, words):
@@ -69,7 +95,7 @@ def test_diagonals(matrix, words):
     columns = len(matrix[0])
     rows = len(column(matrix, 0))
     diff_range = range(-columns + 1, rows)
-    print("diagonals left-top - right-bottom, {}".format(diff_range))
+    print("\ndiagonals left-top - right-bottom, {}".format(diff_range))
     for diff in diff_range:
         details = diagonals(matrix, diff, down=False)
         search_in = details[0]  # diagonal sequence
