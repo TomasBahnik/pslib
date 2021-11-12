@@ -28,7 +28,7 @@ Je celkem 4x2 = 8 moznych smeru (v dane uloze prvni 3 bez reverse)
 
 import sys
 
-from draft.shared.matrices import load_char_matrix, diagonals, column
+from draft.shared.matrices import load_char_matrix, diagonals, column, load_lines_matrix
 
 found_words = []
 
@@ -37,28 +37,30 @@ found_words = []
 #  and for substring start index end index or length
 #  for diagonals and columns ensure the search in right direction
 #  left -> right, top -> down, left-top -> right-bottom
-def find_word(search_in, word):
+def find_word(search_in, words, start_idx, diagonal=False):
     # TODO no need to use list for rows, only for columns and diagonals
-    s1 = ''.join(search_in)
-    s2 = ''.join(word)
-    if search_in == word:
-        print("word {} found".format(word))
-        found_words.append(word)
+    search_in_str = ''.join(search_in)
+    for word in words:
+        lowest_idx = search_in_str.find(word)
+        if lowest_idx != -1:
+            # shift to right for diag to get actual start position of word
+            start_idx = start_idx if not diagonal else start_idx + lowest_idx
+            print("word '{}' : lowest_idx = {},  start at = [{},{}]"
+                  .format(word, lowest_idx, start_idx, lowest_idx))
+            found_words.append(word)
 
 
 def test_rows_columns(matrix, words):
     print("rows ...")
-    for word in words:
-        l = len(column(matrix, 0))
-        for idx in range(0, l):
-            search_in = matrix[idx]
-            find_word(search_in, word)
+    l = len(column(matrix, 0))
+    for idx in range(0, l):
+        search_in = matrix[idx]
+        find_word(search_in, words, idx)
     print("columns ...")
-    for word in words:
-        l = len(matrix[0])
-        for idx in range(0, l):
-            search_in = column(matrix, idx)
-            find_word(search_in, word)
+    l = len(matrix[0])
+    for idx in range(0, l):
+        search_in = column(matrix, idx)
+        find_word(search_in, words, idx)
 
 
 def test_diagonals(matrix, words):
@@ -71,8 +73,9 @@ def test_diagonals(matrix, words):
     for diff in diff_range:
         details = diagonals(matrix, diff, down=False)
         search_in = details[0]  # diagonal sequence
-        for word in words:
-            find_word(search_in, word)
+        row_start_idx = details[1]  # diagonal start coordinates - row
+        col_start_idx = details[2]  # diagonal start coordinates - col
+        find_word(search_in, words, row_start_idx, diagonal=True)
 
 
 def empty_matrix(rows, columns):
@@ -94,13 +97,11 @@ if __name__ == '__main__':
     file_with_words = sys.argv[2]
     matrix = load_char_matrix(file_with_matrix)
     # TODO keep words as list of strings
-    words = load_char_matrix(file_with_words)
+    words = load_lines_matrix(file_with_words)
     matrix_columns = len(matrix[0])
     matrix_rows = len(column(matrix, 0))
     print("matrix rows x columns = {}x{}".format(matrix_rows, matrix_columns))
     test_rows_columns(matrix, words)
     test_diagonals(matrix, words)
-    # print(found_words)
-    tmp = remove_words(matrix, found_words)
-    print("len {}, tmp {}".format(len(tmp), tmp))
+    print(found_words)
     sys.exit(0)
