@@ -9,7 +9,7 @@ def mean(v):
     s = 0.
     for i in range(len(v)):
         s += v[i]
-    return (s / len(v))
+    return s / len(v)
 
 
 def stdev(v):
@@ -21,7 +21,7 @@ def stdev(v):
     return math.sqrt(s / (len(v) - 1))
 
 
-# pole čísel 0..1000  
+# pole čísel 0..1000
 a = list(range(1001))
 # vypočítáme průměr
 print(mean(a))
@@ -34,7 +34,7 @@ def mean2(v):
     s = 0.
     for x in v:
         s += x
-    return (s / len(v))
+    return s / len(v)
 
 
 def stdev2(v):
@@ -54,7 +54,7 @@ print(stdev2(a))
 
 def mean3(v):
     """Calculate a mean of a vector"""
-    return (sum(v) / len(v))
+    return sum(v) / len(v)
 
 
 def stdev3(v):

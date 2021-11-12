@@ -3,7 +3,7 @@
 
 import sys
 
-from draft.cv05.shared import load_matrix, column
+from draft.shared.matrices import diagonals, load_int_matrix, column
 
 empty = 0
 cross = 1
@@ -27,7 +27,7 @@ def last_cross_missing(sequence):
     return False
 
 
-def sub_seq_of_length(sequence, length=5):
+def empty_idx_in_seq_of_length(sequence, length=5):
     """ sub sequences of given length """
     l_s = len(sequence)
     if l_s < length:  # l_s - length < 0
@@ -54,7 +54,7 @@ def print_output(row, col):
 def search_for_piskvorka(matrix, row=True):
     l = len(matrix)
     for idx in range(0, l):
-        empty_idx = sub_seq_of_length(matrix[idx]) if row else sub_seq_of_length(column(matrix, idx))
+        empty_idx = empty_idx_in_seq_of_length(matrix[idx]) if row else empty_idx_in_seq_of_length(column(matrix, idx))
         if empty_idx is not None:
             cross_row_idx = idx if row else empty_idx
             cross_col_idx = empty_idx if row else idx
@@ -63,8 +63,12 @@ def search_for_piskvorka(matrix, row=True):
             print_output(cross_row_idx, cross_col_idx)
 
 
-def cross_diag_seq(seq, seq_row_start_idx, seq_col_start_idx, down):
-    empty_idx = sub_seq_of_length(seq)
+def cross_diag_seq(seq_details):
+    seq = seq_details[0]
+    seq_row_start_idx = seq_details[1]
+    seq_col_start_idx = seq_details[2]
+    down = seq_details[3]
+    empty_idx = empty_idx_in_seq_of_length(seq)
     if empty_idx is not None:
         # print("shift={}, shift_p={}, empty_idx {}, seq_diag {}".format(shift, shift_p, empty_idx, seq))
         # there is no common solution for both diagonals
@@ -80,38 +84,6 @@ def cross_diag_seq(seq, seq_row_start_idx, seq_col_start_idx, down):
         print_output(cross_row_idx, cross_col_idx)
 
 
-def diagonals(matrix, shift, down=True):
-    l_m = len(matrix)
-    r1 = range(0, l_m)
-    r2 = range(0, l_m)
-    seq = []  # for each s new seq
-    # initialized only once for given shift
-    seq_row_start_idx = None
-    seq_col_start_idx = None
-    if down:
-        for i in r1:
-            for j in r2:
-                if (i + j) == shift:  # sum of indexes is equal
-                    # print("shift={} : [{},{}]".format(shift, i, j))
-                    if seq_row_start_idx is None:
-                        seq_row_start_idx = i
-                    if seq_col_start_idx is None:
-                        seq_col_start_idx = j
-                    seq.append(matrix[i][j])
-    else:
-        for i in r1:
-            for j in r2:
-                if i - j == shift:  # difference of indexes is equal and can be negative zero (main diag) or positive
-                    # print("shift={} : [{},{}]".format(shift, i, j))
-                    if seq_row_start_idx is None:
-                        seq_row_start_idx = i
-                    if seq_col_start_idx is None:
-                        seq_col_start_idx = j
-                    seq.append(matrix[i][j])
-    cross_diag_seq(seq, seq_row_start_idx, seq_col_start_idx, down)
-    return seq
-
-
 def test_diagonals(matrix, down=True):
     l = len(matrix)
     r_down = range(0, 2 * l - 1)
@@ -119,11 +91,13 @@ def test_diagonals(matrix, down=True):
     # print("matrix length = {}".format(l))
     if down:
         for k in r_down:
-            seq = diagonals(matrix, k, down)
+            seq_details = diagonals(matrix, k, down)
+            cross_diag_seq(seq_details)
             # print("{} : {}".format(k, seq))
     else:
         for k in r_up:
-            seq = diagonals(matrix, k, down)
+            seq_details = diagonals(matrix, k, down)
+            cross_diag_seq(seq_details)
             # print("{} : {}".format(k, seq))
 
 
@@ -136,7 +110,7 @@ def test_rows_columns(matrix):
 
 if __name__ == '__main__':
     file_with_matrix = sys.argv[1]
-    matrix = load_matrix(file_with_matrix)
+    matrix = load_int_matrix(file_with_matrix)
     test_rows_columns(matrix)
     # print("diagonals down ...")
     test_diagonals(matrix, down=True)
