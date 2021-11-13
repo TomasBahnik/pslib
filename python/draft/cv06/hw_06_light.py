@@ -78,6 +78,8 @@ def find_word(search_in, words, start_idx, rows=True, diagonal=False):
                 range_type = RANGE_TYPE_COLS
                 if start_idx_col != end_idx_col:
                     print("ERROR columns {} != {}".format(start_idx_col, end_idx_col))
+            # TODO provide whole range as row, col pairs use list comprehension according to type
+            #  easy to delete range type becomes obsolete
             idx_range = [range_type, start_idx_row, start_idx_col, end_idx_row, end_idx_col]
             print("word '{}' : range = [{},{}] - [{},{}], length={}, lowest_idx={}"
                   .format(word, start_idx_row, start_idx_col, end_idx_row, end_idx_col, length_of_word, lowest_idx))
@@ -136,20 +138,6 @@ def test_diagonals(matrix, words):
         row_start_idx = details[1]  # diagonal start coordinates - row
         col_start_idx = details[2]  # diagonal start coordinates - col
         find_word(search_in, words, row_start_idx, diagonal=True)
-
-
-def empty_matrix(rows, columns):
-    r = [0] * columns
-    ret = [r] * rows
-    return ret
-
-
-def remove_words(m, f_w):
-    for word in f_w:
-        print("\n*** {}".format(word))
-        for i in range(0, len(m)):
-            m[i] = ([char for char in m[i] if char not in word])
-    return m
 
 
 if __name__ == '__main__':
