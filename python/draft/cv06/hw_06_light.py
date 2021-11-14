@@ -36,6 +36,8 @@ RANGE_TYPE_ROWS = 0
 RANGE_TYPE_COLS = 1
 RANGE_TYPE_DIAG = 2
 
+DEBUG_PRINTS = False
+
 
 # TODO search for substrings in given directions
 #  and for substring start index end index or length
@@ -86,8 +88,9 @@ def find_word(search_in, words, row_start_idx, col_start_idx=0, rows=True, diago
             #  how to do that for diag ??
             #  easy to delete range type becomes obsolete
             idx_range = [range_type, start_idx_row, start_idx_col, end_idx_row, end_idx_col]
-            print("word '{}' : range = [{},{}] - [{},{}], length={}, lowest_idx={}"
-                  .format(word, start_idx_row, start_idx_col, end_idx_row, end_idx_col, length_of_word, lowest_idx))
+            if DEBUG_PRINTS:
+                print("word '{}' : range = [{},{}] - [{},{}], length={}, lowest_idx={}"
+                      .format(word, start_idx_row, start_idx_col, end_idx_row, end_idx_col, length_of_word, lowest_idx))
             # found_words.append(word)
             found_word_ranges.append(idx_range)
 
@@ -120,12 +123,14 @@ def test_delete(matrix):
 
 
 def test_rows_columns(matrix, words):
-    print("\nrows ...")
+    if DEBUG_PRINTS:
+        print("\nrows ...")
     l = len(column(matrix, 0))
     for idx in range(0, l):
         search_in = matrix[idx]
         find_word(search_in, words, idx)
-    print("\ncolumns ...")
+    if DEBUG_PRINTS:
+        print("\ncolumns ...")
     l = len(matrix[0])
     for idx in range(0, l):
         search_in = column(matrix, idx)
@@ -138,7 +143,8 @@ def test_diagonals(matrix, words):
     columns = len(matrix[0])
     rows = len(column(matrix, 0))
     diff_range = range(-columns + 1, rows)
-    print("\ndiagonals left-top - right-bottom, {}".format(diff_range))
+    if DEBUG_PRINTS:
+        print("\ndiagonals left-top - right-bottom, {}".format(diff_range))
     for diff in diff_range:
         details = diagonals(matrix, diff, down=False)
         search_in = details[0]  # diagonal sequence
@@ -153,15 +159,18 @@ if __name__ == '__main__':
     matrix = load_char_matrix(file_with_matrix)
     # print(matrix)
     words = load_lines_matrix(file_with_words)
-    matrix_columns = len(matrix[0])
-    matrix_rows = len(column(matrix, 0))
+    # matrix_columns = len(matrix[0])
+    # matrix_rows = len(column(matrix, 0))
     # print("matrix rows x columns = {}x{}".format(matrix_rows, matrix_columns))
     test_rows_columns(matrix, words)
     test_diagonals(matrix, words)
     # print(found_word_ranges)
     for found_range in found_word_ranges:
         delete_range(matrix, found_range)
+    # join individual rows and add them to list of strings using list comprehension
     result_list = [''.join(r) for r in matrix]
-    print("\n*** Result ***")
+    if DEBUG_PRINTS:
+        print("\n*** Result ***")
+    # join all rows to single string
     print(''.join(result_list))
     sys.exit(0)
