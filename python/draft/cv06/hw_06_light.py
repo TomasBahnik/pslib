@@ -79,7 +79,11 @@ def find_word(search_in, words, row_start_idx, col_start_idx=0, rows=True, diago
                 range_type = RANGE_TYPE_COLS
                 if start_idx_col != end_idx_col:
                     print("ERROR columns {} != {}".format(start_idx_col, end_idx_col))
-            # TODO provide whole range as row, col pairs use list comprehension according to type
+            # TODO provide whole range as (row,col) pairs use list comprehension
+            #  [(x, y) for x in [1,2,3] for y in [3,1,4] if x != y] according to type (row, col, diag)
+            #  row = [(r, c) for r in [0] for c in [3,1,4]]
+            #  col = [(r, c) for r in [0,1,2,3] for c in [3]]
+            #  how to do that for diag ??
             #  easy to delete range type becomes obsolete
             idx_range = [range_type, start_idx_row, start_idx_col, end_idx_row, end_idx_col]
             print("word '{}' : range = [{},{}] - [{},{}], length={}, lowest_idx={}"
@@ -157,6 +161,6 @@ if __name__ == '__main__':
     print(found_word_ranges)
     for found_range in found_word_ranges:
         delete_range(matrix, found_range)
-    for row in matrix:
-        print(''.join(row))
+    result_list = [''.join(r) for r in matrix]
+    print(''.join(result_list))
     sys.exit(0)
