@@ -41,18 +41,19 @@ RANGE_TYPE_DIAG = 2
 #  and for substring start index end index or length
 #  for diagonals and columns ensure the search in right direction
 #  left -> right, top -> down, left-top -> right-bottom
-def find_word(search_in, words, start_idx, rows=True, diagonal=False):
+def find_word(search_in, words, row_start_idx, col_start_idx=0, rows=True, diagonal=False):
     # convert list to string
     search_in_str = ''.join(search_in)
     for word in words:
         lowest_idx = search_in_str.find(word)
         if lowest_idx != -1:
             # shift to right for diag to get actual start position of word
-            start_idx = start_idx if not diagonal else start_idx + lowest_idx
+            row_start_idx = row_start_idx if not diagonal else row_start_idx + lowest_idx
             length_of_word = len(word)
             if diagonal:
-                start_idx_row = start_idx
-                start_idx_col = lowest_idx
+                start_idx_row = row_start_idx
+                # for diagonals started at top - > left diagonal
+                start_idx_col = lowest_idx + col_start_idx
                 end_idx_row = start_idx_row + length_of_word - 1
                 end_idx_col = start_idx_col + length_of_word - 1
                 shift_start = start_idx_row - start_idx_col
@@ -62,7 +63,7 @@ def find_word(search_in, words, start_idx, rows=True, diagonal=False):
                     print("ERROR diag shifts {} != {}".format(shift_start, shift_end))
             elif rows:
                 # valid for rows, for columns interchange
-                start_idx_row = start_idx
+                start_idx_row = row_start_idx
                 start_idx_col = lowest_idx
                 end_idx_row = start_idx_row
                 end_idx_col = lowest_idx + length_of_word - 1
@@ -72,7 +73,7 @@ def find_word(search_in, words, start_idx, rows=True, diagonal=False):
             else:  # columns
                 # valid for columns
                 start_idx_row = lowest_idx
-                start_idx_col = start_idx
+                start_idx_col = row_start_idx
                 end_idx_row = start_idx_row + length_of_word - 1
                 end_idx_col = start_idx_col
                 range_type = RANGE_TYPE_COLS
@@ -110,6 +111,8 @@ def test_delete(matrix):
     delete_range(matrix, [RANGE_TYPE_COLS, 1, 0, 6, 0])
     # brblalo
     delete_range(matrix, [RANGE_TYPE_ROWS, 0, 3, 0, 9])
+    # zadu [3,1] - [6,4]
+    delete_range(matrix, [RANGE_TYPE_DIAG, 3, 1, 6, 4])
 
 
 def test_rows_columns(matrix, words):
@@ -137,7 +140,7 @@ def test_diagonals(matrix, words):
         search_in = details[0]  # diagonal sequence
         row_start_idx = details[1]  # diagonal start coordinates - row
         col_start_idx = details[2]  # diagonal start coordinates - col
-        find_word(search_in, words, row_start_idx, diagonal=True)
+        find_word(search_in, words, row_start_idx, col_start_idx, diagonal=True)
 
 
 if __name__ == '__main__':
