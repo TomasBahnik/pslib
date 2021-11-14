@@ -30,16 +30,18 @@ def column(matrix, i):
 # down=True means right-top to left-bottom
 # down=False means left-top right-bottom used by hw_06_light.py
 def diagonals(matrix, shift, down=True):
-    l_m = len(matrix)
-    r1 = range(0, l_m)
-    r2 = range(0, l_m)
+    matrix_columns = len(matrix[0])
+    matrix_rows = len(column(matrix, 0))
+    # matrix needs not to be square
+    row_range = range(0, matrix_rows)
+    col_range = range(0, matrix_columns)
     seq = []  # for each s new seq
     # initialized only once for given shift
     seq_row_start_idx = None
     seq_col_start_idx = None
     if down:
-        for i in r1:
-            for j in r2:
+        for i in row_range:
+            for j in col_range:
                 if (i + j) == shift:  # sum of indexes is equal
                     print("index sum {} : [{},{}] = {}".format(shift, i, j, matrix[i][j]))
                     if seq_row_start_idx is None:
@@ -48,8 +50,8 @@ def diagonals(matrix, shift, down=True):
                         seq_col_start_idx = j
                     seq.append(matrix[i][j])
     else:
-        for i in r1:
-            for j in r2:
+        for i in row_range:
+            for j in col_range:
                 if i - j == shift:  # difference of indexes is equal and can be negative zero (main diag) or positive
                     # print("index diff={} : [{},{}] = {}".format(shift, i, j, matrix[i][j]))
                     if seq_row_start_idx is None:
