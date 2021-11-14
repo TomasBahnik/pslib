@@ -151,16 +151,17 @@ if __name__ == '__main__':
     file_with_matrix = sys.argv[1]
     file_with_words = sys.argv[2]
     matrix = load_char_matrix(file_with_matrix)
-    print(matrix)
+    # print(matrix)
     words = load_lines_matrix(file_with_words)
     matrix_columns = len(matrix[0])
     matrix_rows = len(column(matrix, 0))
-    print("matrix rows x columns = {}x{}".format(matrix_rows, matrix_columns))
+    # print("matrix rows x columns = {}x{}".format(matrix_rows, matrix_columns))
     test_rows_columns(matrix, words)
     test_diagonals(matrix, words)
-    print(found_word_ranges)
+    # print(found_word_ranges)
     for found_range in found_word_ranges:
         delete_range(matrix, found_range)
     result_list = [''.join(r) for r in matrix]
+    print("\n*** Result ***")
     print(''.join(result_list))
     sys.exit(0)
