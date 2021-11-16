@@ -14,4 +14,10 @@ if __name__ == '__main__':
     expr = (x + y) ** 5
     print(expand(expr))
     print(latex(expand(expr)))
+    a = Integral(sin(x) ** 2, x)
+    res = Eq(a, a.doit())
+    c = Integral(expr, x)
+    print(latex(res))
+    res = Eq(c, c.doit())
+    print(latex(res))
     sys.exit(0)
