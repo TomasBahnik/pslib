@@ -49,11 +49,10 @@ def find_word(search_in, words, row_start_idx, col_start_idx=0, rows=True, diago
     for word in words:
         lowest_idx = search_in_str.find(word)
         if lowest_idx != -1:
-            # shift to right for diag to get actual start position of word
-            row_start_idx = row_start_idx if not diagonal else row_start_idx + lowest_idx
             length_of_word = len(word)
             if diagonal:
-                start_idx_row = row_start_idx
+                # shift to right for diag to get actual start position of word
+                start_idx_row = row_start_idx + lowest_idx
                 # for diagonals started at top - > left diagonal
                 start_idx_col = lowest_idx + col_start_idx
                 end_idx_row = start_idx_row + length_of_word - 1

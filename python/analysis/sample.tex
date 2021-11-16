@@ -1,0 +1,60 @@
+%! Author = tomas.bahnik
+%! Date = 11/16/2021
+
+% Preamble
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{bm}
+\usepackage{physics}
+\usepackage[total={7in,10in}]{geometry}
+\geometry{a4paper}
+\usepackage{hyperref} % Colors for links, text and headings
+\input{math_commands.tex}
+
+
+% Document
+\begin{document}
+    \section{Integrals}\label{sec:integrals}
+
+    \begin{equation}
+        \int x^{2}\, dx = \frac{x^{3}}{3}
+    \end{equation}
+
+    \begin{equation}
+        x^{5} + 5 x^{4} y + 10 x^{3} y^{2} + 10 x^{2} y^{3} + 5 x y^{4} + y^{5}
+    \end{equation}
+
+    \begin{equation}
+        \int \sin^{2}{\left(x \right)}\, dx = \frac{x}{2} - \frac{\sin{\left(x \right)} \cos{\left(x \right)}}{2}
+    \end{equation}
+
+    \begin{equation}
+        \int \left(x + y\right)^{5}\, dx = \frac{x^{6}}{6} + x^{5} y + \frac{5 x^{4} y^{2}}{2} + \frac{10 x^{3} y^{3}}{3} + \frac{5 x^{2} y^{4}}{2} + x y^{5}
+    \end{equation}
+
+
+    \section{Symbols}\label{sec:symbols}
+    \begin{math}
+        \vn, \eva, \ermH, \tD, \etD, \sA, \sF^{n}, \ptrain
+    \end{math}
+
+
+    \section{Matrices}\label{sec:matrices}
+
+    Matrix
+    \begin{math}
+        \mA = \left(\begin{matrix}
+                        34 & 22 & 19 & 12\\72 & 87 & 162 & 122\\69 & 69 & 420 & 89
+        \end{matrix}\right)
+    \end{math}
+
+    Transposed
+    \begin{math}
+        \mA^{T} = \left(\begin{matrix}
+                            34 & 72 & 69\\22 & 87 & 69\\19 & 162 & 420\\12 & 122 & 89
+        \end{matrix}\right)
+    \end{math}
+\end{document}

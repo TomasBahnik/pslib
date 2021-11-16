@@ -1,5 +1,6 @@
 # Prednasky
 
+[Seznam](https://math.fel.cvut.cz/en/people/velebil/teaching/lag_2021_podzim.html)
 
 ## 7A: Determinant, část 1.
 [Prezentace](http://math.fel.cvut.cz/en/people/velebil/files/lag_2021_podzim/lag_handout07a.pdf)
