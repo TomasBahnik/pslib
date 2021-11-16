@@ -1,6 +1,6 @@
-# n = int(input())
 import sys
 
+n = int(input())
 x = float(input())
 
 hint = []
@@ -24,8 +24,10 @@ def init_hint(y):
     hint.append(r2(y))
 
 
-def r3(y):
-    return 1 / 3 * r2(y) + (-1) ** 3 * r1(y) + 2 / y * r0()
+def r(y, m):
+    if m < len(hint):
+        return hint[m]
+    return 1 / m * hint[m - 1] + (-1) ** m * hint[m - 2] + (m - 1) / y * hint[m - 3]
 
 
 if x == 0:
@@ -34,4 +36,4 @@ if x == 0:
 
 init_hint(x)
 print(hint)
-print(r3(x))
+print("r{}({}) = {}".format(n, x, r(x, n)))
