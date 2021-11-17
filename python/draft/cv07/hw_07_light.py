@@ -1,7 +1,15 @@
 import sys
+from timeit import default_timer as timer
 
 n = int(input())
 x = float(input())
+DEBUG_PRINTS = True
+
+
+def debug_print(message):
+    if DEBUG_PRINTS:
+        print(message)
+
 
 hint = []
 
@@ -28,18 +36,27 @@ def r(m, y):
     l = len(hint)
     if m < l:
         return hint[m]
-    if m - l == 0:  # muzu pouzit primo hinty
-        result = (1 / m) * hint[m - 1] + (-1) ** m * hint[m - 2] + (m - 1) / y * hint[m - 3]
-        hint.append(result)
-        return result
-    return r(m - 1, y)
+    else:
+        r(m - 1, y)  # recursion
+        r_m = (1 / m) * hint[m - 1] + (-1) ** m * (m / (m + 1)) * hint[m - 2] + (m - 1) / y * hint[m - 3]
+        hint.append(r_m)
+        return r_m
 
 
-if x == 0:
-    print("error x nemuze byt".format(x))
-    sys.exit(1)
+# 8 decimals
+# n=5, x=1.5  : -3.2468055555555555 expected -3.246805555555556
+# n=20, x=-1.5, : -212609.03633822594 expected -212609.036338226
+if __name__ == '__main__':
+    if x == 0:
+        print("error x nemuze byt".format(x))
+        sys.exit(1)
 
-init_hint(x)
-print(hint)
-r = r(n, x)
-print("r{}({}) = {}".format(n, x, r))
+    init_hint(x)
+    debug_print("Initial values of function={}".format(hint))
+    start = timer()
+    result = r(n, x)
+    end = timer()
+    debug_print('Elapsed time = {} sec'.format(end - start))
+    debug_print("R_{}({}) = {}".format(n, x, result))
+    debug_print("Rounded to 8 decimals : %.8f" % result)
+    print(result)
