@@ -24,10 +24,15 @@ def init_hint(y):
     hint.append(r2(y))
 
 
-def r(y, m):
-    if m < len(hint):
+def r(m, y):
+    l = len(hint)
+    if m < l:
         return hint[m]
-    return 1 / m * hint[m - 1] + (-1) ** m * hint[m - 2] + (m - 1) / y * hint[m - 3]
+    if m - l == 0:  # muzu pouzit primo hinty
+        result = (1 / m) * hint[m - 1] + (-1) ** m * hint[m - 2] + (m - 1) / y * hint[m - 3]
+        hint.append(result)
+        return result
+    return r(m - 1, y)
 
 
 if x == 0:
@@ -36,4 +41,5 @@ if x == 0:
 
 init_hint(x)
 print(hint)
-print("r{}({}) = {}".format(n, x, r(x, n)))
+r = r(n, x)
+print("r{}({}) = {}".format(n, x, r))
