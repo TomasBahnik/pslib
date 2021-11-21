@@ -1,3 +1,9 @@
+# 1. kameny zcela vyplni matici
+# 2. jsou použity všechny kameny
+# 3. každý zcela leží uvnitř matice
+# 4. žadné políčko matice není prázdné
+# 5. barva kamene je vždy větší než 0
+# pokud existuje více řešení, vypište libovolné z nich
 import sys
 
 
@@ -18,6 +24,7 @@ def read_stones(filename):
     return num_rows, num_cols, stones
 
 
+# see 1 and 2
 def check_stone_areas(rows, cols, stones):
     area = 0
     for stone in stones:
