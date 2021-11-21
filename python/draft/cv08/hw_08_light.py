@@ -13,6 +13,7 @@ DEBUG_PRINTS = True
 STONE_COLOR = 0
 STONE_CELLS = 1
 STONE_BORDER = 2  # used for sort
+STONE_SORT_BORDER = 10  # used to switch sorting of stones
 CELL_ROW = 0
 CELL_COLUMN = 1
 
@@ -41,7 +42,7 @@ def check_stone_areas(rows, cols, stones):
     for stone in stones:
         s_c = len(stone[STONE_CELLS])
         area += s_c
-        print("color={}, area ={}".format(stone[0], s_c))
+        debug_print("color={}, area ={}".format(stone[0], s_c), DEBUG_PRINTS)
     if area != rows * cols:
         print('NOSOLUTION')
         return -1
@@ -74,6 +75,15 @@ def stone_border(stone):
     return n
 
 
+def sort_stones(stones, key=STONE_SORT_BORDER):
+    # key=lambda x: len(x[1]), reverse=True : sort by area
+    # key=lambda x: x[STONE_BORDER] : sort by length of border
+    if key == STONE_SORT_BORDER:
+        stones.sort(key=lambda x: x[STONE_BORDER], reverse=True)
+    else:
+        stones.sort(key=lambda x: len(x[1]), reverse=True)
+
+
 if __name__ == '__main__':
     filename = sys.argv[1]
     M, N, stones = read_stones(filename)
@@ -83,6 +93,8 @@ if __name__ == '__main__':
         boarder = stone_border(stone)
         debug_print("Stone {} : cells={}, border={}]"
                     .format(stone[STONE_COLOR], stone[STONE_CELLS], stone[STONE_BORDER]), DEBUG_PRINTS)
+    sort_stones(stones)
 
-    print("matrix {}x{}".format(M, N))
+    debug_print("matrix {}x{}".format(M, N), DEBUG_PRINTS)
     check_stone_areas(M, N, stones)
+    sys.exit(0)
