@@ -126,9 +126,16 @@ def stone_fits_on_board(stone, board, row, col):
     return True
 
 
+# count puts and deletes of stones = compare order of stones by area or by boarder
+puts = 0
+deletes = 0
+
+
 def fill(board, stone_no, stones):
+    global puts, deletes
     if stone_no == len(stones):  # all stones used
         if not any(EMPTY_CELL in x for x in board):
+            debug_print("Puts {},  deletes {}".format(puts, deletes), DEBUG_PRINTS)
             print(board)
             sys.exit(0)
 
@@ -140,6 +147,7 @@ def fill(board, stone_no, stones):
         for c in range(0, board_cols):
             if stone_fits_on_board(last_stone, board, r, c):
                 # put the stone color on board starting at [r,c]
+                puts += 1
                 for cell in last_stone[STONE_CELLS]:
                     cell_row = r + cell[CELL_ROW]
                     cell_column = c + cell[CELL_COLUMN]
@@ -148,6 +156,7 @@ def fill(board, stone_no, stones):
                 fill(board, stone_no + 1, stones)
                 # the last_stone does not fit on the board => delete *the last successfully* placed stone
                 # *the last successfully* placed last_stone and r and c are still available
+                deletes += 1
                 for cell in last_stone[STONE_CELLS]:
                     cell_row = r + cell[CELL_ROW]
                     cell_column = c + cell[CELL_COLUMN]
@@ -156,9 +165,9 @@ def fill(board, stone_no, stones):
 
 if __name__ == '__main__':
     filename = sys.argv[1]
-    M, N, stones = read_stones(filename)
-    board = [[EMPTY_CELL] * M for i in range(0, N)]
-    check_stone_areas(M, N, stones)
+    rows, cols, stones = read_stones(filename)
+    board = [[EMPTY_CELL] * cols for i in range(0, rows)]
+    check_stone_areas(rows, cols, stones)
     prepare_stones(stones)
     fill(board, 0, stones)
     print(NOSOLUTION)
