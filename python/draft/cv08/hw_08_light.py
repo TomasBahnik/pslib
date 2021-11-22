@@ -11,7 +11,7 @@ from draft.shared.general import debug_print
 # denotes empty cells in the board
 # color of stone is guaranteed to be > 0
 NOSOLUTION = 'NOSOLUTION'
-EMPTY_CELL = 0
+EMPTY_CELL_COLOR = 0
 
 DEBUG_PRINTS = False
 # indexes
@@ -119,7 +119,7 @@ def stone_fits_on_board(stone, board, row, col):
         if col_overflow or row_overflow:
             return False
         # another stone already present
-        stone_present = board[new_cell_row][new_cell_col] != EMPTY_CELL
+        stone_present = board[new_cell_row][new_cell_col] != EMPTY_CELL_COLOR
         if stone_present:
             return False
     return True
@@ -133,7 +133,7 @@ deletes = 0
 def fill(board, stone_no, stones):
     global puts, deletes
     if stone_no == len(stones):  # all stones used
-        if not any(EMPTY_CELL in x for x in board):
+        if not any(EMPTY_CELL_COLOR in x for x in board):
             debug_print("Puts {},  deletes {}".format(puts, deletes), DEBUG_PRINTS)
             print(board)
             sys.exit(0)
@@ -145,27 +145,29 @@ def fill(board, stone_no, stones):
     for r in range(0, board_rows):
         for c in range(0, board_cols):
             if stone_fits_on_board(last_stone, board, r, c):
-                # put the stone color on board starting at [r,c]
                 puts += 1
-                for cell in last_stone[STONE_CELLS]:
-                    cell_row = r + cell[CELL_ROW]
-                    cell_column = c + cell[CELL_COLUMN]
-                    board[cell_row][cell_column] = stone_color
+                # put the stone color on board starting at [r,c]
+                fill_stone(board, last_stone, r, c, stone_color)
                 # try to put next stone
                 fill(board, stone_no + 1, stones)
                 # the last_stone does not fit on the board => delete *the last successfully* placed stone
                 # *the last successfully* placed last_stone and r and c are still available
                 deletes += 1
-                for cell in last_stone[STONE_CELLS]:
-                    cell_row = r + cell[CELL_ROW]
-                    cell_column = c + cell[CELL_COLUMN]
-                    board[cell_row][cell_column] = EMPTY_CELL
+                # delete means put EMPTY_CELL_COLOR on the board instead of stone color
+                fill_stone(board, last_stone, r, c, EMPTY_CELL_COLOR)
+
+
+def fill_stone(board, stone, row, column, color):
+    for cell in stone[STONE_CELLS]:
+        cell_row = row + cell[CELL_ROW]
+        cell_column = column + cell[CELL_COLUMN]
+        board[cell_row][cell_column] = color
 
 
 if __name__ == '__main__':
     filename = sys.argv[1]
     rows, cols, stones = read_stones(filename)
-    board = [[EMPTY_CELL] * cols for i in range(0, rows)]
+    board = [[EMPTY_CELL_COLOR] * cols for i in range(0, rows)]
     check_stone_areas(rows, cols, stones)
     prepare_stones(stones)
     fill(board, 0, stones)
