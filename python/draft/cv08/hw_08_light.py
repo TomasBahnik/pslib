@@ -151,7 +151,9 @@ def fill(board, stone_no, stones):
                 # try to put next stone
                 fill(board, stone_no + 1, stones)
                 # the stone_no + 1 does not fit on the board (stone_fits_on_board returns False)
-                # previous call returns => delete previously placed stone
+                # previous call returns (there is no else after last if!)
+                # AND continues at the point where it forked new fill function i.e. HERE
+                # => deletes the stones it has created
                 deletes += 1
                 # delete means put EMPTY_CELL_COLOR on the board instead of stone color
                 fill_stone(board, last_stone, r, c, EMPTY_CELL_COLOR)
