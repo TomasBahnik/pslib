@@ -10,9 +10,10 @@ from draft.shared.general import debug_print
 
 # denotes empty cells in the board
 # color of stone is guaranteed to be > 0
+NOSOLUTION = 'NOSOLUTION'
 EMPTY_CELL = 0
 
-DEBUG_PRINTS = True
+DEBUG_PRINTS = False
 # indexes
 STONE_COLOR = 0
 STONE_CELLS = 1
@@ -50,7 +51,7 @@ def check_stone_areas(rows, cols, stones):
         area += s_c
         debug_print("color={}, area ={}".format(stone[0], s_c), DEBUG_PRINTS)
     if area != rows * cols:
-        print('NOSOLUTION')
+        print("Areas do not fit :" + NOSOLUTION)
         return -1
     return area
 
@@ -112,27 +113,32 @@ def stone_fits_on_board(stone, board, row, col):
         #     max_row = max([cell[CELL_ROW] for cell in cells])
         #     max_col = max([cell[CELL_COLUMN] for cell in cells])
         # but for checking if stone is present all cells need to be tested
-        col_overflow = new_cell_col > board_max_col_idx
         row_overflow = new_cell_row > board_max_row_idx
+        col_overflow = new_cell_col > board_max_col_idx
+        # do not ask for stone present at [new_cell_row, new_cell_col] because it could be
+        # out of range in case of overflow
+        if col_overflow or row_overflow:
+            return False
         # another stone already present
         stone_present = board[new_cell_row][new_cell_col] != EMPTY_CELL
-        if col_overflow or row_overflow or stone_present:
+        if stone_present:
             return False
     return True
 
 
 def fill(board, stone_no, stones):
-    board_rows = len(board)
-    board_cols = len(board[0])
     if stone_no == len(stones):  # all stones used
         if not any(EMPTY_CELL in x for x in board):
             print(board)
             sys.exit(0)
+
+    board_rows = len(board)
+    board_cols = len(board[0])
+    last_stone = stones[stone_no]
+    stone_color = last_stone[STONE_COLOR]
     for r in range(0, board_rows):
         for c in range(0, board_cols):
-            last_stone = stones[stone_no]
             if stone_fits_on_board(last_stone, board, r, c):
-                stone_color = last_stone[STONE_COLOR]
                 # put the stone color on board starting at [r,c]
                 for cell in last_stone[STONE_CELLS]:
                     cell_row = r + cell[CELL_ROW]
@@ -140,12 +146,12 @@ def fill(board, stone_no, stones):
                     board[cell_row][cell_column] = stone_color
                 # try to put next stone
                 fill(board, stone_no + 1, stones)
-            # the last_stone does not fit on the board => delete *the last successfully* placed stone
-            # *the last successfully* placed last_stone and r and c are still available
-            for cell in last_stone[STONE_CELLS]:
-                cell_row = r + cell[CELL_ROW]
-                cell_column = c + cell[CELL_COLUMN]
-                board[cell_row][cell_column] = EMPTY_CELL
+                # the last_stone does not fit on the board => delete *the last successfully* placed stone
+                # *the last successfully* placed last_stone and r and c are still available
+                for cell in last_stone[STONE_CELLS]:
+                    cell_row = r + cell[CELL_ROW]
+                    cell_column = c + cell[CELL_COLUMN]
+                    board[cell_row][cell_column] = EMPTY_CELL
 
 
 if __name__ == '__main__':
@@ -155,4 +161,5 @@ if __name__ == '__main__':
     check_stone_areas(M, N, stones)
     prepare_stones(stones)
     fill(board, 0, stones)
+    print(NOSOLUTION)
     sys.exit(0)
