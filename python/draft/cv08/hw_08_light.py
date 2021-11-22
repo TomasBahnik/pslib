@@ -17,9 +17,8 @@ DEBUG_PRINTS = False
 # indexes
 STONE_COLOR = 0
 STONE_CELLS = 1
-# TODO stone border is last item in stone array (append is used in
-#  draft.cv08.hw_08_light.stone_border, so here should be -1
-STONE_BORDER = 2  # used for sort
+# stone border length is appended in draft.cv08.hw_08_light.stone_border, so here should be -1 for index
+STONE_BORDER = -1  # used for sort
 STONE_SORT_BORDER = 10  # used to switch sorting of stones
 CELL_ROW = 0
 CELL_COLUMN = 1
