@@ -8,10 +8,16 @@ import sys
 
 from draft.shared.general import debug_print
 
+# denotes empty cells in the board
+# color of stone is guaranteed to be > 0
+EMPTY_CELL = 0
+
 DEBUG_PRINTS = True
 # indexes
 STONE_COLOR = 0
 STONE_CELLS = 1
+# TODO stone border is last item in stone array (append is used in
+#  draft.cv08.hw_08_light.stone_border, so here should be -1
 STONE_BORDER = 2  # used for sort
 STONE_SORT_BORDER = 10  # used to switch sorting of stones
 CELL_ROW = 0
@@ -84,17 +90,69 @@ def sort_stones(stones, key=STONE_SORT_BORDER):
         stones.sort(key=lambda x: len(x[1]), reverse=True)
 
 
-if __name__ == '__main__':
-    filename = sys.argv[1]
-    M, N, stones = read_stones(filename)
+def prepare_stones(stones):
     for stone in stones:
         # debug_print("Before {}]".format(stone), DEBUG_PRINTS)
-        moved_cells = move_to_top_left_corner(stone)
-        boarder = stone_border(stone)
+        move_to_top_left_corner(stone)
+        stone_border(stone)
         debug_print("Stone {} : cells={}, border={}]"
                     .format(stone[STONE_COLOR], stone[STONE_CELLS], stone[STONE_BORDER]), DEBUG_PRINTS)
     sort_stones(stones)
 
-    debug_print("matrix {}x{}".format(M, N), DEBUG_PRINTS)
+
+def stone_fits_on_board(stone, board, row, col):
+    cells = stone[STONE_CELLS]
+    board_max_row_idx = len(board) - 1
+    board_max_col_idx = len(board[0]) - 1
+    for cell in cells:
+        new_cell_col = cell[CELL_COLUMN] + col
+        new_cell_row = cell[CELL_ROW] + row
+        # right and bottom board border overflow
+        # only top right and top bottom cells can used
+        #     max_row = max([cell[CELL_ROW] for cell in cells])
+        #     max_col = max([cell[CELL_COLUMN] for cell in cells])
+        # but for checking if stone is present all cells need to be tested
+        col_overflow = new_cell_col > board_max_col_idx
+        row_overflow = new_cell_row > board_max_row_idx
+        # another stone already present
+        stone_present = board[new_cell_row][new_cell_col] != EMPTY_CELL
+        if col_overflow or row_overflow or stone_present:
+            return False
+    return True
+
+
+def fill(board, stone_no, stones):
+    board_rows = len(board)
+    board_cols = len(board[0])
+    if stone_no == len(stones):  # all stones used
+        if not any(EMPTY_CELL in x for x in board):
+            print(board)
+            sys.exit(0)
+    for r in range(0, board_rows):
+        for c in range(0, board_cols):
+            last_stone = stones[stone_no]
+            if stone_fits_on_board(last_stone, board, r, c):
+                stone_color = last_stone[STONE_COLOR]
+                # put the stone color on board starting at [r,c]
+                for cell in last_stone[STONE_CELLS]:
+                    cell_row = r + cell[CELL_ROW]
+                    cell_column = c + cell[CELL_COLUMN]
+                    board[cell_row][cell_column] = stone_color
+                # try to put next stone
+                fill(board, stone_no + 1, stones)
+            # the last_stone does not fit on the board => delete *the last successfully* placed stone
+            # *the last successfully* placed last_stone and r and c are still available
+            for cell in last_stone[STONE_CELLS]:
+                cell_row = r + cell[CELL_ROW]
+                cell_column = c + cell[CELL_COLUMN]
+                board[cell_row][cell_column] = EMPTY_CELL
+
+
+if __name__ == '__main__':
+    filename = sys.argv[1]
+    M, N, stones = read_stones(filename)
+    board = [[EMPTY_CELL] * M for i in range(0, N)]
     check_stone_areas(M, N, stones)
+    prepare_stones(stones)
+    fill(board, 0, stones)
     sys.exit(0)
