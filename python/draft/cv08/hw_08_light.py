@@ -133,9 +133,9 @@ deletes = 0
 def fill(board, stone_no, stones):
     global puts, deletes
     if stone_no == len(stones):  # all stones used
-        if not any(EMPTY_CELL_COLOR in x for x in board):
+        if not any(EMPTY_CELL_COLOR in x for x in board):  # board does not contains any EMPTY_CELL_COLOR
             debug_print("Puts {},  deletes {}".format(puts, deletes), DEBUG_PRINTS)
-            print(board)
+            print(board)  # print filled board
             sys.exit(0)
 
     board_rows = len(board)
@@ -150,8 +150,8 @@ def fill(board, stone_no, stones):
                 fill_stone(board, last_stone, r, c, stone_color)
                 # try to put next stone
                 fill(board, stone_no + 1, stones)
-                # the last_stone does not fit on the board => delete *the last successfully* placed stone
-                # *the last successfully* placed last_stone and r and c are still available
+                # the stone_no + 1 does not fit on the board (stone_fits_on_board returns False)
+                # previous call returns => delete previously placed stone
                 deletes += 1
                 # delete means put EMPTY_CELL_COLOR on the board instead of stone color
                 fill_stone(board, last_stone, r, c, EMPTY_CELL_COLOR)
