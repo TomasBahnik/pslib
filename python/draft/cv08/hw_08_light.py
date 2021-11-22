@@ -126,15 +126,15 @@ def stone_fits_on_board(stone, board, row, col):
 
 
 # count puts and deletes of stones = compare order of stones by area or by boarder
-puts = 0
-deletes = 0
+# puts = 0
+# deletes = 0
 
 
 def fill(board, stone_no, stones):
-    global puts, deletes
+    # global puts, deletes
     if stone_no == len(stones):  # all stones used
         if not any(EMPTY_CELL_COLOR in x for x in board):  # board does not contains any EMPTY_CELL_COLOR
-            debug_print("Puts {},  deletes {}".format(puts, deletes), DEBUG_PRINTS)
+            # debug_print("Puts {},  deletes {}".format(puts, deletes), DEBUG_PRINTS)
             print(board)  # print filled board
             sys.exit(0)
 
@@ -145,7 +145,7 @@ def fill(board, stone_no, stones):
     for r in range(0, board_rows):
         for c in range(0, board_cols):
             if stone_fits_on_board(last_stone, board, r, c):
-                puts += 1
+                # puts += 1
                 # put the stone color on board starting at [r,c]
                 fill_stone(board, last_stone, r, c, stone_color)
                 # try to put next stone
@@ -154,9 +154,14 @@ def fill(board, stone_no, stones):
                 # previous call returns (there is no else after last if!)
                 # AND continues at the point where it forked new fill function i.e. HERE
                 # => deletes the stones it has created
-                deletes += 1
+                # deletes += 1
                 # delete means put EMPTY_CELL_COLOR on the board instead of stone color
                 fill_stone(board, last_stone, r, c, EMPTY_CELL_COLOR)
+    # there is implicit return at the end of the function block
+    # here the function returns when outer for loop finishes without recursively calling next fill function
+    # i.e. when the stone does not fit for any position in board
+    # this makes the return explicit
+    return None
 
 
 def fill_stone(board, stone, row, column, color):
