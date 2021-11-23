@@ -23,6 +23,13 @@ STONE_SORT_BORDER = 10  # used to switch sorting of stones
 CELL_ROW = 0
 CELL_COLUMN = 1
 
+# exit codes
+EC_SOLUTION_FOUND = 0
+# all stones can't fit on board  = no solution
+EC_CANNOT_FIT_ALL_STONES = 1
+# all stones used but empty cell remains on board - happens after changing cell
+EC_EMPTY_CELL_LEFT_ON_BOARD = 2
+
 
 def read_stones(filename):
     stones = []  # vystup funkce - seznam nactenych kamenu
@@ -136,7 +143,13 @@ def fill(board, stone_no, stones):
         if not any(EMPTY_CELL_COLOR in x for x in board):  # board does not contains any EMPTY_CELL_COLOR
             # debug_print("Puts {},  deletes {}".format(puts, deletes), DEBUG_PRINTS)
             print(board)  # print filled board
-            sys.exit(0)
+            sys.exit(EC_SOLUTION_FOUND)
+        # all stones are used but there is EMPTY_CELL_COLOR
+        # e.g two identical cells 2 6 4 7 4 7 4 instead of 2 6 4 7 4 7 3
+        else:
+            print(NOSOLUTION)
+            # print(board)
+            sys.exit(EC_EMPTY_CELL_LEFT_ON_BOARD)
 
     board_rows = len(board)
     board_cols = len(board[0])
@@ -179,4 +192,4 @@ if __name__ == '__main__':
     prepare_stones(stones)
     fill(board, 0, stones)
     print(NOSOLUTION)
-    sys.exit(0)
+    sys.exit(EC_CANNOT_FIT_ALL_STONES)
