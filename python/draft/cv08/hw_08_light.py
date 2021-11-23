@@ -19,7 +19,7 @@ STONE_COLOR = 0
 STONE_CELLS = 1
 # stone border length is appended in draft.cv08.hw_08_light.stone_border, so here should be -1 for index
 STONE_BORDER = -1  # used for sort
-STONE_SORT_BORDER = 10  # used to switch sorting of stones
+SORT_STONES_BY_BORDER = 10  # used to switch sorting of stones
 CELL_ROW = 0
 CELL_COLUMN = 1
 
@@ -49,9 +49,15 @@ def read_stones(filename):
     return num_rows, num_cols, stones
 
 
-# see 1 and 2
-# all stones must be used and fill the whole matrix
 def check_stone_areas(rows, cols, stones):
+    """
+    According to assignment all stones must be used and fully fill the whole board.
+    Calculate area of stone as sum of cells i.e. each cell has area=1
+    :param rows: number of board rows
+    :param cols: number of board columns
+    :param stones: stones
+    :return: area of board and stones if equal or exists with exit code and message
+    """
     area = 0
     for stone in stones:
         s_c = len(stone[STONE_CELLS])
@@ -64,10 +70,15 @@ def check_stone_areas(rows, cols, stones):
     return area
 
 
-# relabel stone cells as if it is at
-# top left corner, shift all cells so that
-# min row = 0 and min column = 0
 def move_to_top_left_corner(stone):
+    """
+    Relabels in place stone cells as if it sits at top left corner
+    by shift all cells so that min row = 0 and min column = 0
+    i.e. subtract min_row from all row positions and
+    min_col from all columns positions
+    :param stone: stone
+    :return: relabeled stone cells
+    """
     stone_cells = stone[STONE_CELLS]
     min_row = min([cell[CELL_ROW] for cell in stone_cells])
     min_col = min([cell[CELL_COLUMN] for cell in stone_cells])
@@ -78,6 +89,13 @@ def move_to_top_left_corner(stone):
 
 
 def stone_border(stone):
+    """
+    Calculates border length of stone as number of missing neighbours.
+    The length of border is appended to the stone definition and thus can accessed
+    at index -1 (last element)
+    :param stone: stone
+    :return: length of stone border
+    """
     n = 0
     cells = stone[STONE_CELLS]
     for cell in cells:
@@ -90,18 +108,29 @@ def stone_border(stone):
     return n
 
 
-def sort_stones(stones, key=STONE_SORT_BORDER):
+def sort_stones(stones, key=SORT_STONES_BY_BORDER):
+    """
+    Sort stones in place either by area or length of border in descending order.
+    :param stones:
+    :param key: Key used for sorting. Default value is by length of boarder
+    :return: None
+    """
     # key=lambda x: len(x[1]), reverse=True : sort by area
     # key=lambda x: x[STONE_BORDER] : sort by length of border
-    if key == STONE_SORT_BORDER:
+    if key == SORT_STONES_BY_BORDER:
         stones.sort(key=lambda x: x[STONE_BORDER], reverse=True)
     else:
         stones.sort(key=lambda x: len(x[1]), reverse=True)
 
 
 def prepare_stones(stones):
+    """
+    Relabels and sorts the stones in place
+    :param stones:
+    :return: None
+    """
     for stone in stones:
-        # debug_print("Before {}]".format(stone), DEBUG_PRINTS)
+        debug_print("Before {}]".format(stone), DEBUG_PRINTS)
         move_to_top_left_corner(stone)
         stone_border(stone)
         debug_print("Stone {} : cells={}, border={}]"
@@ -110,6 +139,17 @@ def prepare_stones(stones):
 
 
 def stone_fits_on_board(stone, board, row, col):
+    """
+    Check if the stone can be placed on board starting at board [row,col] position
+    Stone cannot be placed if it
+       * overflows board boarder
+       * overlays already placed stone
+    :param stone:
+    :param board:
+    :param row: row where stone starts
+    :param col: col where stone starts
+    :return: True/False
+    """
     cells = stone[STONE_CELLS]
     board_max_row_idx = len(board) - 1
     board_max_col_idx = len(board[0]) - 1
@@ -138,8 +178,32 @@ def stone_fits_on_board(stone, board, row, col):
 # puts = 0
 # deletes = 0
 
+def fill_stone(board, stone, row, column, color):
+    """
+    Prints/deletes the stone (color) on/from board at given position.
+    Stone is deleted from board by setting the color of the position to EMPTY_CELL_COLOR.
+    EMPTY_CELL_COLOR is used initialized the board and no stone can have this color
+    :param board:
+    :param stone:
+    :param row:
+    :param column:
+    :param color:
+    :return:
+    """
+    for cell in stone[STONE_CELLS]:
+        cell_row = row + cell[CELL_ROW]
+        cell_column = column + cell[CELL_COLUMN]
+        board[cell_row][cell_column] = color
+
 
 def fill(board, stone_no, stones):
+    """
+    recursively puts stones on the board
+    :param board:
+    :param stone_no:
+    :param stones:
+    :return:
+    """
     # global puts, deletes
     if stone_no == len(stones):  # all stones used
         if not any(EMPTY_CELL_COLOR in x for x in board):  # board does not contains any EMPTY_CELL_COLOR
@@ -178,13 +242,6 @@ def fill(board, stone_no, stones):
     # i.e. when the stone does not fit for any position in board
     # this makes the return explicit
     return None
-
-
-def fill_stone(board, stone, row, column, color):
-    for cell in stone[STONE_CELLS]:
-        cell_row = row + cell[CELL_ROW]
-        cell_column = column + cell[CELL_COLUMN]
-        board[cell_row][cell_column] = color
 
 
 if __name__ == '__main__':
