@@ -29,6 +29,7 @@ EC_SOLUTION_FOUND = 0
 EC_CANNOT_FIT_ALL_STONES = 1
 # all stones used but empty cell remains on board - happens after changing cell
 EC_EMPTY_CELL_LEFT_ON_BOARD = 2
+EC_STONES_DO_NOT_FIT_EXACTLY_ON_BOARD = 3
 
 
 def read_stones(filename):
@@ -57,8 +58,9 @@ def check_stone_areas(rows, cols, stones):
         area += s_c
         debug_print("color={}, area ={}".format(stone[0], s_c), DEBUG_PRINTS)
     if area != rows * cols:
-        print("Areas do not fit :" + NOSOLUTION)
-        return -1
+        print("Stones do not fit on board exactly")
+        print(NOSOLUTION)
+        sys.exit(EC_STONES_DO_NOT_FIT_EXACTLY_ON_BOARD)
     return area
 
 
@@ -147,6 +149,7 @@ def fill(board, stone_no, stones):
         # all stones are used but there is EMPTY_CELL_COLOR
         # e.g two identical cells 2 6 4 7 4 7 4 instead of 2 6 4 7 4 7 3
         else:
+            print("All stones used but empty cell left on board")
             print(NOSOLUTION)
             # print(board)
             sys.exit(EC_EMPTY_CELL_LEFT_ON_BOARD)
