@@ -16,3 +16,9 @@ Podrobnosti: AKLA, podkapitola 8.1 a 8.2.
 Klíčová slova: vlastní číslo (hodnota), vlastní vektor, invariantní prostor, charakteristický polynom matice.
 Keywords: eigenvalue, eigenvector, eigenspace, characteristic polynomial of a matrix.
 Podrobnosti: AKLA, podkapitoly 10.1, 10.3 a 10.4.
+
+## Math
+
+```math
+\int \sin^{2}{\left(x \right)}\, dx = \frac{x}{2} - \frac{\sin{\left(x \right)} \cos{\left(x \right)}}{2}
+```
