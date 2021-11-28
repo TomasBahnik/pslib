@@ -109,27 +109,15 @@ def stone_fits_on_board(stone, board, row, col):
     for cell in cells:
         new_cell_col = cell[CELL_COLUMN] + col
         new_cell_row = cell[CELL_ROW] + row
-        # right and bottom board border overflow
-        # only top right and top bottom cells can used
-        #     max_row = max([cell[CELL_ROW] for cell in cells])
-        #     max_col = max([cell[CELL_COLUMN] for cell in cells])
-        # but for checking if stone is present all cells need to be tested
         row_overflow = new_cell_row > board_max_row_idx
         col_overflow = new_cell_col > board_max_col_idx
-        # do not ask for stone present at [new_cell_row, new_cell_col] because it could be
-        # out of range in case of overflow
         if col_overflow or row_overflow:
             return False
-        # another stone already present
         stone_present = board[new_cell_row][new_cell_col] != EMPTY_CELL_COLOR
         if stone_present:
             return False
     return True
 
-
-# count puts and deletes of stones = compare order of stones by area or by boarder
-# puts = 0
-# deletes = 0
 
 def fill_stone(board, stone, row, column, color):
     for cell in stone[STONE_CELLS]:
@@ -139,18 +127,13 @@ def fill_stone(board, stone, row, column, color):
 
 
 def fill(board, stone_no, stones):
-    # global puts, deletes
     if stone_no == len(stones):  # all stones used
         if not any(EMPTY_CELL_COLOR in x for x in board):  # board does not contains any EMPTY_CELL_COLOR
-            # debug_print("Puts {},  deletes {}".format(puts, deletes), DEBUG_PRINTS)
             print(board)  # print filled board
             sys.exit(EC_SOLUTION_FOUND)
-        # all stones are used but there is EMPTY_CELL_COLOR
-        # e.g two identical cells 2 6 4 7 4 7 4 instead of 2 6 4 7 4 7 3
         else:
             print("All stones used but empty cell left on board")
             print(NOSOLUTION)
-            # print(board)
             sys.exit(EC_EMPTY_CELL_LEFT_ON_BOARD)
 
     board_rows = len(board)
@@ -160,31 +143,17 @@ def fill(board, stone_no, stones):
     for r in range(0, board_rows):
         for c in range(0, board_cols):
             if stone_fits_on_board(last_stone, board, r, c):
-                # puts += 1
-                # put the stone color on board starting at [r,c]
                 fill_stone(board, last_stone, r, c, stone_color)
-                # try to put next stone
                 fill(board, stone_no + 1, stones)
-                # the stone_no + 1 does not fit on the board (stone_fits_on_board returns False)
-                # previous call returns (there is no else after last if!)
-                # AND continues at the point where it forked new fill function i.e. HERE
-                # => deletes the stones it has created
-                # deletes += 1
-                # delete means put EMPTY_CELL_COLOR on the board instead of stone color
                 fill_stone(board, last_stone, r, c, EMPTY_CELL_COLOR)
-    # there is implicit return at the end of the function block
-    # here the function returns when outer for loop finishes without recursively calling next fill function
-    # i.e. when the stone does not fit for any position in board
-    # this makes the return explicit
     return None
 
 
-if __name__ == '__main__':
-    filename = sys.argv[1]
-    rows, cols, stones = read_stones(filename)
-    board = [[EMPTY_CELL_COLOR] * cols for i in range(0, rows)]
-    check_stone_areas(rows, cols, stones)
-    prepare_stones(stones)
-    fill(board, 0, stones)
-    print(NOSOLUTION)
-    sys.exit(EC_CANNOT_FIT_ALL_STONES)
+filename = sys.argv[1]
+rows, cols, stones = read_stones(filename)
+board = [[EMPTY_CELL_COLOR] * cols for i in range(0, rows)]
+check_stone_areas(rows, cols, stones)
+prepare_stones(stones)
+fill(board, 0, stones)
+print(NOSOLUTION)
+sys.exit(EC_CANNOT_FIT_ALL_STONES)
