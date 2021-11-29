@@ -99,11 +99,11 @@ def stone_border(stone):
     n = 0
     cells = stone[STONE_CELLS]
     for cell in cells:
-        l = [cell[CELL_ROW] - 1, cell[CELL_COLUMN]] in cells
-        r = [cell[CELL_ROW] + 1, cell[CELL_COLUMN]] in cells
-        b = [cell[CELL_ROW], cell[CELL_COLUMN] + 1] in cells
-        t = [cell[CELL_ROW], cell[CELL_COLUMN] - 1] in cells
-        n += len([x for x in [l, r, b, t] if x is False])
+        top = [cell[CELL_ROW] - 1, cell[CELL_COLUMN]] in cells
+        bottom = [cell[CELL_ROW] + 1, cell[CELL_COLUMN]] in cells
+        right = [cell[CELL_ROW], cell[CELL_COLUMN] + 1] in cells
+        left = [cell[CELL_ROW], cell[CELL_COLUMN] - 1] in cells
+        n += len([x for x in [top, bottom, right, left] if x is False])
     stone.append(n)
     return n
 
