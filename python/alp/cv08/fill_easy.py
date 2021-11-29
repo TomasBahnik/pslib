@@ -1,3 +1,16 @@
+"""
+def vypln(deska, cisloKamene, kameny):
+    #if cisloKamene == len(kameny):
+        # kontrola reseni
+        # if spravne reseni:
+            # print a exit (kdyz tam nebude exit, tak to vypise vsechny reseni)
+
+    # pro vsechny pozice kamene "cisloKamene":
+        # zapis kamen na hraci desku
+        # vypln(deska, cisloKamene + 1, kameny)
+        # vymaz kameny z desky
+
+"""
 import sys
 
 
@@ -6,9 +19,10 @@ def debug_print(message, print_debug):
         print(message)
 
 
+NOSOLUTION = 'NOSOLUTION'
+
 # denotes empty cells in the board
 # color of stone is guaranteed to be > 0
-NOSOLUTION = 'NOSOLUTION'
 EMPTY_CELL_COLOR = 0
 
 DEBUG_PRINTS = False
