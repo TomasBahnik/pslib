@@ -55,7 +55,7 @@ max_idx = f_values.index(max(f_values))
 # prvni hodnota
 # print(max_idx)
 
-f_values.sort()
+# f_values.sort()
 # print(f_values)
 zaporny_cisla = [x for x in f_values if x < 0]
 # druha hodnota
