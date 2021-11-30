@@ -12,8 +12,8 @@ def det_eigenvalues(matrix):
     if DEBUG_PRINTS:
         print('\nmatrix\n{}\n'.format(matrix))
         print('\ndeterminant={}'.format(det))
-        print('eigenvalues={}'.format(ev[0]))
-        print('right eigenvectors\n{}'.format(ev[1]))
+        # print('eigenvalues={}'.format(ev[0]))
+        # print('right eigenvectors\n{}'.format(ev[1]))
 
 
 if __name__ == '__main__':
@@ -21,5 +21,6 @@ if __name__ == '__main__':
     m_diag = np.diag((1, 2, 3))
     det_eigenvalues(m_diag)
     matrix = np.loadtxt(f)
-    det_eigenvalues(matrix)
+    matrix.transpose()
+    det_eigenvalues(matrix.transpose())
     sys.exit(0)
