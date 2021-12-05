@@ -14,19 +14,31 @@ def lin_equations():
 
 
 def p812():
-    A = Matrix([[1, 1, 1, 1, 0], [1, -1, -1, 0, 0], [1, 1, -1, -1, -1], [2, 2, 0, 0, -1], [1, 1, 5, 5, 2]])
+    matrix = Matrix([[1, 1, 1, 1, 0], [1, -1, -1, 0, 0], [1, 1, -1, -1, -1], [2, 2, 0, 0, -1], [1, 1, 5, 5, 2]])
     b = Matrix([3, 4, 5, 8, -1])
-    return linsolve((A, b), [p_1, p_2, p_3, p_4, p_5])
+    det_a = matrix.det()
+    particular = linsolve((matrix, b), [p_1, p_2, p_3, p_4, p_5])
+    print("\\mA={} \\\\".format(latex(matrix)))
+    print("det(A)={}={} \\\\".format(latex(det_a), latex(factor(det_a))))
+    print("p={}".format(latex(particular)))
+    # kernel
+    b = Matrix([0, 0, 0, 0, 0])
+    kernel = linsolve((matrix, b), [p_1, p_2, p_3, p_4, p_5])
+    print("ker={}".format(latex(kernel)))
 
 
 def cv9():
-    m_a = Matrix([[a, 1, 1, 1], [1, a, 1, 1], [1, 1, a, 1], [1, 1, 1, a]])
+    matrix = Matrix([[a, 1, 1, 1], [1, a, 1, 1], [1, 1, a, 1], [1, 1, 1, a]])
     b = Matrix([1, 1, 1, 1])
-    det_a = m_a.det()
-    p_s = linsolve((m_a, b), [p_1, p_2, p_3, p_4])
-    print("\\mA={} \\\\".format(latex(m_a)))
+    det_a = matrix.det()
+    particular = linsolve((matrix, b), [p_1, p_2, p_3, p_4])
+    print("\\mA={} \\\\".format(latex(matrix)))
     print("det(A)={}={} \\\\".format(latex(det_a), latex(factor(det_a))))
-    print("p={}".format(latex(p_s)))
+    print("p={}".format(latex(particular)))
+    # kernel
+    b = Matrix([0, 0, 0, 0])
+    kernel = linsolve((matrix, b), [p_1, p_2, p_3, p_4])
+    print("ker={}".format(latex(kernel)))
 
 
 def matrices():
@@ -39,6 +51,8 @@ def matrices():
 if __name__ == '__main__':
     init_printing()  # doctest: +SKIP
     # matrices()
+    print("\nCviceni 9")
     cv9()
-    # print(p812())
+    print("\nProblem 8.1.2")
+    p812()
     sys.exit(0)
