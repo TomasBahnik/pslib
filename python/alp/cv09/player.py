@@ -20,8 +20,8 @@ class Player(base.BasePlayer):
         newStone = []
         for cell in stone:
             rowCell, colCell = cell
-            newRow = rowCell + cell
-            newCol = colCell + cell
+            newRow = rowCell + cell # nejde !!
+            newCol = colCell + cell # nemuzeme secist cislo a pole (cell = row a col zaroven)
             newStone.append([newRow, newCol])
         return newStone
 
