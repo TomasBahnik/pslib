@@ -20,16 +20,13 @@ def p812():
 
 
 def cv9():
-    A = Matrix([[a, 1, 1, 1], [1, a, 1, 1], [1, 1, a, 1], [1, 1, 1, a]])
-    b = Matrix([1, 1, 1, 1, ])
-    det_A = A.det()
-    particular_sol = linsolve((A, b), [p_1, p_2, p_3, p_4])
-    f_p = factor(det_A)
-    print(latex(A))
-    print(latex(det_A))
-    print(latex(f_p))
-    print(particular_sol)
-    print(latex(particular_sol))
+    m_a = Matrix([[a, 1, 1, 1], [1, a, 1, 1], [1, 1, a, 1], [1, 1, 1, a]])
+    b = Matrix([1, 1, 1, 1])
+    det_a = m_a.det()
+    p_s = linsolve((m_a, b), [p_1, p_2, p_3, p_4])
+    print("\\mA={} \\\\".format(latex(m_a)))
+    print("det(A)={}={} \\\\".format(latex(det_a), latex(factor(det_a))))
+    print("p={}".format(latex(p_s)))
 
 
 def matrices():
