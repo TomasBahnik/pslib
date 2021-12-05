@@ -3,7 +3,7 @@ import sys
 from sympy import *
 
 x, y, z, t, a = symbols('x y z t a')
-p_1, p_2, p_3, p_4, p_5 = symbols('x_1 x_2 x_3 x_4 x_5')
+p_1, p_2, p_3, p_4, p_5 = symbols('p_1 p_2 p_3 p_4 p_5')
 k, m, n = symbols('k m n', integer=True)
 
 
