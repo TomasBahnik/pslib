@@ -17,14 +17,6 @@
 
 % Document
 \begin{document}
-    \section{Analysis}\label{sec:analysis}
-
-    \begin{align}
-        \int x^{2}\, dx &=& \frac{x^{3}}{3} \\
-        \int \sin^{2}{\left(x \right)}\, dx &=& \frac{x}{2} - \frac{\sin{\left(x \right)} \cos{\left(x \right)}}{2} \\
-        \int \left(x + y\right)^{5}\, dx &=& \frac{x^{6}}{6} + x^{5} y + \frac{5 x^{4} y^{2}}{2} + \frac{10 x^{3} y^{3}}{3} + \frac{5 x^{2} y^{4}}{2} + x y^{5}
-    \end{align}
-
 
     \section{Linear Algebra}\label{sec:linalg}
 
@@ -42,12 +34,18 @@
     \begin{math}
         \mA=\left[\begin{matrix}
                       a & 1 & 1 & 1\\1 & a & 1 & 1\\1 & 1 & a & 1\\1 & 1 & 1 & a
+        \end{matrix}\right]
+        \evb=\left[\begin{matrix}
+                       1\\1\\1\\1
         \end{matrix}\right] \\
         det(A)=a^{4} - 6 a^{2} + 8 a - 3=\left(a - 1\right)^{3} \left(a + 3\right) \\
         p=\left\{\left( \frac{1}{a + 3}, \  \frac{1}{a + 3}, \  \frac{1}{a + 3}, \  \frac{1}{a + 3}\right)\right\} \\
         kernel=\left[ \right] \\
         rank=4 \\
-        solution (b=0)=\left\{\left( 0, \  0, \  0, \  0\right)\right\}
+        solution (b=0)=\left\{\left( 0, \  0, \  0, \  0\right)\right\} \\
+        {\bm{A}}^{-1}=\left[\begin{matrix}
+                            \frac{a + 2}{a^{2} + 2 a - 3} & - \frac{1}{a^{2} + 2 a - 3} & - \frac{1}{a^{2} + 2 a - 3} & - \frac{1}{a^{2} + 2 a - 3}\\- \frac{1}{a^{2} + 2 a - 3} & \frac{a + 2}{a^{2} + 2 a - 3} & - \frac{1}{a^{2} + 2 a - 3} & - \frac{1}{a^{2} + 2 a - 3}\\- \frac{1}{a^{2} + 2 a - 3} & - \frac{1}{a^{2} + 2 a - 3} & \frac{a + 2}{a^{2} + 2 a - 3} & - \frac{1}{a^{2} + 2 a - 3}\\- \frac{1}{a^{2} + 2 a - 3} & - \frac{1}{a^{2} + 2 a - 3} & - \frac{1}{a^{2} + 2 a - 3} & \frac{a + 2}{a^{2} + 2 a - 3}
+        \end{matrix}\right] \\
     \end{math}
 
     \subsection{Problem 8.1.2}\label{subsec:812}
@@ -55,6 +53,9 @@
     \begin{math}
         \mA=\left[\begin{matrix}
                       1 & 1 & 1 & 1 & 0\\1 & -1 & -1 & 0 & 0\\1 & 1 & -1 & -1 & -1\\2 & 2 & 0 & 0 & -1\\1 & 1 & 5 & 5 & 2
+        \end{matrix}\right]
+        \evb=\left[\begin{matrix}
+                       3\\4\\5\\8\\-1
         \end{matrix}\right] \\
         det(A)=0=0 \\
         p=\left\{\left( \frac{7}{2} - \frac{p_{4}}{2}, \  \frac{p_{4}}{2} + \frac{p_{5}}{2} + \frac{1}{2}, \  - p_{4} - \frac{p_{5}}{2} - 1, \  p_{4}, \  p_{5}\right)\right\} \\
@@ -66,6 +67,15 @@
         rank=3 \\
         solution (b=0)=\left\{\left( - \frac{p_{4}}{2}, \  \frac{p_{4}}{2} + \frac{p_{5}}{2}, \  - p_{4} - \frac{p_{5}}{2}, \  p_{4}, \  p_{5}\right)\right\}
     \end{math}
+
+
+    \section{Analysis}\label{sec:analysis}
+
+    \begin{align}
+        \int x^{2}\, dx &=& \frac{x^{3}}{3} \\
+        \int \sin^{2}{\left(x \right)}\, dx &=& \frac{x}{2} - \frac{\sin{\left(x \right)} \cos{\left(x \right)}}{2} \\
+        \int \left(x + y\right)^{5}\, dx &=& \frac{x^{6}}{6} + x^{5} y + \frac{5 x^{4} y^{2}}{2} + \frac{10 x^{3} y^{3}}{3} + \frac{5 x^{2} y^{4}}{2} + x y^{5}
+    \end{align}
 
 
 \end{document}

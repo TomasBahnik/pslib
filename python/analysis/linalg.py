@@ -21,6 +21,12 @@ def matrix_properties(matrix, b, p):
     ker = matrix.nullspace()
     particular = linsolve((matrix, b), p)
     print("\\mA={} {}".format(latex(matrix), latex_new_line))
+    if det_a == 0:
+        print("determinant = 0, can't compute inverse")
+    else:
+        inv = matrix.inv()
+        print("mA-1={} {}".format(latex(inv), latex_new_line))
+    print("\\evb={} {}".format(latex(b), latex_new_line))
     print("det(A)={}={} {}".format(latex(det_a), latex(factor(det_a)), latex_new_line))
     print("p={} {}".format(latex(particular), latex_new_line))
     print("kernel={} {}".format(latex(ker), latex_new_line))
