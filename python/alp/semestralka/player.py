@@ -27,10 +27,10 @@ class Player(base.BasePlayer):
 
     def canBePlaced(self, stone):
         # stone = [[row, col], ... [row, col]]
-        # true if all [row, cal] inside board and all row, col are free
+        # true if all [row, cal] inside board and all row, col are free i.e. the cell contains 0
         for cell in stone:
             row, col = cell
-            if not (self.inBoard(row, col) and self.board[row][col] == 0):
+            if self.inBoard(row, col) and self.board[row][col] == 0:
                 pass
             else:
                 return False
