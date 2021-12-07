@@ -1,9 +1,9 @@
 import sys
 import random
 import copy
-import base
+import alp.semestralka.base as base
 
-from draw import Drawer
+from alp.semestralka.draw import Drawer
 
 
 class Player(base.BasePlayer):
@@ -20,8 +20,8 @@ class Player(base.BasePlayer):
         newStone = []
         for cell in stone:
             rowCell, colCell = cell
-            newRow = rowCell + cell # nejde !!
-            newCol = colCell + cell # nemuzeme secist cislo a pole (cell = row a col zaroven)
+            newRow = rowCell + row_col[0]
+            newCol = colCell + row_col[1]
             newStone.append([newRow, newCol])
         return newStone
 
@@ -49,7 +49,7 @@ class Player(base.BasePlayer):
 
         for row in range(len(self.board)):
             for col in range(len(self.board[0])):
-                moveStone = self.moveStone(stone, row, col)
+                moveStone = self.moveStone(stone, [row, col])
                 if self.canBePlaced(moveStone):
                     return [stoneIdx, moveStone]
 
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     print("stones are", stones)
 
     # prepare board and marks
-    board, marks = base.makeBoard10();
+    board, marks = base.makeBoard10()
 
     # create both players
     p1 = Player("pepa", board, marks, stones, 1)
@@ -78,14 +78,14 @@ if __name__ == "__main__":
         p1play = True
         p2play = True
 
-        m = p1.move()  # first player, we assume that a corrent output is returned
+        move_ret_val = p1.move()  # first player, we assume that a corrent output is returned
 
         # the following if/else is simplified. On Brute, we will check if return value
         # from move() is valid ...
-        if len(m) == 0:
+        if len(move_ret_val) == 0:
             p1play = False
         else:
-            stoneIdx, stone = m
+            stoneIdx, stone = move_ret_val
             stoneColor = stones[stoneIdx][0]
             base.writeBoard(p1.board, stone, stoneColor)  # write stone to player1's board
             base.writeBoard(p2.board, stone, stoneColor)  # write stone to player2's board
@@ -95,11 +95,11 @@ if __name__ == "__main__":
         d.draw(p2.board, p2.marks, "move-{:02d}a.png".format(moveidx))  # draw to png
 
         # now we call player2 and update boards/freeStones of both players
-        m = p2.move()
-        if len(m) == 0:
+        move_ret_val = p2.move()
+        if len(move_ret_val) == 0:
             p2play = False
         else:
-            stoneIdx, stone = m
+            stoneIdx, stone = move_ret_val
             stoneColor = stones[stoneIdx][0]
             base.writeBoard(p1.board, stone, stoneColor)
             base.writeBoard(p2.board, stone, stoneColor)
