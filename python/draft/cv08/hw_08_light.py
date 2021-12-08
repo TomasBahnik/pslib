@@ -88,6 +88,17 @@ def move_to_top_left_corner(stone):
     return stone_cells
 
 
+# 90 is [[0,-1],[1,0]]
+def rotate_stone_counter_clockwise_90(stone):
+    stone_cells = stone[STONE_CELLS]
+    for cell in stone_cells:
+        r = cell[CELL_ROW]
+        c = cell[CELL_COLUMN]
+        cell[CELL_ROW] = -c
+        cell[CELL_COLUMN] = r
+    return stone_cells
+
+
 def stone_border(stone):
     """
     Calculates border length of stone as number of missing neighbours.
