@@ -1,9 +1,9 @@
-import sys
-import random
-import copy
 import alp.semestralka.base as base
 
 from alp.semestralka.draw import Drawer
+
+from draft.cv08.hw_08_light import move_to_top_left_corner, rotate_stone_counter_clockwise_90, STONE_CELLS, CELL_COLUMN, \
+    CELL_ROW, STONE_COLOR, EMPTY_CELL_COLOR
 
 
 class Player(base.BasePlayer):
@@ -55,12 +55,59 @@ class Player(base.BasePlayer):
 
         return []
 
+    # nově položený kamen se musí dotýkat alespoň jednou hranou některého z již položených kamenů
+    # kameny stejné barvy se nikdy nesmějí dotýkat hranou (kameny různých barev se mohou dotýkat)
+    # nesmi vzniknout zcela pokryta bunka 2x2
+    def has_correct_side(self, stone):
+        cells = stone[STONE_CELLS]
+        color = stone[STONE_COLOR]  # > 0 we can divide
+        same_color_cnt = 0  # must be zero
+        empty_color_cnt = 0  # no limit but can used for existence of 2x2 cells
+        diff_color_cnt = 0  # must be >= 1
+        for cell in cells:
+            # colors > 0 or EMPTY_CELL_COLOR = 0. test ratio might be less than 1
+            top = board[cell[CELL_ROW] - 1, cell[CELL_COLUMN]] / color
+            bottom = board[cell[CELL_ROW] + 1, cell[CELL_COLUMN]] / color
+            right = board[cell[CELL_ROW], cell[CELL_COLUMN] + 1] / color
+            left = board[cell[CELL_ROW], cell[CELL_COLUMN] - 1] / color
+            same_color_cnt += len([x for x in [top, bottom, right, left] if x == 1])
+            diff_color_cnt += len([x for x in [top, bottom, right, left] if x != 1])
+            empty_color_cnt += len([x for x in [top, bottom, right, left] if x == EMPTY_CELL_COLOR])
+
+
+# kameny nesmí přečnívat z desky, nebo zakrývat (ani částečně) již položené kameny
+def is_move_valid(player, move):
+    # use player board to check
+    # player_sign = player.player
+    # player_board = player.board
+    # any(player_sign in x for x in player_board)
+    return len(move) != 0
+
+
+def shift_stones(stones):
+    for s in stones:
+        move_to_top_left_corner(s)
+
+
+def rotate_stones(stones):
+    for s in stones:
+        rotate_stone_counter_clockwise_90(s)
+
 
 if __name__ == "__main__":
 
     # load stones from file
     stones = base.loadStones("stones.txt")
     print("stones are", stones)
+    shift_stones(stones)
+    # print("shifted stones are", stones)
+    rotate_stones(stones)
+    # print("rotated stones are", stones)
+    shift_stones(stones)
+    # print("rotated shifted stones are", stones)
+    rotate_stones(stones)
+    rotate_stones(stones)
+    # sys.exit(0)
 
     # prepare board and marks
     board, marks = base.makeBoard10()
@@ -82,7 +129,7 @@ if __name__ == "__main__":
 
         # the following if/else is simplified. On Brute, we will check if return value
         # from move() is valid ...
-        if len(move_ret_val) == 0:
+        if not is_move_valid(p1, move_ret_val):
             p1play = False
         else:
             stoneIdx, stone = move_ret_val
@@ -96,7 +143,7 @@ if __name__ == "__main__":
 
         # now we call player2 and update boards/freeStones of both players
         move_ret_val = p2.move()
-        if len(move_ret_val) == 0:
+        if not is_move_valid(p2, move_ret_val):
             p2play = False
         else:
             stoneIdx, stone = move_ret_val
@@ -109,7 +156,7 @@ if __name__ == "__main__":
         d.draw(p1.board, p1.marks, "move-{:02d}b.png".format(moveidx))
 
         # if both players return [] from move, the game ends
-        if p1play == False and p2play == False:
+        if p1play is False and p2play is False:
             print("end of game")
             break
 
