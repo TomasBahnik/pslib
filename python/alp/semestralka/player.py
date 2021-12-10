@@ -2,8 +2,8 @@ import alp.semestralka.base as base
 
 from alp.semestralka.draw import Drawer
 
-from draft.cv08.hw_08_light import move_to_top_left_corner, rotate_stone_counter_clockwise_90, STONE_CELLS, CELL_COLUMN, \
-    CELL_ROW, STONE_COLOR, EMPTY_CELL_COLOR
+from draft.cv08.hw_08_light import move_to_top_left_corner, rotate_stone_counter_clockwise_90, CELL_COLUMN, \
+    CELL_ROW, EMPTY_CELL_COLOR
 
 
 class Player(base.BasePlayer):
@@ -25,7 +25,7 @@ class Player(base.BasePlayer):
             newStone.append([newRow, newCol])
         return newStone
 
-    def canBePlaced(self, stone):
+    def canBePlaced(self, stone, stoneColor):
         # stone = [[row, col], ... [row, col]]
         # true if all [row, cal] inside board and all row, col are free i.e. the cell contains 0
         for cell in stone:
@@ -34,6 +34,8 @@ class Player(base.BasePlayer):
                 pass
             else:
                 return False
+        if not self.has_correct_side(stone, stoneColor):
+            return False
         return True
 
     def move(self):
@@ -44,13 +46,13 @@ class Player(base.BasePlayer):
             if no stone can be placed:
             return []
         """
-        stoneIdx = 4
+        stoneIdx = 2
         stoneColor, stone = self.stones[stoneIdx]
 
         for row in range(len(self.board)):
             for col in range(len(self.board[0])):
                 moveStone = self.moveStone(stone, [row, col])
-                if self.canBePlaced(moveStone):
+                if self.canBePlaced(moveStone, stoneColor):
                     return [stoneIdx, moveStone]
 
         return []
@@ -58,21 +60,29 @@ class Player(base.BasePlayer):
     # nově položený kamen se musí dotýkat alespoň jednou hranou některého z již položených kamenů
     # kameny stejné barvy se nikdy nesmějí dotýkat hranou (kameny různých barev se mohou dotýkat)
     # nesmi vzniknout zcela pokryta bunka 2x2
-    def has_correct_side(self, stone):
-        cells = stone[STONE_CELLS]
-        color = stone[STONE_COLOR]  # > 0 we can divide
+    # color > 0 we can divide
+    def has_correct_side(self, stone, color):
         same_color_cnt = 0  # must be zero
         empty_color_cnt = 0  # no limit but can used for existence of 2x2 cells
         diff_color_cnt = 0  # must be >= 1
-        for cell in cells:
+        for cell in stone:
             # colors > 0 or EMPTY_CELL_COLOR = 0. test ratio might be less than 1
-            top = board[cell[CELL_ROW] - 1, cell[CELL_COLUMN]] / color
-            bottom = board[cell[CELL_ROW] + 1, cell[CELL_COLUMN]] / color
-            right = board[cell[CELL_ROW], cell[CELL_COLUMN] + 1] / color
-            left = board[cell[CELL_ROW], cell[CELL_COLUMN] - 1] / color
-            same_color_cnt += len([x for x in [top, bottom, right, left] if x == 1])
-            diff_color_cnt += len([x for x in [top, bottom, right, left] if x != 1])
-            empty_color_cnt += len([x for x in [top, bottom, right, left] if x == EMPTY_CELL_COLOR])
+            row = cell[CELL_ROW] - 1
+            col = cell[CELL_COLUMN]
+            top = self.board[row][col] / color if self.inBoard(row, col) else None
+            row = cell[CELL_ROW] + 1
+            col = cell[CELL_COLUMN]
+            bottom = self.board[row][col] / color if self.inBoard(row, col) else None
+            row = cell[CELL_ROW]
+            col = cell[CELL_COLUMN] + 1
+            right = self.board[row][col] / color if self.inBoard(row, col) else None
+            row = cell[CELL_ROW]
+            col = cell[CELL_COLUMN] - 1
+            left = self.board[row][col] / color if self.inBoard(row, col) else None
+            same_color_cnt += len([x for x in [top, bottom, right, left] if x is not None and x == 1])
+            diff_color_cnt += len([x for x in [top, bottom, right, left] if x is not None and x != 1])
+            empty_color_cnt += len([x for x in [top, bottom, right, left] if x is not None and x == EMPTY_CELL_COLOR])
+        return same_color_cnt == 0  # only one condition
 
 
 # kameny nesmí přečnívat z desky, nebo zakrývat (ani částečně) již položené kameny
@@ -100,14 +110,8 @@ if __name__ == "__main__":
     stones = base.loadStones("stones.txt")
     print("stones are", stones)
     shift_stones(stones)
-    # print("shifted stones are", stones)
     rotate_stones(stones)
-    # print("rotated stones are", stones)
     shift_stones(stones)
-    # print("rotated shifted stones are", stones)
-    rotate_stones(stones)
-    rotate_stones(stones)
-    # sys.exit(0)
 
     # prepare board and marks
     board, marks = base.makeBoard10()
