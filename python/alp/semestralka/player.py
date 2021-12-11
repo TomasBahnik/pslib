@@ -46,8 +46,11 @@ class Player(base.BasePlayer):
             if no stone can be placed:
             return []
         """
-        stoneIdx = 2
-        stoneColor, stone = self.stones[stoneIdx]
+        try:
+            stoneIdx = self.freeStones.index(True)
+            stoneColor, stone = self.stones[stoneIdx]
+        except ValueError as ve:
+            return []
 
         for row in range(len(self.board)):
             for col in range(len(self.board[0])):
