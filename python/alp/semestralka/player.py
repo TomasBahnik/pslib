@@ -72,16 +72,24 @@ class Player(base.BasePlayer):
             # colors > 0 or EMPTY_CELL_COLOR = 0. test ratio might be less than 1
             row = cell[CELL_ROW] - 1
             col = cell[CELL_COLUMN]
-            top = self.board[row][col] / color if self.inBoard(row, col) else None
+            t_c = self.board[row][col] if self.inBoard(row, col) else None
+            top = t_c / color if t_c is not None else None
+
             row = cell[CELL_ROW] + 1
             col = cell[CELL_COLUMN]
-            bottom = self.board[row][col] / color if self.inBoard(row, col) else None
+            b_c = self.board[row][col] if self.inBoard(row, col) else None
+            bottom = b_c / color if b_c is not None else None
+
             row = cell[CELL_ROW]
             col = cell[CELL_COLUMN] + 1
-            right = self.board[row][col] / color if self.inBoard(row, col) else None
+            r_c = self.board[row][col] if self.inBoard(row, col) else None
+            right = r_c / color if r_c is not None else None
+
             row = cell[CELL_ROW]
             col = cell[CELL_COLUMN] - 1
-            left = self.board[row][col] / color if self.inBoard(row, col) else None
+            l_c = self.board[row][col] if self.inBoard(row, col) else None
+            left = l_c / color if l_c is not None else None
+
             same_color_cnt += len([x for x in [top, bottom, right, left] if x is not None and x == 1])
             diff_color_cnt += len([x for x in [top, bottom, right, left] if x is not None and x != 1])
             empty_color_cnt += len([x for x in [top, bottom, right, left] if x is not None and x == EMPTY_CELL_COLOR])
@@ -125,7 +133,7 @@ if __name__ == "__main__":
 
     # not necessary, only if you want to draw board to png files
     d = Drawer()
-    d.draw(p1.board, p1.marks, "init.png");
+    d.draw(p1.board, p1.marks, "init.png")
 
     moveidx = 0
     while True:
