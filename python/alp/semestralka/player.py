@@ -5,6 +5,8 @@ from alp.semestralka.draw import Drawer
 from draft.cv08.hw_08_light import move_to_top_left_corner, rotate_stone_counter_clockwise_90, CELL_COLUMN, \
     CELL_ROW, EMPTY_CELL_COLOR
 
+from draft.shared.matrices import column
+
 
 class Player(base.BasePlayer):
     def __init__(self, name, board, marks, stones, player):
@@ -60,40 +62,53 @@ class Player(base.BasePlayer):
 
         return []
 
+    def check_surrounding(self, cell, stone):
+        if cell in stone:
+            return None
+        else:
+            return self.board[cell[0]][cell[1]] if self.inBoard(cell[0], cell[1]) else None
+
+    def stone_surroundings(self, stone, stone_color):
+        surrounding = []
+        for r in [-1, 0, 1]:
+            for c in [-1, 0, 1]:
+                for cell in stone:
+                    row = cell[CELL_ROW] + r
+                    col = cell[CELL_COLUMN] + c
+                    cell = [row, col]
+                    cell_color = self.check_surrounding(cell, stone)
+                    # no cells outside board no empty cells and no duplicates
+                    # TODO filter in list comprehension
+                    if cell_color is not None and cell_color != EMPTY_CELL_COLOR and cell not in column(surrounding, 0):
+                        color_ratio = cell_color / stone_color
+                        surrounding += [[cell, cell_color, color_ratio]]
+        return surrounding
+
+    def check_square(self, surround, stone):
+        f_c = column(surround, 0)
+        next_cell_filled = []
+        for cell in stone:
+            r, c = cell
+            n = [r + 1, c] in f_c or [r, c + 1] in f_c or [r - 1, c] in f_c or [r, c - 1] in f_c
+            next_cell_filled += [n]
+        return [x for x in next_cell_filled if x is True]
+
     # nově položený kamen se musí dotýkat alespoň jednou hranou některého z již položených kamenů
     # kameny stejné barvy se nikdy nesmějí dotýkat hranou (kameny různých barev se mohou dotýkat)
     # nesmi vzniknout zcela pokryta bunka 2x2
     # color > 0 we can divide
-    def has_correct_side(self, stone, color):
-        same_color_cnt = 0  # must be zero
-        empty_color_cnt = 0  # no limit but can used for existence of 2x2 cells
-        diff_color_cnt = 0  # must be >= 1
-        for cell in stone:
-            # colors > 0 or EMPTY_CELL_COLOR = 0. test ratio might be less than 1
-            row = cell[CELL_ROW] - 1
-            col = cell[CELL_COLUMN]
-            t_c = self.board[row][col] if self.inBoard(row, col) else None
-            top = t_c / color if t_c is not None else None
-
-            row = cell[CELL_ROW] + 1
-            col = cell[CELL_COLUMN]
-            b_c = self.board[row][col] if self.inBoard(row, col) else None
-            bottom = b_c / color if b_c is not None else None
-
-            row = cell[CELL_ROW]
-            col = cell[CELL_COLUMN] + 1
-            r_c = self.board[row][col] if self.inBoard(row, col) else None
-            right = r_c / color if r_c is not None else None
-
-            row = cell[CELL_ROW]
-            col = cell[CELL_COLUMN] - 1
-            l_c = self.board[row][col] if self.inBoard(row, col) else None
-            left = l_c / color if l_c is not None else None
-
-            same_color_cnt += len([x for x in [top, bottom, right, left] if x is not None and x == 1])
-            diff_color_cnt += len([x for x in [top, bottom, right, left] if x is not None and x != 1])
-            empty_color_cnt += len([x for x in [top, bottom, right, left] if x is not None and x == EMPTY_CELL_COLOR])
-        return same_color_cnt == 0  # only one condition
+    def has_correct_side(self, stone, stone_color):
+        surroundings = self.stone_surroundings(stone, stone_color)
+        colors = column(surroundings, 1)
+        color_ratios = column(surroundings, 2)
+        # must be zero
+        same_color_cnt = len([x for x in color_ratios if x == 1])
+        # no limit but can used for existence of 2x2 cells
+        diff_color_cnt = len([x for x in color_ratios if x != 1 and x != EMPTY_CELL_COLOR])
+        # must be >= 1
+        empty_color_cnt = len([x for x in color_ratios if x == EMPTY_CELL_COLOR])
+        m = self.check_square(surroundings, stone)
+        return same_color_cnt == 0 and len(m) < 2
 
 
 # kameny nesmí přečnívat z desky, nebo zakrývat (ani částečně) již položené kameny
