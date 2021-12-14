@@ -2,8 +2,8 @@ import alp.semestralka.base as base
 
 from alp.semestralka.draw import Drawer
 
-from draft.cv08.hw_08_light import move_to_top_left_corner, rotate_stone_counter_clockwise_90, CELL_COLUMN, \
-    CELL_ROW, EMPTY_CELL_COLOR
+from draft.cv08.hw_08_light import CELL_COLUMN, \
+    CELL_ROW, EMPTY_CELL_COLOR, move_cells_top_left, rotate_cells_90, rotate_cells_180, rotate_cells_270
 
 from draft.shared.matrices import column
 
@@ -27,6 +27,7 @@ class Player(base.BasePlayer):
             newStone.append([newRow, newCol])
         return newStone
 
+    # TODO check if it covers most of 2nd player marks
     def canBePlaced(self, stone, stoneColor):
         # stone = [[row, col], ... [row, col]]
         # true if all [row, cal] inside board and all row, col are free i.e. the cell contains 0
@@ -51,14 +52,18 @@ class Player(base.BasePlayer):
         try:
             stoneIdx = self.freeStones.index(True)
             stoneColor, stone = self.stones[stoneIdx]
-        except ValueError as ve:
+        except ValueError as ve:  # in case when there is no stone left i.e. index returns None
             return []
 
+        # do not change global variable
+        new_stone = move_cells_top_left(stone)
+        new_stones = [new_stone, rotate_cells_90(new_stone), rotate_cells_180(new_stone), rotate_cells_270(new_stone)]
         for row in range(len(self.board)):
             for col in range(len(self.board[0])):
-                moveStone = self.moveStone(stone, [row, col])
-                if self.canBePlaced(moveStone, stoneColor):
-                    return [stoneIdx, moveStone]
+                for n_s in new_stones:  # check all rotations which is best one
+                    moveStone = self.moveStone(n_s, [row, col])
+                    if self.canBePlaced(moveStone, stoneColor):
+                        return [stoneIdx, moveStone]
 
         return []
 
@@ -93,6 +98,7 @@ class Player(base.BasePlayer):
             next_cell_filled += [n]
         return [x for x in next_cell_filled if x is True]
 
+    # kameny nesmí přečnívat z desky, nebo zakrývat (ani částečně) již položené kameny
     # nově položený kamen se musí dotýkat alespoň jednou hranou některého z již položených kamenů
     # kameny stejné barvy se nikdy nesmějí dotýkat hranou (kameny různých barev se mohou dotýkat)
     # nesmi vzniknout zcela pokryta bunka 2x2
@@ -111,7 +117,8 @@ class Player(base.BasePlayer):
         return same_color_cnt == 0 and len(m) < 2
 
 
-# kameny nesmí přečnívat z desky, nebo zakrývat (ani částečně) již položené kameny
+# the following if/else is simplified. On Brute, we will check if return value
+# from move() is valid ...
 def is_move_valid(player, move):
     # use player board to check
     # player_sign = player.player
@@ -120,24 +127,11 @@ def is_move_valid(player, move):
     return len(move) != 0
 
 
-def shift_stones(stones):
-    for s in stones:
-        move_to_top_left_corner(s)
-
-
-def rotate_stones(stones):
-    for s in stones:
-        rotate_stone_counter_clockwise_90(s)
-
-
 if __name__ == "__main__":
 
     # load stones from file
     stones = base.loadStones("stones.txt")
     print("stones are", stones)
-    shift_stones(stones)
-    rotate_stones(stones)
-    shift_stones(stones)
 
     # prepare board and marks
     board, marks = base.makeBoard10()
@@ -155,35 +149,36 @@ if __name__ == "__main__":
         p1play = True
         p2play = True
 
-        move_ret_val = p1.move()  # first player, we assume that a corrent output is returned
+        move = p1.move()  # first player, we assume that a corrent output is returned
 
         # the following if/else is simplified. On Brute, we will check if return value
         # from move() is valid ...
-        if not is_move_valid(p1, move_ret_val):
+        if not is_move_valid(p1, move):
             p1play = False
         else:
-            stoneIdx, stone = move_ret_val
+            stoneIdx, stone = move
             stoneColor = stones[stoneIdx][0]
             base.writeBoard(p1.board, stone, stoneColor)  # write stone to player1's board
             base.writeBoard(p2.board, stone, stoneColor)  # write stone to player2's board
             p1.freeStones[stoneIdx] = False  # tell player1 which stone is used
             p2.freeStones[stoneIdx] = False  # tell player2 which stone is used
-
-        d.draw(p2.board, p2.marks, "move-{:02d}a.png".format(moveidx))  # draw to png
+        if p1play:  # draw only if played
+            d.draw(p2.board, p2.marks, "move-{:02d}a.png".format(moveidx))  # draw to png
 
         # now we call player2 and update boards/freeStones of both players
-        move_ret_val = p2.move()
-        if not is_move_valid(p2, move_ret_val):
+        move = p2.move()
+        if not is_move_valid(p2, move):
             p2play = False
         else:
-            stoneIdx, stone = move_ret_val
+            stoneIdx, stone = move
             stoneColor = stones[stoneIdx][0]
             base.writeBoard(p1.board, stone, stoneColor)
             base.writeBoard(p2.board, stone, stoneColor)
             p1.freeStones[stoneIdx] = False
             p2.freeStones[stoneIdx] = False
 
-        d.draw(p1.board, p1.marks, "move-{:02d}b.png".format(moveidx))
+        if p2play:
+            d.draw(p1.board, p1.marks, "move-{:02d}b.png".format(moveidx))
 
         # if both players return [] from move, the game ends
         if p1play is False and p2play is False:
