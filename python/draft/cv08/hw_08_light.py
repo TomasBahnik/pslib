@@ -80,23 +80,40 @@ def move_to_top_left_corner(stone):
     :return: relabeled stone cells
     """
     stone_cells = stone[STONE_CELLS]
+    return move_cells_top_left(stone_cells)
+
+
+def move_cells_top_left(stone_cells):
     min_row = min([cell[CELL_ROW] for cell in stone_cells])
     min_col = min([cell[CELL_COLUMN] for cell in stone_cells])
+    new_cells = []
     for cell in stone_cells:
-        cell[CELL_ROW] -= min_row
-        cell[CELL_COLUMN] -= min_col
-    return stone_cells
+        new_cells += [[cell[CELL_ROW] - min_row, cell[CELL_COLUMN] - min_col]]
+    return new_cells
 
 
 # 90 is [[0,-1],[1,0]]
 def rotate_stone_counter_clockwise_90(stone):
     stone_cells = stone[STONE_CELLS]
+    return rotate_cells_90(stone_cells)
+
+
+def rotate_cells_90(stone_cells):
+    new_cells = []
     for cell in stone_cells:
         r = cell[CELL_ROW]
         c = cell[CELL_COLUMN]
-        cell[CELL_ROW] = -c
-        cell[CELL_COLUMN] = r
-    return stone_cells
+        new_cells += [[-c, r]]
+    # after rotate move to the top left
+    return move_cells_top_left(new_cells)
+
+
+def rotate_cells_180(stone_cells):
+    return rotate_cells_90(rotate_cells_90(stone_cells))
+
+
+def rotate_cells_270(stone_cells):
+    return rotate_cells_90(rotate_cells_90(rotate_cells_90(stone_cells)))
 
 
 def stone_border(stone):
