@@ -27,7 +27,7 @@ class Player(base.BasePlayer):
             newStone.append([newRow, newCol])
         return newStone
 
-    # TODO check if it covers most of 2nd player marks
+    # TODO maximize player.score function
     def canBePlaced(self, stone, stoneColor):
         # stone = [[row, col], ... [row, col]]
         # true if all [row, cal] inside board and all row, col are free i.e. the cell contains 0
@@ -51,17 +51,18 @@ class Player(base.BasePlayer):
         """
         try:
             stoneIdx = self.freeStones.index(True)
-            stoneColor, stone = self.stones[stoneIdx]
+            stoneColor, stone = self.stones[stoneIdx]  # new local variables are created
         except ValueError as ve:  # in case when there is no stone left i.e. index returns None
             return []
 
-        # do not change global variable
-        new_stone = move_cells_top_left(stone)
-        new_stones = [new_stone, rotate_cells_90(new_stone), rotate_cells_180(new_stone), rotate_cells_270(new_stone)]
+        # here new local variable stone is used and might be assigned
+        # do not use in/out variables anyway
+        stone = move_cells_top_left(stone)
+        rotated_stones = [stone, rotate_cells_90(stone), rotate_cells_180(stone), rotate_cells_270(stone)]
         for row in range(len(self.board)):
             for col in range(len(self.board[0])):
-                for n_s in new_stones:  # check all rotations which is best one
-                    moveStone = self.moveStone(n_s, [row, col])
+                for r_s in rotated_stones:  # check all rotations which is best one
+                    moveStone = self.moveStone(r_s, [row, col])
                     if self.canBePlaced(moveStone, stoneColor):
                         return [stoneIdx, moveStone]
 
