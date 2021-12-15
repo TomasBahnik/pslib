@@ -78,14 +78,15 @@ class Player(base.BasePlayer):
                     all_scores.append([stone_idx, single_move])
                 else:
                     return []
-            if len(all_scores) > 0:
-                stone_score = all_scores[0][1]  # first free stone
-                opp_marks = column(stone_score, 1)
-                max_opp_mark_idx = opp_marks.index(max(opp_marks))
-                best_move = stone_score[max_opp_mark_idx][2]
-                duration = time.perf_counter() - t0
-                print("Move duration = {} sec".format(duration))
-                return [stone_idx, best_move]
+        if len(all_scores) > 0:
+            stone_idx = all_scores[0][0]
+            stone_score = all_scores[0][1]  # first free stone
+            opp_marks = column(stone_score, 1)
+            max_opp_mark_idx = opp_marks.index(max(opp_marks))
+            best_move = stone_score[max_opp_mark_idx][2]
+            duration = time.perf_counter() - t0
+            print("Move duration = {} sec".format(duration))
+            return [stone_idx, best_move]
         return []
 
     def single_move(self, a_stone, stone_color):
