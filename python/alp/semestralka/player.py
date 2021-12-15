@@ -68,29 +68,38 @@ class Player(base.BasePlayer):
             if no stone can be placed:
             return []
         """
+        all_scores = []  # store scores to find the best next placement
+        t0 = time.perf_counter()
         for stone_idx in range(len(self.freeStones)):
             if self.freeStones[stone_idx] is True:
                 stone_color, the_stone = self.stones[stone_idx]  # new local variables are created
-                return self.single_move(the_stone, stone_color, stone_idx)
+                single_move = self.single_move(the_stone, stone_color)
+                if len(single_move) > 0:
+                    all_scores.append([stone_idx, single_move])
+                else:
+                    return []
+            if len(all_scores) > 0:
+                stone_score = all_scores[0][1]  # first free stone
+                opp_marks = column(stone_score, 1)
+                max_opp_mark_idx = opp_marks.index(max(opp_marks))
+                best_move = stone_score[max_opp_mark_idx][2]
+                duration = time.perf_counter() - t0
+                print("Move duration = {} sec".format(duration))
+                return [stone_idx, best_move]
+        return []
 
-    def single_move(self, a_stone, stone_color, stone_idx):
-        new_scores = []  # store scores to find the best next placement
+    def single_move(self, a_stone, stone_color):
+        stone_scores = []  # store scores to find the best next placement
         a_stone = move_cells_top_left(a_stone)
         rotated_stones = [a_stone, rotate_cells_90(a_stone), rotate_cells_180(a_stone), rotate_cells_270(a_stone)]
-        t0 = time.perf_counter()
         for row in range(len(self.board)):
             for col in range(len(self.board[0])):
                 for r_s in rotated_stones:  # check all rotations which is best one
                     moveStone = self.moveStone(r_s, [row, col])
                     if self.canBePlaced(moveStone, stone_color):
-                        new_scores.append(self.stone_score(moveStone))
-        if len(new_scores) > 0:
-            opp_marks = column(new_scores, 1)
-            max_opp_mark_idx = opp_marks.index(max(opp_marks))
-            best_move = new_scores[max_opp_mark_idx][2]
-            duration = time.perf_counter() - t0
-            print("Single move duration = {} sec".format(duration))
-            return [stone_idx, best_move]
+                        stone_scores.append(self.stone_score(moveStone))
+        if len(stone_scores) > 0:
+            return stone_scores
         return []
 
     def check_surrounding(self, cell, stone):
