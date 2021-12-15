@@ -1,10 +1,9 @@
+import time
+
 import alp.semestralka.base as base
-
 from alp.semestralka.draw import Drawer
-
 from draft.cv08.hw_08_light import CELL_COLUMN, \
     CELL_ROW, EMPTY_CELL_COLOR, move_cells_top_left, rotate_cells_90, rotate_cells_180, rotate_cells_270
-
 from draft.shared.matrices import column
 
 
@@ -47,20 +46,20 @@ class Player(base.BasePlayer):
                 my_marks += 1
         return [my_marks, opponent_marks, new_stone]
 
-    # TODO maximize player.score function
-    def canBePlaced(self, stone, stoneColor):
+    def canBePlaced(self, a_stone, stone_color):
         # stone = [[row, col], ... [row, col]]
-        for cell in stone:
+        for cell in a_stone:
             row, col = cell
             # true if all stone cells are inside the board and cells in board are free i.e. contain 0
             if self.inBoard(row, col) and self.board[row][col] == 0:
                 pass
             else:
                 return False
-        if not self.has_correct_side(stone, stoneColor):
+        if not self.has_correct_side(a_stone, stone_color):
             return False
         return True
 
+    @property
     def move(self):
         """ return [ stoneIdx, [ stonePosition] ]
             stoneIdx .. integer .. index of stone to self.freeStones
@@ -69,29 +68,29 @@ class Player(base.BasePlayer):
             if no stone can be placed:
             return []
         """
-        try:
-            stoneIdx = self.freeStones.index(True)
-            stoneColor, stone = self.stones[stoneIdx]  # new local variables are created
-        except ValueError as ve:  # in case when there is no stone left i.e. index returns None
-            return []
+        for stone_idx in range(len(self.freeStones)):
+            if self.freeStones[stone_idx] is True:
+                stone_color, the_stone = self.stones[stone_idx]  # new local variables are created
+                return self.single_move(the_stone, stone_color, stone_idx)
 
-        # here new local variable stone is used and might be assigned
-        # do not use in/out variables anyway
+    def single_move(self, a_stone, stone_color, stone_idx):
         new_scores = []  # store scores to find the best next placement
-        stone = move_cells_top_left(stone)
-        rotated_stones = [stone, rotate_cells_90(stone), rotate_cells_180(stone), rotate_cells_270(stone)]
+        a_stone = move_cells_top_left(a_stone)
+        rotated_stones = [a_stone, rotate_cells_90(a_stone), rotate_cells_180(a_stone), rotate_cells_270(a_stone)]
+        t0 = time.perf_counter()
         for row in range(len(self.board)):
             for col in range(len(self.board[0])):
                 for r_s in rotated_stones:  # check all rotations which is best one
                     moveStone = self.moveStone(r_s, [row, col])
-                    if self.canBePlaced(moveStone, stoneColor):
+                    if self.canBePlaced(moveStone, stone_color):
                         new_scores.append(self.stone_score(moveStone))
         if len(new_scores) > 0:
             opp_marks = column(new_scores, 1)
             max_opp_mark_idx = opp_marks.index(max(opp_marks))
             best_move = new_scores[max_opp_mark_idx][2]
-            return [stoneIdx, best_move]
-
+            duration = time.perf_counter() - t0
+            print("Single move duration = {} sec".format(duration))
+            return [stone_idx, best_move]
         return []
 
     def check_surrounding(self, cell, stone):
@@ -176,7 +175,7 @@ if __name__ == "__main__":
         p1play = True
         p2play = True
 
-        move = p1.move()  # first player, we assume that a corrent output is returned
+        move = p1.move  # first player, we assume that a corrent output is returned
 
         # the following if/else is simplified. On Brute, we will check if return value
         # from move() is valid ...
@@ -193,7 +192,7 @@ if __name__ == "__main__":
             d.draw(p2.board, p2.marks, "move-{:02d}a.png".format(moveidx))  # draw to png
 
         # now we call player2 and update boards/freeStones of both players
-        move = p2.move()
+        move = p2.move
         if not is_move_valid(p2, move):
             p2play = False
         else:
