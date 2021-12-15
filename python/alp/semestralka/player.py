@@ -27,12 +27,32 @@ class Player(base.BasePlayer):
             newStone.append([newRow, newCol])
         return newStone
 
+    # snaží se je co nejvíc uchránit svoje znacky a
+    # naopak se snaží pokrýt soupeřovy značky
+    def stone_score(self, new_stone):
+        """ count the number of open pieces for player (=1 or -1)
+            self.score(self.player) -> counts YOUR score (the number of your open marks)
+            self.score(-self.player) -> counts OPPONENT's score (the number of his/her open marks)
+        """
+        opponent_marks = 0  # maximize
+        my_marks = 0  # keep uncovered but put the stone in such a way that they can't be covered
+        for cell in new_stone:
+            r, c = cell
+            if self.board[r][c] != 0:  # should not happen at this moment
+                print("ERROR invalid placement")
+                return -1
+            if self.marks[r][c] == -self.player:
+                opponent_marks += 1
+            if self.marks[r][c] == self.player:
+                my_marks += 1
+        return [my_marks, opponent_marks, new_stone]
+
     # TODO maximize player.score function
     def canBePlaced(self, stone, stoneColor):
         # stone = [[row, col], ... [row, col]]
-        # true if all [row, cal] inside board and all row, col are free i.e. the cell contains 0
         for cell in stone:
             row, col = cell
+            # true if all stone cells are inside the board and cells in board are free i.e. contain 0
             if self.inBoard(row, col) and self.board[row][col] == 0:
                 pass
             else:
@@ -57,6 +77,7 @@ class Player(base.BasePlayer):
 
         # here new local variable stone is used and might be assigned
         # do not use in/out variables anyway
+        new_scores = []  # store scores to find the best next placement
         stone = move_cells_top_left(stone)
         rotated_stones = [stone, rotate_cells_90(stone), rotate_cells_180(stone), rotate_cells_270(stone)]
         for row in range(len(self.board)):
@@ -64,7 +85,12 @@ class Player(base.BasePlayer):
                 for r_s in rotated_stones:  # check all rotations which is best one
                     moveStone = self.moveStone(r_s, [row, col])
                     if self.canBePlaced(moveStone, stoneColor):
-                        return [stoneIdx, moveStone]
+                        new_scores.append(self.stone_score(moveStone))
+        if len(new_scores) > 0:
+            opp_marks = column(new_scores, 1)
+            max_opp_mark_idx = opp_marks.index(max(opp_marks))
+            best_move = new_scores[max_opp_mark_idx][2]
+            return [stoneIdx, best_move]
 
         return []
 
