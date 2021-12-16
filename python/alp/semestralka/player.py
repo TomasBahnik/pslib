@@ -83,7 +83,9 @@ class Player(base.BasePlayer):
                 stone_idx = a_s[0]
                 stone_score = a_s[1]
                 opp_marks = column(stone_score, 1)
-                max_opp_mark_idx = opp_marks.index(max(opp_marks))
+                max_opp_marks = max(opp_marks)
+                print("Max opponent marks = {}".format(max_opp_marks))
+                max_opp_mark_idx = opp_marks.index(max_opp_marks)
                 best_move = stone_score[max_opp_mark_idx][2]
                 duration = time.perf_counter() - t0
                 print("Move duration = {} sec".format(duration))
