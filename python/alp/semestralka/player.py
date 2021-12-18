@@ -101,7 +101,10 @@ class Player(base.BasePlayer):
                 for r_s in rotated_stones:  # check all rotations which is best one
                     moveStone = self.moveStone(r_s, [row, col])
                     if self.canBePlaced(moveStone, stone_color):
-                        stone_scores.append(self.stone_score(moveStone))
+                        stone_score = self.stone_score(moveStone)
+                        my_marks = stone_score[0]  # do not cover my own marks!
+                        if my_marks == 0:
+                            stone_scores.append(stone_score)
         if len(stone_scores) > 0:
             return stone_scores
         return []
