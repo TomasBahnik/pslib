@@ -124,12 +124,15 @@ class Player(base.BasePlayer):
                     cell = [row, col]
                     cell_color = self.check_surrounding(cell, stone)
                     # no cells outside board no empty cells and no duplicates
-                    # TODO filter in list comprehension
                     if cell_color is not None and cell_color != EMPTY_CELL_COLOR and cell not in column(surrounding, 0):
                         color_ratio = cell_color / stone_color
                         surrounding += [[cell, cell_color, color_ratio]]
         return surrounding
 
+    # TODO review
+    #  len < 2 dava max 1 spolecnou hranu
+    #  len < 3 vybira lepsi pozice dovoli 2 spolecne hrany ale NESMI dovolit
+    #  aby 2 *sousedni* bunky mely spolecne hrany na *stejne* strane <= hlavni kriretium - soucin = 0 ?
     def check_square(self, surround, stone):
         f_c = column(surround, 0)
         next_cell_filled = []
@@ -155,7 +158,7 @@ class Player(base.BasePlayer):
         # must be >= 1
         empty_color_cnt = len([x for x in color_ratios if x == EMPTY_CELL_COLOR])
         m = self.check_square(surroundings, stone)
-        return same_color_cnt == 0 and len(m) < 2
+        return same_color_cnt == 0 and len(m) < 3  # viz TODO alp.semestralka.player.Player.check_square
 
 
 # the following if/else is simplified. On Brute, we will check if return value
