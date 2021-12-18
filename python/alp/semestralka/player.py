@@ -59,7 +59,6 @@ class Player(base.BasePlayer):
             return False
         return True
 
-    @property
     def move(self):
         """ return [ stoneIdx, [ stonePosition] ]
             stoneIdx .. integer .. index of stone to self.freeStones
@@ -191,7 +190,7 @@ if __name__ == "__main__":
         p1play = True
         p2play = True
 
-        move = p1.move  # first player, we assume that a corrent output is returned
+        move = p1.move()  # first player, we assume that a corrent output is returned
 
         # the following if/else is simplified. On Brute, we will check if return value
         # from move() is valid ...
@@ -208,7 +207,7 @@ if __name__ == "__main__":
             d.draw(p2.board, p2.marks, "move-{:02d}a.png".format(moveidx))  # draw to png
 
         # now we call player2 and update boards/freeStones of both players
-        move = p2.move
+        move = p2.move()
         if not is_move_valid(p2, move):
             p2play = False
         else:
