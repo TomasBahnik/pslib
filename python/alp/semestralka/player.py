@@ -1,5 +1,5 @@
 import time
-
+import copy
 import alp.semestralka.base as base
 from alp.semestralka.draw import Drawer
 from draft.cv08.hw_08_light import CELL_COLUMN, \
@@ -133,14 +133,45 @@ class Player(base.BasePlayer):
     #  len < 2 dava max 1 spolecnou hranu
     #  len < 3 vybira lepsi pozice dovoli 2 spolecne hrany ale NESMI dovolit
     #  aby 2 *sousedni* bunky mely spolecne hrany na *stejne* strane <= hlavni kriretium - soucin = 0 ?
-    def check_square(self, surround, stone):
-        f_c = column(surround, 0)
-        next_cell_filled = []
+    def check_square(self, stone, stone_color):
+        tmp_board = copy.deepcopy(self.board)
+        cell_has_two_neighbour = []
+        # put stone on tmp board original board can be used but the stone must be deleted
+        base.writeBoard(tmp_board, stone, stone_color)
         for cell in stone:
             r, c = cell
-            n = [r + 1, c] in f_c or [r, c + 1] in f_c or [r - 1, c] in f_c or [r, c - 1] in f_c
-            next_cell_filled += [n]
-        return [x for x in next_cell_filled if x is True]
+            x = r
+            y = c - 1
+            left = tmp_board[x][y] if self.inBoard(x, y) else 0
+            x = r - 1
+            y = c - 1
+            left_top = tmp_board[x][y] if self.inBoard(x, y) else 0
+            x = r - 1
+            y = c
+            top = tmp_board[x][y] if self.inBoard(x, y) else 0
+            x = r - 1
+            y = c + 1
+            right_top = tmp_board[x][y] if self.inBoard(x, y) else 0
+            x = r
+            y = c + 1
+            right = tmp_board[x][y] if self.inBoard(x, y) else 0
+            x = r + 1
+            y = c + 1
+            right_bottom = tmp_board[x][y] if self.inBoard(x, y) else 0
+            x = r + 1
+            y = c
+            bottom = tmp_board[x][y] if self.inBoard(x, y) else 0
+            x = r + 1
+            y = c - 1
+            bottom_left = tmp_board[x][y] if self.inBoard(x, y) else 0
+            # all must be true
+            a = left * left_top * top == 0
+            b = top * right_top * right == 0
+            c = right * right_bottom * bottom == 0
+            d = bottom * bottom_left * left == 0
+            cell_has_two_neighbour += [a and b and c and d]
+        square = [x for x in cell_has_two_neighbour if x is False]
+        return len(square) == 0  # no False => no square
 
     # kameny nesmí přečnívat z desky, nebo zakrývat (ani částečně) již položené kameny
     # nově položený kamen se musí dotýkat alespoň jednou hranou některého z již položených kamenů
@@ -148,8 +179,8 @@ class Player(base.BasePlayer):
     # nesmi vzniknout zcela pokryta bunka 2x2
     # color > 0 we can divide
     def has_correct_side(self, stone, stone_color):
+        # might be used for optimizing position based on marks
         surroundings = self.stone_surroundings(stone, stone_color)
-        colors = column(surroundings, 1)
         color_ratios = column(surroundings, 2)
         # must be zero
         same_color_cnt = len([x for x in color_ratios if x == 1])
@@ -157,8 +188,8 @@ class Player(base.BasePlayer):
         diff_color_cnt = len([x for x in color_ratios if x != 1 and x != EMPTY_CELL_COLOR])
         # must be >= 1
         empty_color_cnt = len([x for x in color_ratios if x == EMPTY_CELL_COLOR])
-        m = self.check_square(surroundings, stone)
-        return same_color_cnt == 0 and len(m) < 3  # viz TODO alp.semestralka.player.Player.check_square
+        no_square = self.check_square(stone, stone_color)
+        return same_color_cnt == 0 and no_square
 
 
 # the following if/else is simplified. On Brute, we will check if return value
