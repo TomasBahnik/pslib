@@ -6,13 +6,15 @@ from draft.cv08.hw_08_light import CELL_COLUMN, \
     CELL_ROW, EMPTY_CELL_COLOR, move_cells_top_left, rotate_cells_90, rotate_cells_180, rotate_cells_270
 from draft.shared.matrices import column
 
+FIRST_FREE_STONE_SCORE = 'first_free_stone_score'
+
 
 class Player(base.BasePlayer):
     def __init__(self, name, board, marks, stones, player):
         """ constructor of Player. Place you variables here with prefix 'self' -> e.g. 'self.myVariable' """
 
         base.BasePlayer.__init__(self, name, board, marks, stones, player)  # do not change this line!!
-        self.algorithm = "my great method"  # name of your method. Will be used in tournament mode
+        self.algorithm = FIRST_FREE_STONE_SCORE  # name of your method. Will be used in tournament mode
 
     def moveStone(self, stone, row_col):
         # stone = [[row1, col1], ... [rown, coln]]
@@ -59,6 +61,24 @@ class Player(base.BasePlayer):
             return False
         return True
 
+    def all_stone_scores(self):
+        all_scores = []  # store scores to find the best next placement
+        for stone_idx in range(len(self.freeStones)):
+            if self.freeStones[stone_idx] is True:
+                stone_color, the_stone = self.stones[stone_idx]  # new local variables are created
+                single_move = self.single_move(the_stone, stone_color)
+                if len(single_move) > 0:
+                    all_scores.append([stone_idx, single_move])
+        return all_scores
+
+    def first_free_stone_scores(self):
+        stone_idx = self.freeStones.index(True)
+        stone_color, the_stone = self.stones[stone_idx]  # new local variables are created
+        single_move = self.single_move(the_stone, stone_color)
+        if len(single_move) > 0:
+            return [stone_idx, single_move]
+        return []
+
     def move(self):
         """ return [ stoneIdx, [ stonePosition] ]
             stoneIdx .. integer .. index of stone to self.freeStones
@@ -67,29 +87,35 @@ class Player(base.BasePlayer):
             if no stone can be placed:
             return []
         """
-        all_scores = []  # store scores to find the best next placement
         t0 = time.perf_counter()
-        for stone_idx in range(len(self.freeStones)):
-            if self.freeStones[stone_idx] is True:
-                stone_color, the_stone = self.stones[stone_idx]  # new local variables are created
-                single_move = self.single_move(the_stone, stone_color)
-                if len(single_move) > 0:
-                    all_scores.append([stone_idx, single_move])
-                else:
-                    return []
-        if len(all_scores) > 0:
-            for a_s in all_scores:
-                stone_idx = a_s[0]
-                stone_score = a_s[1]
-                opp_marks = column(stone_score, 1)
-                max_opp_marks = max(opp_marks)
-                print("Max opponent marks = {}".format(max_opp_marks))
-                max_opp_mark_idx = opp_marks.index(max_opp_marks)
-                best_move = stone_score[max_opp_mark_idx][2]
-                duration = time.perf_counter() - t0
-                print("Move duration = {} sec".format(duration))
-                return [stone_idx, best_move]
+        scores = self.first_free_stone_scores() if self.algorithm == FIRST_FREE_STONE_SCORE else self.all_stone_scores()
+        duration = time.perf_counter() - t0
+        print("scores calculation duration = {} sec".format(duration))
+        if len(scores) > 0:
+            if self.algorithm == FIRST_FREE_STONE_SCORE:
+                return self.get_best_move(scores)
+            else:
+                # TODO efficient way for best move from all scores
+                return self.get_best_move(scores[0])
         return []
+
+    @staticmethod
+    def get_best_move(stone_score):
+        """ Structure of stone score
+            [0] ... stone index
+            [1] ... [my_marks, opponent_marks] covered marks , my covered marks are always 0 => might be removed
+            [2] ... new stone position
+        """
+        idx = stone_score[0]
+        score = stone_score[1]
+        # opponent marks covered by move
+        opp_marks = column(score, 1)
+        max_opp_marks = max(opp_marks)
+        print("Max opponent marks = {}".format(max_opp_marks))
+        max_opp_mark_idx = opp_marks.index(max_opp_marks)
+        # simple criteria :  best move = the one which covers most of opponent marks
+        best_move = score[max_opp_mark_idx][2]
+        return [idx, best_move]
 
     def single_move(self, a_stone, stone_color):
         stone_scores = []  # store scores to find the best next placement
