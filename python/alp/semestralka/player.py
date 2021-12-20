@@ -1,5 +1,5 @@
 import time
-import copy
+
 import alp.semestralka.base as base
 from alp.semestralka.draw import Drawer
 from draft.cv08.hw_08_light import CELL_COLUMN, \
@@ -134,36 +134,37 @@ class Player(base.BasePlayer):
     #  len < 3 vybira lepsi pozice dovoli 2 spolecne hrany ale NESMI dovolit
     #  aby 2 *sousedni* bunky mely spolecne hrany na *stejne* strane <= hlavni kriretium - soucin = 0 ?
     def check_square(self, stone, stone_color):
-        tmp_board = copy.deepcopy(self.board)
+        # tmp_board = copy.deepcopy(self.board)
         cell_has_two_neighbour = []
-        # put stone on tmp board original board can be used but the stone must be deleted
-        base.writeBoard(tmp_board, stone, stone_color)
+        # put temporarily stone on board. It is guaranteed that the cells are empty
+        # creating a deep copy takes ~ 0.2 sec
+        base.writeBoard(self.board, stone, stone_color)
         for cell in stone:
             r, c = cell
             x = r
             y = c - 1
-            left = tmp_board[x][y] if self.inBoard(x, y) else 0
+            left = self.board[x][y] if self.inBoard(x, y) else 0
             x = r - 1
             y = c - 1
-            left_top = tmp_board[x][y] if self.inBoard(x, y) else 0
+            left_top = self.board[x][y] if self.inBoard(x, y) else 0
             x = r - 1
             y = c
-            top = tmp_board[x][y] if self.inBoard(x, y) else 0
+            top = self.board[x][y] if self.inBoard(x, y) else 0
             x = r - 1
             y = c + 1
-            right_top = tmp_board[x][y] if self.inBoard(x, y) else 0
+            right_top = self.board[x][y] if self.inBoard(x, y) else 0
             x = r
             y = c + 1
-            right = tmp_board[x][y] if self.inBoard(x, y) else 0
+            right = self.board[x][y] if self.inBoard(x, y) else 0
             x = r + 1
             y = c + 1
-            right_bottom = tmp_board[x][y] if self.inBoard(x, y) else 0
+            right_bottom = self.board[x][y] if self.inBoard(x, y) else 0
             x = r + 1
             y = c
-            bottom = tmp_board[x][y] if self.inBoard(x, y) else 0
+            bottom = self.board[x][y] if self.inBoard(x, y) else 0
             x = r + 1
             y = c - 1
-            bottom_left = tmp_board[x][y] if self.inBoard(x, y) else 0
+            bottom_left = self.board[x][y] if self.inBoard(x, y) else 0
             # all must be true
             a = left * left_top * top == 0
             b = top * right_top * right == 0
@@ -171,6 +172,8 @@ class Player(base.BasePlayer):
             d = bottom * bottom_left * left == 0
             cell_has_two_neighbour += [a and b and c and d]
         square = [x for x in cell_has_two_neighbour if x is False]
+        # delete stone
+        base.writeBoard(self.board, stone, EMPTY_CELL_COLOR)
         return len(square) == 0  # no False => no square
 
     # kameny nesmí přečnívat z desky, nebo zakrývat (ani částečně) již položené kameny
