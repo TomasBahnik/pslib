@@ -96,6 +96,11 @@ class Player(base.BasePlayer):
                 return self.get_best_move(scores)
             else:
                 # TODO efficient way for best move from all scores
+                # x = scores[:][:][:][:][1][1]
+                # opp_marks = column(x, 1)
+                # max_opp_marks = max(opp_marks)
+                # print("Max opponent marks = {}".format(max_opp_marks))
+                # max_opp_mark_idx = opp_marks.index(max_opp_marks)
                 return self.get_best_move(scores[0])
         return []
 
