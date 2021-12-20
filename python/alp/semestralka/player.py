@@ -90,22 +90,24 @@ class Player(base.BasePlayer):
         t0 = time.perf_counter()
         scores = self.first_free_stone_scores() if self.algorithm == FIRST_FREE_STONE_SCORE else self.all_stone_scores()
         duration = time.perf_counter() - t0
-        print("scores calculation duration = {} sec".format(duration))
+        print("{} : scores calculation duration = {} sec".format(self.name, duration))
         if len(scores) > 0:
             if self.algorithm == FIRST_FREE_STONE_SCORE:
                 return self.get_best_move(scores)
             else:
-                # TODO efficient way for best move from all scores
-                # x = scores[:][:][:][:][1][1]
-                # opp_marks = column(x, 1)
-                # max_opp_marks = max(opp_marks)
-                # print("Max opponent marks = {}".format(max_opp_marks))
-                # max_opp_mark_idx = opp_marks.index(max_opp_marks)
-                return self.get_best_move(scores[0])
+                # TODO review and optimize way for best move from all scores
+                #  this must win but not
+                # stone_indexes = column(scores, 0)
+                stone_scores = column(scores, 1)
+                x = column(stone_scores, 0)
+                opp_marks = column(x, 1)
+                max_opp_marks = max(opp_marks)
+                max_opp_mark_idx = opp_marks.index(max_opp_marks)
+                print("{} : all_free_stones : Max opponent marks = {}".format(self.name, max_opp_marks))
+                return self.get_best_move(scores[max_opp_mark_idx])
         return []
 
-    @staticmethod
-    def get_best_move(stone_score):
+    def get_best_move(self, stone_score):
         """ Structure of stone score
             [0] ... stone index
             [1] ... [my_marks, opponent_marks] covered marks , my covered marks are always 0 => might be removed
@@ -116,7 +118,7 @@ class Player(base.BasePlayer):
         # opponent marks covered by move
         opp_marks = column(score, 1)
         max_opp_marks = max(opp_marks)
-        print("Max opponent marks = {}".format(max_opp_marks))
+        print("{} : get_best_move : Max opponent marks = {}".format(self.name, max_opp_marks))
         max_opp_mark_idx = opp_marks.index(max_opp_marks)
         # simple criteria :  best move = the one which covers most of opponent marks
         best_move = score[max_opp_mark_idx][2]
@@ -247,7 +249,9 @@ if __name__ == "__main__":
 
     # create both players
     p1 = Player("pepa", board, marks, stones, 1)
+    p1.algorithm = 'none'
     p2 = Player("franta", board, marks, stones, -1)
+    p2.algorithm = FIRST_FREE_STONE_SCORE
 
     # not necessary, only if you want to draw board to png files
     d = Drawer()
