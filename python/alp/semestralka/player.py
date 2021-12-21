@@ -2,6 +2,7 @@ import time
 
 import alp.semestralka.base as base
 from alp.semestralka.draw import Drawer
+from alp.semestralka.ston_scores import StoneScore
 from draft.cv08.hw_08_light import CELL_COLUMN, \
     CELL_ROW, EMPTY_CELL_COLOR, move_cells_top_left, rotate_cells_90, rotate_cells_180, rotate_cells_270
 from draft.shared.matrices import column
@@ -113,16 +114,8 @@ class Player(base.BasePlayer):
             [1] ... [my_marks, opponent_marks] covered marks , my covered marks are always 0 => might be removed
             [2] ... new stone position
         """
-        idx = stone_score[0]
-        score = stone_score[1]
-        # opponent marks covered by move
-        opp_marks = column(score, 1)
-        max_opp_marks = max(opp_marks)
-        print("{} : get_best_move : Max opponent marks = {}".format(self.name, max_opp_marks))
-        max_opp_mark_idx = opp_marks.index(max_opp_marks)
-        # simple criteria :  best move = the one which covers most of opponent marks
-        best_move = score[max_opp_mark_idx][2]
-        return [idx, best_move]
+        stoneScore = StoneScore(stone_score)
+        return stoneScore.result()
 
     def single_move(self, a_stone, stone_color):
         stone_scores = []  # store scores to find the best next placement
