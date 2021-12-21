@@ -23,5 +23,5 @@ class StoneScore:
     def best_move(self):
         return self.score()[self.max_opp_mark_idx()][2]
 
-    def result(self):
+    def best_result(self):
         return [self.idx(), self.best_move()]

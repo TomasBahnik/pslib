@@ -94,28 +94,16 @@ class Player(base.BasePlayer):
         print("{} : scores calculation duration = {} sec".format(self.name, duration))
         if len(scores) > 0:
             if self.algorithm == FIRST_FREE_STONE_SCORE:
-                return self.get_best_move(scores)
+                stoneScore = StoneScore(scores)
+                return stoneScore.best_result()
             else:
-                # TODO review and optimize way for best move from all scores
-                #  this must win but not
-                # stone_indexes = column(scores, 0)
-                stone_scores = column(scores, 1)
-                x = column(stone_scores, 0)
-                opp_marks = column(x, 1)
-                max_opp_marks = max(opp_marks)
-                max_opp_mark_idx = opp_marks.index(max_opp_marks)
-                print("{} : all_free_stones : Max opponent marks = {}".format(self.name, max_opp_marks))
-                return self.get_best_move(scores[max_opp_mark_idx])
+                stoneScores = []
+                for score in scores:
+                    stoneScores += [StoneScore(score)]
+                opp_marks = [x.max_opp_marks() for x in stoneScores]
+                max_opp_marks_idx = opp_marks.index(max(opp_marks))
+                return stoneScores[max_opp_marks_idx].best_result()
         return []
-
-    def get_best_move(self, stone_score):
-        """ Structure of stone score
-            [0] ... stone index
-            [1] ... [my_marks, opponent_marks] covered marks , my covered marks are always 0 => might be removed
-            [2] ... new stone position
-        """
-        stoneScore = StoneScore(stone_score)
-        return stoneScore.result()
 
     def single_move(self, a_stone, stone_color):
         stone_scores = []  # store scores to find the best next placement
@@ -242,9 +230,10 @@ if __name__ == "__main__":
 
     # create both players
     p1 = Player("pepa", board, marks, stones, 1)
-    p1.algorithm = 'none'
     p2 = Player("franta", board, marks, stones, -1)
-    p2.algorithm = FIRST_FREE_STONE_SCORE
+    # FIRST_FREE_STONE_SCORE is default
+    # p1.algorithm = 'none'
+    # p2.algorithm = FIRST_FREE_STONE_SCORE
 
     # not necessary, only if you want to draw board to png files
     d = Drawer()
