@@ -73,7 +73,10 @@ class Player(base.BasePlayer):
         return all_scores
 
     def first_free_stone_scores(self):
-        stone_idx = self.freeStones.index(True)
+        try:
+            stone_idx = self.freeStones.index(True)
+        except ValueError as ve:  # in case when there is no free stone
+            return []
         stone_color, the_stone = self.stones[stone_idx]  # new local variables are created
         single_move = self.single_move(the_stone, stone_color)
         if len(single_move) > 0:
@@ -133,14 +136,16 @@ class Player(base.BasePlayer):
         for r in [-1, 0, 1]:
             for c in [-1, 0, 1]:
                 for cell in stone:
-                    row = cell[CELL_ROW] + r
-                    col = cell[CELL_COLUMN] + c
-                    cell = [row, col]
-                    cell_color = self.check_surrounding(cell, stone)
-                    # no cells outside board no empty cells and no duplicates
-                    if cell_color is not None and cell_color != EMPTY_CELL_COLOR and cell not in column(surrounding, 0):
-                        color_ratio = cell_color / stone_color
-                        surrounding += [[cell, cell_color, color_ratio]]
+                    # do not check diagonal neighbours => one of r/c should be 0
+                    if abs(r) + abs(c) == 1:
+                        row = cell[CELL_ROW] + r
+                        col = cell[CELL_COLUMN] + c
+                        cell = [row, col]
+                        cell_color = self.check_surrounding(cell, stone)
+                        # no cells outside board no empty cells and no duplicates
+                        if cell_color is not None and cell_color != EMPTY_CELL_COLOR and cell not in column(surrounding, 0):
+                            color_ratio = cell_color / stone_color
+                            surrounding += [[cell, cell_color, color_ratio]]
         return surrounding
 
     # TODO review
@@ -206,7 +211,10 @@ class Player(base.BasePlayer):
         # must be >= 1
         empty_color_cnt = len([x for x in color_ratios if x == EMPTY_CELL_COLOR])
         no_square = self.check_square(stone, stone_color)
-        return same_color_cnt == 0 and no_square
+        first_check = same_color_cnt == 0 and no_square
+        # if there is already used stone current stone has to touch it => surroundings is not empty
+        return first_check and len(surroundings) > 0 if False in self.freeStones else first_check
+        # return first_check
 
 
 # the following if/else is simplified. On Brute, we will check if return value
