@@ -20,8 +20,8 @@ my_text_calendar = calendar.TextCalendar()
 for month in range(1, 13):
 
     # Compute the dates for each week that overlaps the month
-    c = calendar.monthcalendar(YEAR, month)
-    # c = my_text_calendar.monthdayscalendar(YEAR, month)
+    # c = calendar.monthcalendar(YEAR, month)
+    c = my_text_calendar.monthdayscalendar(YEAR, month)
     for week in c:
         if week[calendar.MONDAY] and week[calendar.SUNDAY]:  # full week
             start_day = week[calendar.MONDAY]
@@ -41,5 +41,5 @@ for month in range(1, 13):
             # end_idx = week.index(end)
             end_day_name = calendar.day_name[last_day_idx - 1]
             # print('week {}'.format(week))
-        print('week {} : {}.{}.{} ({}) - {}.{}.{} ({})'.
+        print('{} : {}.{}.{} ({}) - {}.{}.{} ({})'.
               format(week, start_day, month, YEAR, start_day_name, end_day, month, YEAR, end_day_name))
