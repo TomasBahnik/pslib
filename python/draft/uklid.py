@@ -1,6 +1,5 @@
 import calendar
 import datetime
-import itertools
 
 YEAR = 2022
 
@@ -39,13 +38,22 @@ def str_weeks(weeks):
     return ret_val.strip()
 
 
-for f in flats:
-    w = [x[0] for x in week_flat if x[1] == f]
-    name = flat_name[f]
-    print('{}\t{}'.format(name, str_weeks(w)))
+out_file = 'uklid.csv'
+with open(out_file, "w", encoding='utf-8') as csv_file:
+    csv_file.write('Jmeno\tUklid\n')
+    for f in flats:
+        w = [x[0] for x in week_flat if x[1] == f]
+        name = flat_name[f]
+        csv_file.write(name + '\t' + str_weeks(w) + '\n')
+        print('{}\t{}'.format(name, str_weeks(w)))
 
-for w_f in week_flat:
-    w = w_f[0]
-    f = w_f[1]
-    name = flat_name[f]
-    print('{}: {} - {}'.format(name, w[0].strftime("%d.%m.%Y"), w[1].strftime("%d.%m.%Y")))
+# out_file_md = 'uklid.md'
+# df = pd.read_csv(out_file)
+# with open(out_file_md, 'w', encoding='utf-8') as md:
+#     df.to_markdown(md, index=False)
+
+# for w_f in week_flat:
+#     w = w_f[0]
+#     f = w_f[1]
+#     name = flat_name[f]
+#     print('{}: {} - {}'.format(name, w[0].strftime("%d.%m.%Y"), w[1].strftime("%d.%m.%Y")))
