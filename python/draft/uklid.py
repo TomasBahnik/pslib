@@ -18,8 +18,8 @@ def weekday_from_date(day, month, year):
 my_text_calendar = calendar.TextCalendar()
 c = my_text_calendar.yeardatescalendar(YEAR)
 flats = range(1, 17)
-flat_name = {1: 'Macoun', 2: 'Havrdova', 3: 'Noskova', 4: 'Hnidkova', 5: 'Bahnik', 6: 'Veber', 7: 'Matura',
-             8: 'Nevim', 9: 'Nevim', 10: 'Nevim', 11: 'Nevim', 12: 'Nevim', 13: 'Nevim', 14: 'Nevim', 15: 'Pekar',
+flat_name = {1: 'Macoun', 2: 'Havrdova', 3: 'Nosková', 4: 'Hnidková', 5: 'Bahník', 6: 'Veber', 7: 'Matura',
+             8: 'Nevim', 9: 'Nevim', 10: 'Nevim', 11: 'Nevim', 12: 'Nevim', 13: 'Nevim', 14: 'Nevim', 15: 'Pekařová',
              16: 'Kopal'}
 unique_weeks = set()
 for month in c:
@@ -28,7 +28,21 @@ for month in c:
             my_week = (days[calendar.MONDAY], days[calendar.SUNDAY])
             unique_weeks.add(my_week)
 
-week_flat = zip(sorted(unique_weeks), itertools.cycle(flats))
+# week_flat = list(zip(sorted(unique_weeks), itertools.cycle(flats)))
+week_flat = list(zip(sorted(unique_weeks), flats))
+
+
+def str_weeks(weeks):
+    ret_val = ''
+    for x in weeks:
+        ret_val += x[0].strftime("%d.%m.%Y") + '-' + x[1].strftime("%d.%m.%Y") + ' '
+    return ret_val.strip()
+
+
+for f in flats:
+    w = [x[0] for x in week_flat if x[1] == f]
+    name = flat_name[f]
+    print('{}\t{}'.format(name, str_weeks(w)))
 
 for w_f in week_flat:
     w = w_f[0]
