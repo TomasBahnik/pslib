@@ -1,5 +1,6 @@
 import calendar
 import datetime
+import itertools
 
 YEAR = 2022
 
@@ -28,7 +29,10 @@ for month in c:
             unique_weeks.add(my_week)
 
 # week_flat = list(zip(sorted(unique_weeks), itertools.cycle(flats)))
-week_flat = list(zip(sorted(unique_weeks), flats))
+# one week
+# week_flat = list(zip(sorted(unique_weeks), flats))
+# two weeks
+week_flat = list(zip(sorted(unique_weeks), itertools.chain(flats, flats)))
 
 
 def str_weeks(weeks):
