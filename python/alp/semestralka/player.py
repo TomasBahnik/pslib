@@ -1,7 +1,7 @@
 import time
 
-import alp.semestralka.base as base
-from alp.semestralka.draw import Drawer
+import base
+from draw import Drawer
 
 FIRST_FREE_STONE_SCORE = 'first_free_stone_score'
 CELL_COLUMN = 1
