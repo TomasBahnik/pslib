@@ -3,11 +3,42 @@ import time
 import alp.semestralka.base as base
 from alp.semestralka.draw import Drawer
 from alp.semestralka.ston_scores import StoneScore
-from draft.cv08.hw_08_light import CELL_COLUMN, \
-    CELL_ROW, EMPTY_CELL_COLOR, move_cells_top_left, rotate_cells_90, rotate_cells_180, rotate_cells_270
-from draft.shared.matrices import column
 
 FIRST_FREE_STONE_SCORE = 'first_free_stone_score'
+CELL_COLUMN = 1
+CELL_ROW = 0
+EMPTY_CELL_COLOR = 0
+
+
+def move_cells_top_left(stone_cells):
+    min_row = min([cell[CELL_ROW] for cell in stone_cells])
+    min_col = min([cell[CELL_COLUMN] for cell in stone_cells])
+    new_cells = []
+    for cell in stone_cells:
+        new_cells += [[cell[CELL_ROW] - min_row, cell[CELL_COLUMN] - min_col]]
+    return new_cells
+
+
+def rotate_cells_90(stone_cells):
+    new_cells = []
+    for cell in stone_cells:
+        r = cell[CELL_ROW]
+        c = cell[CELL_COLUMN]
+        new_cells += [[-c, r]]
+    # after rotate move to the top left
+    return move_cells_top_left(new_cells)
+
+
+def rotate_cells_180(stone_cells):
+    return rotate_cells_90(rotate_cells_90(stone_cells))
+
+
+def rotate_cells_270(stone_cells):
+    return rotate_cells_90(rotate_cells_90(rotate_cells_90(stone_cells)))
+
+
+def column(matrix, i):
+    return [row[i] for row in matrix]
 
 
 class Player(base.BasePlayer):
@@ -143,7 +174,8 @@ class Player(base.BasePlayer):
                         cell = [row, col]
                         cell_color = self.check_surrounding(cell, stone)
                         # no cells outside board no empty cells and no duplicates
-                        if cell_color is not None and cell_color != EMPTY_CELL_COLOR and cell not in column(surrounding, 0):
+                        if cell_color is not None and cell_color != EMPTY_CELL_COLOR and cell not in column(surrounding,
+                                                                                                            0):
                             color_ratio = cell_color / stone_color
                             surrounding += [[cell, cell_color, color_ratio]]
         return surrounding
