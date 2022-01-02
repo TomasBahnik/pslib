@@ -7,6 +7,12 @@ FIRST_FREE_STONE_SCORE = 'first_free_stone_score'
 CELL_COLUMN = 1
 CELL_ROW = 0
 EMPTY_CELL_COLOR = 0
+DEBUG_PRINTS = False
+
+
+def debug_print(message, print_debug):
+    if print_debug:
+        print(message)
 
 
 def move_cells_top_left(stone_cells):
@@ -71,7 +77,10 @@ class Player(base.BasePlayer):
         """ constructor of Player. Place you variables here with prefix 'self' -> e.g. 'self.myVariable' """
 
         base.BasePlayer.__init__(self, name, board, marks, stones, player)  # do not change this line!!
-        self.algorithm = FIRST_FREE_STONE_SCORE  # name of your method. Will be used in tournament mode
+        if self.tournament is not True:
+            self.algorithm = FIRST_FREE_STONE_SCORE  # name of your method. Will be used in tournament mode
+        else:
+            self.algorithm = "all free stones"
 
     def moveStone(self, stone, row_col):
         # stone = [[row1, col1], ... [rown, coln]]
@@ -150,7 +159,7 @@ class Player(base.BasePlayer):
         t0 = time.perf_counter()
         scores = self.first_free_stone_scores() if self.algorithm == FIRST_FREE_STONE_SCORE else self.all_stone_scores()
         duration = time.perf_counter() - t0
-        print("{} : scores calculation duration = {} sec".format(self.name, duration))
+        debug_print("{} : scores calculation duration = {} sec".format(self.name, duration), DEBUG_PRINTS)
         if len(scores) > 0:
             if self.algorithm == FIRST_FREE_STONE_SCORE:
                 stoneScore = StoneScore(scores)
@@ -288,7 +297,7 @@ if __name__ == "__main__":
 
     # load stones from file
     stones = base.loadStones("stones.txt")
-    print("stones are", stones)
+    debug_print("stones are {}".format(stones), DEBUG_PRINTS)
 
     # prepare board and marks
     board, marks = base.makeBoard10()
@@ -298,7 +307,7 @@ if __name__ == "__main__":
     p2 = Player("franta", board, marks, stones, -1)
     # FIRST_FREE_STONE_SCORE is default
     # p1.algorithm = 'none'
-    # p2.algorithm = FIRST_FREE_STONE_SCORE
+    # p2.algorithm = "none"
 
     # not necessary, only if you want to draw board to png files
     d = Drawer()
@@ -342,7 +351,7 @@ if __name__ == "__main__":
 
         # if both players return [] from move, the game ends
         if p1play is False and p2play is False:
-            print("end of game")
+            debug_print("end of game", DEBUG_PRINTS)
             break
 
         moveidx += 1
