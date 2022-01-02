@@ -2,7 +2,6 @@ import time
 
 import alp.semestralka.base as base
 from alp.semestralka.draw import Drawer
-from alp.semestralka.ston_scores import StoneScore
 
 FIRST_FREE_STONE_SCORE = 'first_free_stone_score'
 CELL_COLUMN = 1
@@ -39,6 +38,32 @@ def rotate_cells_270(stone_cells):
 
 def column(matrix, i):
     return [row[i] for row in matrix]
+
+
+class StoneScore:
+    def __init__(self, stone_scores):
+        self.stone_scores = stone_scores
+
+    def idx(self):
+        return self.stone_scores[0]
+
+    def score(self):
+        return self.stone_scores[1]
+
+    def opp_marks(self):
+        return column(self.score(), 1)
+
+    def max_opp_marks(self):
+        return max(self.opp_marks())
+
+    def max_opp_mark_idx(self):
+        return self.opp_marks().index(self.max_opp_marks())
+
+    def best_move(self):
+        return self.score()[self.max_opp_mark_idx()][2]
+
+    def best_result(self):
+        return [self.idx(), self.best_move()]
 
 
 class Player(base.BasePlayer):
