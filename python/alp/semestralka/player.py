@@ -77,10 +77,7 @@ class Player(base.BasePlayer):
         """ constructor of Player. Place you variables here with prefix 'self' -> e.g. 'self.myVariable' """
 
         base.BasePlayer.__init__(self, name, board, marks, stones, player)  # do not change this line!!
-        if self.tournament is not True:
-            self.algorithm = FIRST_FREE_STONE_SCORE  # name of your method. Will be used in tournament mode
-        else:
-            self.algorithm = "all free stones"
+        self.algorithm = "all free stones"
 
     def moveStone(self, stone, row_col):
         # stone = [[row1, col1], ... [rown, coln]]
