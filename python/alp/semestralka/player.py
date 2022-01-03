@@ -58,8 +58,27 @@ class StoneScore:
     def score(self):
         return self.stone_scores[1]
 
+    def my_marks(self):
+        """ list of covered my marks """
+        return column(self.score(), 0)
+
     def opp_marks(self):
+        """ list of covered opponent marks """
         return column(self.score(), 1)
+
+    def my_opp_marks(self):
+        """ list of tuples covered (my marks, opponent marks) """
+        return list(zip(self.my_marks(), self.opp_marks()))
+
+    def opp_my_marks_diff(self):
+        return [x[1] - x[0] for x in self.my_opp_marks()]
+
+    def max_marks_diff(self):
+        """ maximal diff between opponents and my marks """
+        return max(self.opp_my_marks_diff())
+
+    def max_marks_diff_idx(self):
+        return self.opp_my_marks_diff().index(self.max_marks_diff())
 
     def max_opp_marks(self):
         return max(self.opp_marks())
@@ -67,8 +86,13 @@ class StoneScore:
     def max_opp_mark_idx(self):
         return self.opp_marks().index(self.max_opp_marks())
 
+    def best_score_idx(self):
+        # self.max_opp_mark_idx() just maximizes opponent's marks coverage
+        # maximize difference between my and opponent's marks coverage
+        return self.max_marks_diff_idx()
+
     def best_move(self):
-        return self.score()[self.max_opp_mark_idx()][2]
+        return self.score()[self.best_score_idx()][2]
 
     def best_result(self):
         return [self.idx(), self.best_move()]
@@ -167,9 +191,9 @@ class Player(base.BasePlayer):
                 stoneScores = []
                 for score in scores:
                     stoneScores += [StoneScore(score)]
-                opp_marks = [x.max_opp_marks() for x in stoneScores]
-                max_opp_marks_idx = opp_marks.index(max(opp_marks))
-                return stoneScores[max_opp_marks_idx].best_result()
+                marks_diffs = [x.max_marks_diff() for x in stoneScores]
+                max_marks_diff_idx = marks_diffs.index(max(marks_diffs))
+                return stoneScores[max_marks_diff_idx].best_result()
         return []
 
     def single_move(self, a_stone, stone_color):
