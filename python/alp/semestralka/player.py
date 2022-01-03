@@ -103,7 +103,7 @@ class Player(base.BasePlayer):
         """ constructor of Player. Place you variables here with prefix 'self' -> e.g. 'self.myVariable' """
 
         base.BasePlayer.__init__(self, name, board, marks, stones, player)  # do not change this line!!
-        self.algorithm = "all free stones"
+        self.algorithm = "all free stones v.2"
 
     def moveStone(self, stone, row_col):
         # stone = [[row1, col1], ... [rown, coln]]
