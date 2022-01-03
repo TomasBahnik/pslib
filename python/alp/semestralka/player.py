@@ -1,13 +1,75 @@
 import time
 
-import alp.semestralka.base as base
-from alp.semestralka.draw import Drawer
-from alp.semestralka.ston_scores import StoneScore
-from draft.cv08.hw_08_light import CELL_COLUMN, \
-    CELL_ROW, EMPTY_CELL_COLOR, move_cells_top_left, rotate_cells_90, rotate_cells_180, rotate_cells_270
-from draft.shared.matrices import column
+import base
+from draw import Drawer
 
 FIRST_FREE_STONE_SCORE = 'first_free_stone_score'
+CELL_COLUMN = 1
+CELL_ROW = 0
+EMPTY_CELL_COLOR = 0
+DEBUG_PRINTS = False
+
+
+def debug_print(message, print_debug):
+    if print_debug:
+        print(message)
+
+
+def move_cells_top_left(stone_cells):
+    min_row = min([cell[CELL_ROW] for cell in stone_cells])
+    min_col = min([cell[CELL_COLUMN] for cell in stone_cells])
+    new_cells = []
+    for cell in stone_cells:
+        new_cells += [[cell[CELL_ROW] - min_row, cell[CELL_COLUMN] - min_col]]
+    return new_cells
+
+
+def rotate_cells_90(stone_cells):
+    new_cells = []
+    for cell in stone_cells:
+        r = cell[CELL_ROW]
+        c = cell[CELL_COLUMN]
+        new_cells += [[-c, r]]
+    # after rotate move to the top left
+    return move_cells_top_left(new_cells)
+
+
+def rotate_cells_180(stone_cells):
+    return rotate_cells_90(rotate_cells_90(stone_cells))
+
+
+def rotate_cells_270(stone_cells):
+    return rotate_cells_90(rotate_cells_90(rotate_cells_90(stone_cells)))
+
+
+def column(matrix, i):
+    return [row[i] for row in matrix]
+
+
+class StoneScore:
+    def __init__(self, stone_scores):
+        self.stone_scores = stone_scores
+
+    def idx(self):
+        return self.stone_scores[0]
+
+    def score(self):
+        return self.stone_scores[1]
+
+    def opp_marks(self):
+        return column(self.score(), 1)
+
+    def max_opp_marks(self):
+        return max(self.opp_marks())
+
+    def max_opp_mark_idx(self):
+        return self.opp_marks().index(self.max_opp_marks())
+
+    def best_move(self):
+        return self.score()[self.max_opp_mark_idx()][2]
+
+    def best_result(self):
+        return [self.idx(), self.best_move()]
 
 
 class Player(base.BasePlayer):
@@ -15,7 +77,7 @@ class Player(base.BasePlayer):
         """ constructor of Player. Place you variables here with prefix 'self' -> e.g. 'self.myVariable' """
 
         base.BasePlayer.__init__(self, name, board, marks, stones, player)  # do not change this line!!
-        self.algorithm = FIRST_FREE_STONE_SCORE  # name of your method. Will be used in tournament mode
+        self.algorithm = "all free stones"
 
     def moveStone(self, stone, row_col):
         # stone = [[row1, col1], ... [rown, coln]]
@@ -94,7 +156,7 @@ class Player(base.BasePlayer):
         t0 = time.perf_counter()
         scores = self.first_free_stone_scores() if self.algorithm == FIRST_FREE_STONE_SCORE else self.all_stone_scores()
         duration = time.perf_counter() - t0
-        print("{} : scores calculation duration = {} sec".format(self.name, duration))
+        debug_print("{} : scores calculation duration = {} sec".format(self.name, duration), DEBUG_PRINTS)
         if len(scores) > 0:
             if self.algorithm == FIRST_FREE_STONE_SCORE:
                 stoneScore = StoneScore(scores)
@@ -118,9 +180,7 @@ class Player(base.BasePlayer):
                     moveStone = self.moveStone(r_s, [row, col])
                     if self.canBePlaced(moveStone, stone_color):
                         stone_score = self.stone_score(moveStone)
-                        my_marks = stone_score[0]  # do not cover my own marks!
-                        if my_marks == 0:
-                            stone_scores.append(stone_score)
+                        stone_scores.append(stone_score)
         if len(stone_scores) > 0:
             return stone_scores
         return []
@@ -143,7 +203,8 @@ class Player(base.BasePlayer):
                         cell = [row, col]
                         cell_color = self.check_surrounding(cell, stone)
                         # no cells outside board no empty cells and no duplicates
-                        if cell_color is not None and cell_color != EMPTY_CELL_COLOR and cell not in column(surrounding, 0):
+                        if cell_color is not None and cell_color != EMPTY_CELL_COLOR and cell not in column(surrounding,
+                                                                                                            0):
                             color_ratio = cell_color / stone_color
                             surrounding += [[cell, cell_color, color_ratio]]
         return surrounding
@@ -231,7 +292,7 @@ if __name__ == "__main__":
 
     # load stones from file
     stones = base.loadStones("stones.txt")
-    print("stones are", stones)
+    debug_print("stones are {}".format(stones), DEBUG_PRINTS)
 
     # prepare board and marks
     board, marks = base.makeBoard10()
@@ -241,7 +302,7 @@ if __name__ == "__main__":
     p2 = Player("franta", board, marks, stones, -1)
     # FIRST_FREE_STONE_SCORE is default
     # p1.algorithm = 'none'
-    # p2.algorithm = FIRST_FREE_STONE_SCORE
+    # p2.algorithm = "none"
 
     # not necessary, only if you want to draw board to png files
     d = Drawer()
@@ -285,7 +346,7 @@ if __name__ == "__main__":
 
         # if both players return [] from move, the game ends
         if p1play is False and p2play is False:
-            print("end of game")
+            debug_print("end of game", DEBUG_PRINTS)
             break
 
         moveidx += 1
