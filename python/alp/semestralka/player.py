@@ -1,5 +1,7 @@
 import time
 
+# import alp.semestralka.base as base
+# from alp.semestralka.draw import Drawer
 import base
 from draw import Drawer
 
@@ -203,8 +205,8 @@ class Player(base.BasePlayer):
                         cell = [row, col]
                         cell_color = self.check_surrounding(cell, stone)
                         # no cells outside board no empty cells and no duplicates
-                        if cell_color is not None and cell_color != EMPTY_CELL_COLOR and cell not in column(surrounding,
-                                                                                                            0):
+                        if cell_color is not None and cell_color != EMPTY_CELL_COLOR \
+                                and cell not in column(surrounding, 0):
                             color_ratio = cell_color / stone_color
                             surrounding += [[cell, cell_color, color_ratio]]
         return surrounding
@@ -273,8 +275,10 @@ class Player(base.BasePlayer):
         empty_color_cnt = len([x for x in color_ratios if x == EMPTY_CELL_COLOR])
         no_square = self.check_square(stone, stone_color)
         first_check = same_color_cnt == 0 and no_square
-        # if there is already used stone current stone has to touch it => surroundings is not empty
-        return first_check and len(surroundings) > 0 if False in self.freeStones else first_check
+        # if there is already stone on board (board is not empty)
+        # current stone has to touch it => surroundings is not empty
+        # stone on board can be even at the start of the game i.e. all stones are free
+        return first_check and len(surroundings) > 0 if not self.isEmpty() else first_check
         # return first_check
 
 
