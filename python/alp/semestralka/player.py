@@ -114,10 +114,10 @@ class Player(base.BasePlayer):
         # performance measure board_size * stone_size
         max_stones_size = max_perf // board_size
         idx_size = []
-        for idx in range(len(stones)):
+        for idx in range(len(self.stones)):
             if self.freeStones[idx] is True:
                 # combine stone index and its length
-                idx_size += [(idx, len(stones[idx][1]))]
+                idx_size += [(idx, len(self.stones[idx][1]))]
         # sor by stone length descending
         idx_size.sort(key=lambda x: x[1], reverse=True)
         ret_val = [x[0] for x in idx_size[:max_stones_size]]  # only indexes not sizes
