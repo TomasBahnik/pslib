@@ -120,7 +120,7 @@ class Player(base.BasePlayer):
                 idx_size += [(idx, len(self.stones[idx][1]))]
         # sor by stone length descending
         idx_size.sort(key=lambda x: x[1], reverse=True)
-        ret_val = [x[0] for x in idx_size[:max_stones_size]]  # only indexes not sizes
+        ret_val = [x[0] for x in idx_size]  # only indexes not sizes
         # ret_val.sort() keep stones in size order
         debug_print("free_stones_indexes : len = {}, {}".format(len(ret_val), ret_val), DEBUG_PRINTS)
         return ret_val
