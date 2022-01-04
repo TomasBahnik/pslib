@@ -1,9 +1,12 @@
 import time
 
-# import alp.semestralka.base as base
-# from alp.semestralka.draw import Drawer
-import base
-from draw import Drawer
+import alp.semestralka.base as base
+from alp.semestralka.draw import Drawer
+# import base
+# from draw import Drawer
+
+ALGORITHM = "free stones limited"
+MAX_PERF = 2100
 
 FIRST_FREE_STONE_SCORE = 'first_free_stone_score'
 CELL_COLUMN = 1
@@ -103,7 +106,24 @@ class Player(base.BasePlayer):
         """ constructor of Player. Place you variables here with prefix 'self' -> e.g. 'self.myVariable' """
 
         base.BasePlayer.__init__(self, name, board, marks, stones, player)  # do not change this line!!
-        self.algorithm = "all free stones"
+        self.algorithm = ALGORITHM
+
+    def free_stones_indexes(self, max_perf):
+        """ limit number of used stones to largest"""
+        board_size = len(self.board[1]) * len(column(self.board, 0))
+        # performance measure board_size * stone_size
+        max_stones_size = max_perf // board_size
+        idx_size = []
+        for idx in range(len(stones)):
+            if self.freeStones[idx] is True:
+                # combine stone index and its length
+                idx_size += [(idx, len(stones[idx][1]))]
+        # sor by stone length descending
+        idx_size.sort(key=lambda x: x[1], reverse=True)
+        ret_val = [x[0] for x in idx_size[:max_stones_size]]  # only indexes not sizes
+        # ret_val.sort() keep stones in size order
+        debug_print("free_stones_indexes : len = {}, {}".format(len(ret_val), ret_val), DEBUG_PRINTS)
+        return ret_val
 
     def moveStone(self, stone, row_col):
         # stone = [[row1, col1], ... [rown, coln]]
@@ -152,12 +172,12 @@ class Player(base.BasePlayer):
 
     def all_stone_scores(self):
         all_scores = []  # store scores to find the best next placement
-        for stone_idx in range(len(self.freeStones)):
-            if self.freeStones[stone_idx] is True:
-                stone_color, the_stone = self.stones[stone_idx]  # new local variables are created
-                single_move = self.single_move(the_stone, stone_color)
-                if len(single_move) > 0:
-                    all_scores.append([stone_idx, single_move])
+        f_s_i = self.free_stones_indexes(MAX_PERF)
+        for stone_idx in f_s_i:
+            stone_color, the_stone = self.stones[stone_idx]  # new local variables are created
+            single_move = self.single_move(the_stone, stone_color)
+            if len(single_move) > 0:
+                all_scores.append([stone_idx, single_move])
         return all_scores
 
     def first_free_stone_scores(self):
