@@ -1,9 +1,9 @@
 import time
 
-import alp.semestralka.base as base
-from alp.semestralka.draw import Drawer
-# import base
-# from draw import Drawer
+# import alp.semestralka.base as base
+# from alp.semestralka.draw import Drawer
+import base
+from draw import Drawer
 
 ALGORITHM = "free stones limited"
 MAX_PERF = 2100
