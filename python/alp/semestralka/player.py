@@ -5,9 +5,9 @@ import time
 import base
 from draw import Drawer
 
-ALGORITHM = "free stones limited"
+ALGORITHM = "free stones limited 2"
 MAX_PERF = 2100
-MIN_USED_STONES = 1
+MIN_USED_STONES = 2
 
 FIRST_FREE_STONE_SCORE = 'first_free_stone_score'
 CELL_COLUMN = 1
