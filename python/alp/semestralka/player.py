@@ -7,6 +7,7 @@ from draw import Drawer
 
 ALGORITHM = "free stones limited"
 MAX_PERF = 2100
+MIN_USED_STONES = 1
 
 FIRST_FREE_STONE_SCORE = 'first_free_stone_score'
 CELL_COLUMN = 1
@@ -120,7 +121,16 @@ class Player(base.BasePlayer):
                 idx_size += [(idx, len(self.stones[idx][1]))]
         # sor by stone length descending
         idx_size.sort(key=lambda x: x[1], reverse=True)
-        ret_val = [x[0] for x in idx_size]  # only indexes not sizes
+        used_stones_count = len([x for x in self.freeStones if x is False])
+        if used_stones_count >= MIN_USED_STONES:  # at least MIN_USED_STONES
+            ret_val = [x[0] for x in idx_size]  # return all remaining stones
+            debug_print("used_stones_count = {}. return all {} idx"
+                        .format(used_stones_count, len(ret_val)), DEBUG_PRINTS)
+        # this is 1st move and there is high chance that some valid move will be available even with subset of stones
+        else:
+            ret_val = [x[0] for x in idx_size[:max_stones_size]]
+            debug_print("used_stones_count = {}. return only {} idx"
+                        .format(used_stones_count, len(ret_val)), DEBUG_PRINTS)
         # ret_val.sort() keep stones in size order
         debug_print("free_stones_indexes : len = {}, {}".format(len(ret_val), ret_val), DEBUG_PRINTS)
         return ret_val
