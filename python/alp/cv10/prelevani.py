@@ -52,7 +52,7 @@ states = start.expand()
 print(states)
 
 goal = [3, 2, 0]
-
+"cvika12"
 openList = []
 openList.append(start)  # pole referenci
 known = {}
