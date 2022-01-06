@@ -9,7 +9,6 @@ ALGORITHM = "free stones limited dyn"
 MAX_PERF = 2300
 MIN_USED_STONES = 3
 
-FIRST_FREE_STONE_SCORE = 'first_free_stone_score'
 CELL_COLUMN = 1
 CELL_ROW = 0
 EMPTY_CELL_COLOR = 0
@@ -191,17 +190,6 @@ class Player(base.BasePlayer):
                 all_scores.append([stone_idx, single_move])
         return all_scores
 
-    def first_free_stone_scores(self):
-        try:
-            stone_idx = self.freeStones.index(True)
-        except ValueError as ve:  # in case when there is no free stone
-            return []
-        stone_color, the_stone = self.stones[stone_idx]  # new local variables are created
-        single_move = self.single_move(the_stone, stone_color)
-        if len(single_move) > 0:
-            return [stone_idx, single_move]
-        return []
-
     def move(self):
         """ return [ stoneIdx, [ stonePosition] ]
             stoneIdx .. integer .. index of stone to self.freeStones
@@ -211,20 +199,16 @@ class Player(base.BasePlayer):
             return []
         """
         t0 = time.perf_counter()
-        scores = self.first_free_stone_scores() if self.algorithm == FIRST_FREE_STONE_SCORE else self.all_stone_scores()
+        scores = self.all_stone_scores()
         duration = time.perf_counter() - t0
         debug_print("{} : scores calculation duration = {} sec".format(self.name, duration), DEBUG_PRINTS)
         if len(scores) > 0:
-            if self.algorithm == FIRST_FREE_STONE_SCORE:
-                stoneScore = StoneScore(scores)
-                return stoneScore.best_result()
-            else:
-                stoneScores = []
-                for score in scores:
-                    stoneScores += [StoneScore(score)]
-                marks_diffs = [x.max_marks_diff() for x in stoneScores]
-                max_marks_diff_idx = marks_diffs.index(max(marks_diffs))
-                return stoneScores[max_marks_diff_idx].best_result()
+            stoneScores = []
+            for score in scores:
+                stoneScores += [StoneScore(score)]
+            marks_diffs = [x.max_marks_diff() for x in stoneScores]
+            max_marks_diff_idx = marks_diffs.index(max(marks_diffs))
+            return stoneScores[max_marks_diff_idx].best_result()
         return []
 
     def single_move(self, a_stone, stone_color):
