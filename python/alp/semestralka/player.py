@@ -5,9 +5,9 @@ import time
 import base
 from draw import Drawer
 
-ALGORITHM = "free stones limited 2"
-MAX_PERF = 2100
-MIN_USED_STONES = 2
+ALGORITHM = "free stones limited dyn"
+MAX_PERF = 2300
+MIN_USED_STONES = 3
 
 FIRST_FREE_STONE_SCORE = 'first_free_stone_score'
 CELL_COLUMN = 1
@@ -128,9 +128,10 @@ class Player(base.BasePlayer):
                         .format(used_stones_count, len(ret_val)), DEBUG_PRINTS)
         # this is 1st move and there is high chance that some valid move will be available even with subset of stones
         else:
+            max_stones_size += used_stones_count
             ret_val = [x[0] for x in idx_size[:max_stones_size]]
-            debug_print("used_stones_count = {}. return only {} idx"
-                        .format(used_stones_count, len(ret_val)), DEBUG_PRINTS)
+            debug_print("used_stones_count = {}. return only {}, max_stones_size = {} "
+                        .format(used_stones_count, len(ret_val), max_stones_size), DEBUG_PRINTS)
         # ret_val.sort() keep stones in size order
         debug_print("free_stones_indexes : len = {}, {}".format(len(ret_val), ret_val), DEBUG_PRINTS)
         return ret_val
