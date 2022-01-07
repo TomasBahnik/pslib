@@ -26,19 +26,59 @@ def read_balls(input_file):
 
 
 def rotate_circle(circle, direction):
-    ret_val = circle[direction:] + circle[:direction]
+    d = - direction
+    ret_val = circle[d:] + circle[:d]
     return ret_val
 
 
-ROTATION_P = 1
-ROTATION_M = -1
+def play(game, move):
+    c1, d = move
+    new_c = rotate_circle(game[c1], d)
+    game[c1] = new_c
+    c2 = GREEN_CIRCLE if c1 == RED_CIRCLE else RED_CIRCLE
+    # 0 and 2 must be the same
+    game[c2][0] = game[c1][0]
+    game[c2][2] = game[c1][2]
+
+
+GREEN_BALL = 1
+GREEN_CIRCLE = 1
+RED_BALL = 0
+RED_CIRCLE = 0
+CIRCLE_MOVE_P = 1
+CIRCLE_MOVE_M = -1
+
+
+def print_game(game):
+    debug_print("r={}".format(game[RED_CIRCLE]), DEBUG_PRINTS)
+    debug_print("g={}\n".format(game[GREEN_CIRCLE]), DEBUG_PRINTS)
+
+
+# a=[0, 1, 2, 3, 4, 5]
+# m=[1, 2, 3, 4, 5, 0],True
+# a=[0, 1, 2, 3, 4, 5]
+# p=[5, 0, 1, 2, 3, 4],True
+def test_moves():
+    a = [0, 1, 2, 3, 4, 5]
+    m_expected = [1, 2, 3, 4, 5, 0]  # index increased by -1 (m)
+    p_expected = [5, 0, 1, 2, 3, 4]  # index increased by +1 (p)
+    m = rotate_circle(a, CIRCLE_MOVE_M)
+    p = rotate_circle(a, CIRCLE_MOVE_P)
+    debug_print("a={}".format(a), DEBUG_PRINTS)
+    debug_print("m={},{}".format(m, m == m_expected), DEBUG_PRINTS)
+    debug_print("a={}".format(a), DEBUG_PRINTS)
+    debug_print("p={},{}\n".format(p, p == p_expected), DEBUG_PRINTS)
+
 
 if __name__ == '__main__':
+    test_moves()
     # red_balls = list(map(int, input().split()))
     # green_balls = list(map(int, input().split()))
     filename = sys.argv[1]
     red_circle, green_circle = read_balls(filename)
-    debug_print("red balls={}, green balls={}".format(red_circle, green_circle), DEBUG_PRINTS)
-    rp = rotate_circle(red_circle, ROTATION_P)
-    rm = rotate_circle(red_circle, ROTATION_M)
-    debug_print("rp={}, rm={}".format(rp, rm), DEBUG_PRINTS)
+    # positions R=0, G=1
+    game = [red_circle, green_circle]
+    print_game(game)
+    move = (GREEN_CIRCLE, CIRCLE_MOVE_P)
+    play(game, move)
+    print_game(game)
