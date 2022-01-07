@@ -73,8 +73,10 @@ def test_inputs(file, moves):
     red_circle, green_circle = read_balls(file)
     # positions R=0, G=1
     game = [red_circle, green_circle]
+    debug_print('before moves', DEBUG_PRINTS)
     print_game(game)
     play(game, moves)
+    debug_print('after moves', DEBUG_PRINTS)
     print_game(game)
 
 
