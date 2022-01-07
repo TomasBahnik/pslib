@@ -7,7 +7,7 @@ from draw import Drawer
 
 ALGORITHM = "free stones limited dyn"
 MAX_PERF = 2300
-MIN_USED_STONES = 3
+MIN_USED_STONES = 4
 
 CELL_COLUMN = 1
 CELL_ROW = 0
