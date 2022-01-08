@@ -5,8 +5,8 @@ import time
 import base
 from draw import Drawer
 
-MAX_PERF = 2300
-MIN_USED_STONES = 5
+MAX_PERF = 2100
+MIN_USED_STONES = 6
 ALGORITHM = str(MIN_USED_STONES) + '.' + str(MAX_PERF)
 
 CELL_COLUMN = 1
