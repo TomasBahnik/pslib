@@ -15,9 +15,9 @@ EMPTY_CELL_COLOR = 0
 DEBUG_PRINTS = False
 
 
-def debug_print(message, print_debug):
-    if print_debug:
-        print(message)
+# def debug_print(message, print_debug):
+#     if print_debug:
+#         print(message)
 
 
 def move_cells_top_left(stone_cells):
@@ -107,12 +107,12 @@ class Player(base.BasePlayer):
 
         base.BasePlayer.__init__(self, name, board, marks, stones, player)  # do not change this line!!
         self.algorithm = ALGORITHM
+        self.board_size = len(self.board[1]) * len(column(self.board, 0))
+        self.max_stones_size = MAX_PERF // self.board_size
 
-    def free_stones_indexes(self, max_perf):
+    def free_stones_indexes(self):
         """ limit number of used stones to largest"""
-        board_size = len(self.board[1]) * len(column(self.board, 0))
         # performance measure board_size * stone_size
-        max_stones_size = max_perf // board_size
         idx_size = []
         for idx in range(len(self.stones)):
             if self.freeStones[idx] is True:
@@ -123,16 +123,16 @@ class Player(base.BasePlayer):
         used_stones_count = len([x for x in self.freeStones if x is False])
         if used_stones_count >= MIN_USED_STONES:  # at least MIN_USED_STONES
             ret_val = [x[0] for x in idx_size]  # return all remaining stones
-            debug_print("used_stones_count = {}. return all {} idx"
-                        .format(used_stones_count, len(ret_val)), DEBUG_PRINTS)
+            # debug_print("used_stones_count = {}. return all {} idx"
+            #             .format(used_stones_count, len(ret_val)), DEBUG_PRINTS)
         # this is 1st move and there is high chance that some valid move will be available even with subset of stones
         else:
-            max_stones_size += used_stones_count
-            ret_val = [x[0] for x in idx_size[:max_stones_size]]
-            debug_print("used_stones_count = {}. return only {}, max_stones_size = {} "
-                        .format(used_stones_count, len(ret_val), max_stones_size), DEBUG_PRINTS)
+            max_stones = self.max_stones_size + used_stones_count
+            ret_val = [x[0] for x in idx_size[:max_stones]]
+            # debug_print("used_stones_count = {}. return only {}, max_stones_size = {} "
+            #             .format(used_stones_count, len(ret_val), max_stones), DEBUG_PRINTS)
         # ret_val.sort() keep stones in size order
-        debug_print("free_stones_indexes : len = {}, {}".format(len(ret_val), ret_val), DEBUG_PRINTS)
+        # debug_print("free_stones_indexes : len = {}, {}".format(len(ret_val), ret_val), DEBUG_PRINTS)
         return ret_val
 
     def moveStone(self, stone, row_col):
@@ -182,7 +182,7 @@ class Player(base.BasePlayer):
 
     def all_stone_scores(self):
         all_scores = []  # store scores to find the best next placement
-        f_s_i = self.free_stones_indexes(MAX_PERF)
+        f_s_i = self.free_stones_indexes()
         for stone_idx in f_s_i:
             stone_color, the_stone = self.stones[stone_idx]  # new local variables are created
             single_move = self.single_move(the_stone, stone_color)
@@ -198,10 +198,10 @@ class Player(base.BasePlayer):
             if no stone can be placed:
             return []
         """
-        t0 = time.perf_counter()
+        # t0 = time.perf_counter()
         scores = self.all_stone_scores()
-        duration = time.perf_counter() - t0
-        debug_print("{} : scores calculation duration = {} sec".format(self.name, duration), DEBUG_PRINTS)
+        # duration = time.perf_counter() - t0
+        # debug_print("{} : scores calculation duration = {} sec".format(self.name, duration), DEBUG_PRINTS)
         if len(scores) > 0:
             stoneScores = []
             for score in scores:
@@ -335,7 +335,7 @@ if __name__ == "__main__":
 
     # load stones from file
     stones = base.loadStones("stones.txt")
-    debug_print("stones are {}".format(stones), DEBUG_PRINTS)
+    # debug_print("stones are {}".format(stones), DEBUG_PRINTS)
 
     # prepare board and marks
     board, marks = base.makeBoard10()
@@ -389,7 +389,7 @@ if __name__ == "__main__":
 
         # if both players return [] from move, the game ends
         if p1play is False and p2play is False:
-            debug_print("end of game", DEBUG_PRINTS)
+            # debug_print("end of game", DEBUG_PRINTS)
             break
 
         moveidx += 1
