@@ -107,12 +107,13 @@ class Player(base.BasePlayer):
 
         base.BasePlayer.__init__(self, name, board, marks, stones, player)  # do not change this line!!
         self.algorithm = ALGORITHM
+        self.board_size = len(self.board[1]) * len(column(self.board, 0))
+        self.max_stones_size = MAX_PERF // self.board_size
 
     def free_stones_indexes(self, max_perf):
         """ limit number of used stones to largest"""
-        board_size = len(self.board[1]) * len(column(self.board, 0))
         # performance measure board_size * stone_size
-        max_stones_size = max_perf // board_size
+
         idx_size = []
         for idx in range(len(self.stones)):
             if self.freeStones[idx] is True:
@@ -127,10 +128,10 @@ class Player(base.BasePlayer):
                         .format(used_stones_count, len(ret_val)), DEBUG_PRINTS)
         # this is 1st move and there is high chance that some valid move will be available even with subset of stones
         else:
-            max_stones_size += used_stones_count
-            ret_val = [x[0] for x in idx_size[:max_stones_size]]
+            max_stones = self.max_stones_size + used_stones_count
+            ret_val = [x[0] for x in idx_size[:max_stones]]
             debug_print("used_stones_count = {}. return only {}, max_stones_size = {} "
-                        .format(used_stones_count, len(ret_val), max_stones_size), DEBUG_PRINTS)
+                        .format(used_stones_count, len(ret_val), max_stones), DEBUG_PRINTS)
         # ret_val.sort() keep stones in size order
         debug_print("free_stones_indexes : len = {}, {}".format(len(ret_val), ret_val), DEBUG_PRINTS)
         return ret_val
