@@ -1,4 +1,3 @@
-import random
 import time
 
 # import alp.semestralka.base as base
@@ -6,9 +5,9 @@ import time
 import base
 from draw import Drawer
 
-MAX_PERF = 2100
-MIN_USED_STONES = 6
-ALGORITHM = str(MIN_USED_STONES) + '.' + str(MAX_PERF) + '.rnd'
+MAX_PERF = 2300
+MIN_USED_STONES = 7
+ALGORITHM = str(MIN_USED_STONES) + '.' + str(MAX_PERF)
 
 CELL_COLUMN = 1
 CELL_ROW = 0
@@ -50,15 +49,6 @@ def rotate_cells_270(stone_cells):
 
 def column(matrix, i):
     return [row[i] for row in matrix]
-
-
-def get_index_positions(list_of_elems, element):
-    """ Returns the indexes of all occurrences of given element in the list"""
-    index_pos_list = []
-    for i in range(len(list_of_elems)):
-        if list_of_elems[i] == element:
-            index_pos_list.append(i)
-    return index_pos_list
 
 
 class StoneScore:
@@ -217,10 +207,7 @@ class Player(base.BasePlayer):
             for score in scores:
                 stoneScores += [StoneScore(score)]
             marks_diffs = [x.max_marks_diff() for x in stoneScores]
-            max1 = max(marks_diffs)
-            all_max = get_index_positions(marks_diffs, max1)
-            max_marks_diff_idx = random.choice(all_max)
-            # max_marks_diff_idx = marks_diffs.index(max1)
+            max_marks_diff_idx = marks_diffs.index(max(marks_diffs))
             return stoneScores[max_marks_diff_idx].best_result()
         return []
 
