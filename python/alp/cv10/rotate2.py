@@ -42,7 +42,8 @@ class State:
         self.prev = None
 
     def __repr__(self):
-        return str(self.both) + str(self.act)
+        # return str(self.both) + str(self.act)
+        return str(self.act)
 
     def expand(self):
         new_state = []
@@ -72,10 +73,13 @@ known = {}
 while len(openList) > 0:
     s = openList.pop(0)
     if s.both == goal:
+        output = []
         while s != None:
-            print(s)
+            output.append(s)
             s = s.prev
-        print("Huraa")
+        output.reverse()
+        for x in output:
+            print(x, end="")
         break
 
     exp = s.expand()
