@@ -80,7 +80,22 @@ def test_inputs(file, moves):
     print_game(game)
 
 
+def test_all_inputs():
+    # input_1.txt : (1,p)
+    moves = [(GREEN_CIRCLE, CIRCLE_MOVE_P)]
+    test_inputs('input_1.txt', moves)
+    # input_2.txt : (1,p)(0,m)
+    moves = [(GREEN_CIRCLE, CIRCLE_MOVE_P), (RED_CIRCLE, CIRCLE_MOVE_M)]
+    test_inputs('input_2.txt', moves)
+    # input_3.txt : (0,m)(1,p)(1,p)(0,p)(1,p)(0,p)
+    moves = [(RED_CIRCLE, CIRCLE_MOVE_M), (GREEN_CIRCLE, CIRCLE_MOVE_P), (GREEN_CIRCLE, CIRCLE_MOVE_P),
+             (RED_CIRCLE, CIRCLE_MOVE_P), (GREEN_CIRCLE, CIRCLE_MOVE_P), (RED_CIRCLE, CIRCLE_MOVE_P)]
+    test_inputs('input_3.txt', moves)
+
+
 maxVolumes = [5, 3, 5]
+goal = [3, 2, 0]
+initial_volumes = [5, 0, 0]
 
 
 class State:
@@ -129,28 +144,15 @@ class State:
         return newStates
 
 
-def test_all_inputs():
-    # input_1.txt : (1,p)
-    moves = [(GREEN_CIRCLE, CIRCLE_MOVE_P)]
-    test_inputs('input_1.txt', moves)
-    # input_2.txt : (1,p)(0,m)
-    moves = [(GREEN_CIRCLE, CIRCLE_MOVE_P), (RED_CIRCLE, CIRCLE_MOVE_M)]
-    test_inputs('input_2.txt', moves)
-    # input_3.txt : (0,m)(1,p)(1,p)(0,p)(1,p)(0,p)
-    moves = [(RED_CIRCLE, CIRCLE_MOVE_M), (GREEN_CIRCLE, CIRCLE_MOVE_P), (GREEN_CIRCLE, CIRCLE_MOVE_P),
-             (RED_CIRCLE, CIRCLE_MOVE_P), (GREEN_CIRCLE, CIRCLE_MOVE_P), (RED_CIRCLE, CIRCLE_MOVE_P)]
-    test_inputs('input_3.txt', moves)
-
-
 if __name__ == '__main__':
     # test_moves()
     # red_balls = list(map(int, input().split()))
     # green_balls = list(map(int, input().split()))
-    start_state = State([5, 0, 0])
+
+    start_state = State(initial_volumes)
     states = start_state.expand()
     print(states)
 
-    goal = [3, 2, 0]
     open_states = [start_state]
     known = {}
     while len(open_states) > 0:
