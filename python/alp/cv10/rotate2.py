@@ -42,8 +42,7 @@ class State:
         self.prev = None
 
     def __repr__(self):
-        str(self.both) + str(self.act)
-        return
+        return str(self.both) + str(self.act)
 
     def expand(self):
         new_state = []
