@@ -1,3 +1,5 @@
+import copy
+
 DEBUG_PRINTS = True
 
 GREEN_BALL = 1
@@ -6,6 +8,7 @@ RED_BALL = 0
 RED_CIRCLE = 0
 CIRCLE_MOVE_P = 1
 CIRCLE_MOVE_M = -1
+CIRCLE_SYMBOLS = {CIRCLE_MOVE_P: 'p', CIRCLE_MOVE_M: 'm'}
 
 
 def debug_print(message, print_debug):
@@ -27,13 +30,25 @@ def read_circles(input_file):
     #         cells.append([coords[2 * i + 0], coords[2 * i + 1]])
     #     stones.append([color, cells])
     # f.close()
-    return r_circle, g_circle
+    return [r_circle, g_circle]
 
 
 def rotate_circle(circle, direction):
     d = - direction
     ret_val = circle[d:] + circle[:d]
     return ret_val
+
+
+def play2(game, move):
+    c1, d = move
+    new_game = copy.deepcopy(game)
+    new_c = rotate_circle(new_game[c1], d)
+    new_game[c1] = new_c
+    c2 = GREEN_CIRCLE if c1 == RED_CIRCLE else RED_CIRCLE
+    # 0 and 2 must be the same
+    new_game[c2][0] = new_c[0]
+    new_game[c2][2] = new_c[2]
+    return new_game
 
 
 def play(game, moves):
@@ -93,54 +108,31 @@ def test_all_inputs():
     test_inputs('input_3.txt', moves)
 
 
-maxVolumes = [1, 1, 1, 1, 1, 1]
-goal = [1, 1, 0, 0, 0, 1]
-circles = read_circles('input_1.txt')
-initial_volumes = [1, 0, 1, 0, 1, 0]
-
-
 class State:
-    def __init__(self, initial_circles):
-        self.circles = initial_circles[:]
+    def __init__(self, i_circles):
+        self.circles = copy.deepcopy(i_circles)
         self.act = ""
         self.prev = None
 
     def __repr__(self):
-        return str(self.circles) + str(self.act)
+        return str(self.act)
+        # return str(self.circles) + str(self.act)
 
     def expand(self):
         newStates = []
-        # akce Ni - nalit
+        # akce rotate p
         for i in range(len(self.circles)):
-            if self.circles[i] < maxVolumes[i]:
-                tmp = State(self.circles)
-                tmp.circles[i] = maxVolumes[i]
-                tmp.act = "N{}".format(i)
-                newStates.append(tmp)
+            tmp = State(self.circles)
+            tmp.circles = play2(self.circles, [i, CIRCLE_MOVE_P])
+            tmp.act = "({},{})".format(i, CIRCLE_SYMBOLS[CIRCLE_MOVE_P])
+            newStates.append(tmp)
 
-        # akce Vi - vylit
+        # akce rotate m
         for i in range(len(self.circles)):
-            for j in range(len(self.circles)):
-                if self.circles[i] > 0 and self.circles[j] < maxVolumes[j]:
-                    tmp = State(self.circles)
-                    tmp.circles[i] = 0
-                    tmp.act = "V{}".format(i)
-                    newStates.append(tmp)
-
-        # prelit z i do j
-        # nejtezzsi krok, zkusit doma !!
-        for i in range(len(self.circles)):
-            for j in range(len(self.circles)):
-                tmp = State(self.circles)
-                tmp.act = "{}P{}".format(i, j)
-                rest = maxVolumes[j] - self.circles[j]
-                if self.circles[i] > rest:
-                    tmp.circles[j] += rest
-                    tmp.circles[i] -= rest
-                else:
-                    tmp.circles[j] += tmp.circles[i]
-                    tmp.circles[i] = 0
-                newStates.append(tmp)
+            tmp = State(self.circles)
+            tmp.circles = play2(self.circles, [i, CIRCLE_MOVE_M])
+            tmp.act = "({},{})".format(i, CIRCLE_SYMBOLS[CIRCLE_MOVE_M])
+            newStates.append(tmp)
 
         return newStates
 
@@ -149,10 +141,12 @@ if __name__ == '__main__':
     # test_moves()
     # red_balls = list(map(int, input().split()))
     # green_balls = list(map(int, input().split()))
-
-    start_state = State(initial_volumes)
+    initial_circles = read_circles('input_3.txt')
+    goal = [[1, 0, 0, 0, 0, 0], [1, 1, 0, 1, 1, 1]]
+    # goal = initial_circles
+    start_state = State(initial_circles)
     states = start_state.expand()
-    print(states)
+    # print(states)
 
     open_states = [start_state]
     known = {}
@@ -160,9 +154,9 @@ if __name__ == '__main__':
         s = open_states.pop(0)
         if s.circles == goal:
             while s != None:
-                print(s)
+                print(s, end=',')
                 s = s.prev
-            print("Huraa")
+            # print("Huraa")
             break
 
         exp = s.expand()  # pole referenci
