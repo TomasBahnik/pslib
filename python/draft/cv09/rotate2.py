@@ -80,20 +80,91 @@ def test_inputs(file, moves):
     print_game(game)
 
 
-if __name__ == '__main__':
-    # test_moves()
-    # red_balls = list(map(int, input().split()))
-    # green_balls = list(map(int, input().split()))
+maxVolumes = [5, 3, 5]
 
+
+class State:
+    def __init__(self, initial_volumes):
+        self.volumes = initial_volumes[:]
+        self.act = ""
+        self.prev = None
+
+    def __repr__(self):
+        return str(self.volumes) + str(self.act)
+
+    def expand(self):
+        newStates = []
+        # akce Ni - nalit
+        for i in range(len(self.volumes)):
+            if self.volumes[i] < maxVolumes[i]:
+                tmp = State(self.volumes)
+                tmp.volumes[i] = maxVolumes[i]
+                tmp.act = "N{}".format(i)
+                newStates.append(tmp)
+
+        # akce Vi - vylit
+        for i in range(len(self.volumes)):
+            for j in range(len(self.volumes)):
+                if self.volumes[i] > 0 and self.volumes[j] < maxVolumes[j]:
+                    tmp = State(self.volumes)
+                    tmp.volumes[i] = 0
+                    tmp.act = "V{}".format(i)
+                    newStates.append(tmp)
+
+        # prelit z i do j
+        # nejtezzsi krok, zkusit doma !!
+        for i in range(len(self.volumes)):
+            for j in range(len(self.volumes)):
+                tmp = State(self.volumes)
+                tmp.act = "{}P{}".format(i, j)
+                rest = maxVolumes[j] - self.volumes[j]
+                if self.volumes[i] > rest:
+                    tmp.volumes[j] += rest
+                    tmp.volumes[i] -= rest
+                else:
+                    tmp.volumes[j] += tmp.volumes[i]
+                    tmp.volumes[i] = 0
+                newStates.append(tmp)
+
+        return newStates
+
+
+def test_all_inputs():
     # input_1.txt : (1,p)
     moves = [(GREEN_CIRCLE, CIRCLE_MOVE_P)]
     test_inputs('input_1.txt', moves)
-
     # input_2.txt : (1,p)(0,m)
     moves = [(GREEN_CIRCLE, CIRCLE_MOVE_P), (RED_CIRCLE, CIRCLE_MOVE_M)]
     test_inputs('input_2.txt', moves)
-
     # input_3.txt : (0,m)(1,p)(1,p)(0,p)(1,p)(0,p)
     moves = [(RED_CIRCLE, CIRCLE_MOVE_M), (GREEN_CIRCLE, CIRCLE_MOVE_P), (GREEN_CIRCLE, CIRCLE_MOVE_P),
              (RED_CIRCLE, CIRCLE_MOVE_P), (GREEN_CIRCLE, CIRCLE_MOVE_P), (RED_CIRCLE, CIRCLE_MOVE_P)]
     test_inputs('input_3.txt', moves)
+
+
+if __name__ == '__main__':
+    # test_moves()
+    # red_balls = list(map(int, input().split()))
+    # green_balls = list(map(int, input().split()))
+    start_state = State([5, 0, 0])
+    states = start_state.expand()
+    print(states)
+
+    goal = [3, 2, 0]
+    open_states = [start_state]
+    known = {}
+    while len(open_states) > 0:
+        s = open_states.pop(0)
+        if s.volumes == goal:
+            while s != None:
+                print(s)
+                s = s.prev
+            print("Huraa")
+            break
+
+        exp = s.expand()  # pole referenci
+        for state in exp:
+            if not str(state.volumes) is known:
+                state.prev = s
+                open_states.append(state)
+                known[str(state.volumes)] = 1
