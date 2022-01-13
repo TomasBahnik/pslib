@@ -13,7 +13,7 @@ def debug_print(message, print_debug):
         print(message)
 
 
-def read_balls(input_file):
+def read_circles(input_file):
     balls = []
     f = open(input_file, "r")
     r_circle = list(map(int, f.readline().strip().split()))  # precti 1. radek ze souboru
@@ -70,7 +70,7 @@ def test_moves():
 
 def test_inputs(file, moves):
     debug_print('{}'.format(file), DEBUG_PRINTS)
-    red_circle, green_circle = read_balls(file)
+    red_circle, green_circle = read_circles(file)
     # positions R=0, G=1
     game = [red_circle, green_circle]
     debug_print('before moves', DEBUG_PRINTS)
@@ -93,52 +93,53 @@ def test_all_inputs():
     test_inputs('input_3.txt', moves)
 
 
-maxVolumes = [5, 3, 5]
-goal = [3, 2, 0]
-initial_volumes = [5, 0, 0]
+maxVolumes = [1, 1, 1, 1, 1, 1]
+goal = [1, 1, 0, 0, 0, 1]
+circles = read_circles('input_1.txt')
+initial_volumes = [1, 0, 1, 0, 1, 0]
 
 
 class State:
-    def __init__(self, initial_volumes):
-        self.volumes = initial_volumes[:]
+    def __init__(self, initial_circles):
+        self.circles = initial_circles[:]
         self.act = ""
         self.prev = None
 
     def __repr__(self):
-        return str(self.volumes) + str(self.act)
+        return str(self.circles) + str(self.act)
 
     def expand(self):
         newStates = []
         # akce Ni - nalit
-        for i in range(len(self.volumes)):
-            if self.volumes[i] < maxVolumes[i]:
-                tmp = State(self.volumes)
-                tmp.volumes[i] = maxVolumes[i]
+        for i in range(len(self.circles)):
+            if self.circles[i] < maxVolumes[i]:
+                tmp = State(self.circles)
+                tmp.circles[i] = maxVolumes[i]
                 tmp.act = "N{}".format(i)
                 newStates.append(tmp)
 
         # akce Vi - vylit
-        for i in range(len(self.volumes)):
-            for j in range(len(self.volumes)):
-                if self.volumes[i] > 0 and self.volumes[j] < maxVolumes[j]:
-                    tmp = State(self.volumes)
-                    tmp.volumes[i] = 0
+        for i in range(len(self.circles)):
+            for j in range(len(self.circles)):
+                if self.circles[i] > 0 and self.circles[j] < maxVolumes[j]:
+                    tmp = State(self.circles)
+                    tmp.circles[i] = 0
                     tmp.act = "V{}".format(i)
                     newStates.append(tmp)
 
         # prelit z i do j
         # nejtezzsi krok, zkusit doma !!
-        for i in range(len(self.volumes)):
-            for j in range(len(self.volumes)):
-                tmp = State(self.volumes)
+        for i in range(len(self.circles)):
+            for j in range(len(self.circles)):
+                tmp = State(self.circles)
                 tmp.act = "{}P{}".format(i, j)
-                rest = maxVolumes[j] - self.volumes[j]
-                if self.volumes[i] > rest:
-                    tmp.volumes[j] += rest
-                    tmp.volumes[i] -= rest
+                rest = maxVolumes[j] - self.circles[j]
+                if self.circles[i] > rest:
+                    tmp.circles[j] += rest
+                    tmp.circles[i] -= rest
                 else:
-                    tmp.volumes[j] += tmp.volumes[i]
-                    tmp.volumes[i] = 0
+                    tmp.circles[j] += tmp.circles[i]
+                    tmp.circles[i] = 0
                 newStates.append(tmp)
 
         return newStates
@@ -157,7 +158,7 @@ if __name__ == '__main__':
     known = {}
     while len(open_states) > 0:
         s = open_states.pop(0)
-        if s.volumes == goal:
+        if s.circles == goal:
             while s != None:
                 print(s)
                 s = s.prev
@@ -166,7 +167,7 @@ if __name__ == '__main__':
 
         exp = s.expand()  # pole referenci
         for state in exp:
-            if not str(state.volumes) is known:
+            if not str(state.circles) is known:
                 state.prev = s
                 open_states.append(state)
-                known[str(state.volumes)] = 1
+                known[str(state.circles)] = 1
