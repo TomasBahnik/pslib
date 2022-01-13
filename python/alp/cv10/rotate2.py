@@ -47,17 +47,19 @@ class State:
 
     def expand(self):
         new_state = []
+
         """move P"""
         for i in range(len(self.both)):
             tmp = State(self.both)
-            tmp.both[i] = move(self.both, [i, CIRCLE_MOVE_P])
-            tmp.act = "({},{})".format(i, SYMBOL[0])
+            tmp.both = move(self.both, [i, CIRCLE_MOVE_P])
+            tmp.act = "({},{})".format(i, SYMBOL[CIRCLE_MOVE_P])
             new_state.append(tmp)
+
         """move M"""
         for i in range(len(self.both)):
             tmp = State(self.both)
-            tmp.both[i] = move(self.both, [i, CIRCLE_MOVE_M])
-            tmp.act = "({},{})".format(i, SYMBOL[1])
+            tmp.both = move(self.both, [i, CIRCLE_MOVE_M])
+            tmp.act = "({},{})".format(i, SYMBOL[CIRCLE_MOVE_M])
             new_state.append(tmp)
         return new_state
 
