@@ -1,3 +1,5 @@
+import sys
+
 passes = [1, 2, 3, 4, 5, 6, 7]
 pattern = [[1, 6, 4, 6, 2, 6, 4, 6],
            [7, 7, 7, 7, 7, 7, 7, 7],
@@ -65,6 +67,43 @@ idx_of_passes = {}
 for p in passes:
     idx_of_passes[p] = idx_of_pass(p)
 
+pass_ratio = {2 ** 6: 1, 2 ** 5: 2, 2 ** 4: 3, 2 ** 3: 4, 2 ** 2: 5, 2 ** 1: 6, 2 ** 0: 7}
+
+
+def test2(i):
+    img_w = i[0][0]
+    img_h = i[0][1]
+    e_i = empty_image(img_w, img_h)
+    img_size = img_w * img_h
+    img_coded = i[1]
+    num_of_patterns = (img_w // len(pattern[0])) * (img_h // len(pattern[0]))
+    power_of_2 = img_size // len(img_coded)
+    max_pass = pass_ratio[power_of_2]
+    w_r = img_w // 8
+    r_r = img_h // 8
+    row_range = [x * 8 for x in range(0, r_r)]
+    col_range = [x * 8 for x in range(0, w_r)]
+    all_samples = []
+    for p in range(1, max_pass + 1):
+        samples = idx_of_passes[p]
+        for r in row_range:
+            for c in col_range:
+                for s in samples:
+                    n_r = s[0] + r
+                    n_c = s[1] + c
+                    all_samples += [[n_r, n_c]]
+    decode = [all_samples, img_coded]
+    # sorted_list = sorted(list, key=lambda x: (x[0], -x[1]))
+    all_samples.sort(key=lambda x: (x[0], x[1]))
+    if len(all_samples) != len(img_coded):
+        print("ERROR - coded length mismatch exiting")
+        sys.exit(1)
+    for i in range(len(img_coded)):
+        val = img_coded[i]
+        coord = all_samples[i]
+        e_i[coord[0]][coord[1]] = val
+    print(e_i)
+
 
 def test(i):
     tot = 0
@@ -83,18 +122,23 @@ def test(i):
         samples[p] = img_sample[prev:tot]
         prev = tot
 
+    w_r = img_w // 8
+    r_r = img_h // 8
+    # [0, 8, 16]
+    row_range = [x * 8 for x in range(0, r_r)]
+    col_range = [x * 8 for x in range(0, w_r)]
     for pruchod in passes:
         sam = samples[pruchod]
         pos_pruchod = idx_of_passes[pruchod]
         if len(sam) > 0 and len(pos_pruchod) > 0:
             for r, c in pos_pruchod:
-                for f in [0, 8, 16]:
-                    for g in [0, 8, 16]:
+                for f in row_range:
+                    for g in col_range:
                         e_i[r + f][c + g] = sam.pop(0)
     print(e_i)
 
 
 if __name__ == "__main__":
-    test(input_1)
+    test2(input_2)
     print("\n")
     # test(input_2)
