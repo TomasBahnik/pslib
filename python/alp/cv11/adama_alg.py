@@ -83,12 +83,14 @@ def test(i):
         samples[p] = img_sample[prev:tot]
         prev = tot
 
-    pos_1 = idx_of_passes[1][0]
-    sam = samples[1]
-    r, c = pos_1
-    for f in [0, 7, 15]:
-        for g in [0, 7, 15]:
-            e_i[r + f][c + g] = sam.pop(0)
+    for pruchod in passes:
+        sam = samples[pruchod]
+        pos_pruchod = idx_of_passes[pruchod]
+        if len(sam) > 0 and len(pos_pruchod) > 0:
+            for r, c in pos_pruchod:
+                for f in [0, 8, 16]:
+                    for g in [0, 8, 16]:
+                        e_i[r + f][c + g] = sam.pop(0)
     print(e_i)
 
 
