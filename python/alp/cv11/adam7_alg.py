@@ -1,5 +1,5 @@
-from alp.cv11.adam7_data import quarter_24_8, input_1_16_24_24, input_1_8_24_24
 from alp.cv11.adam7_data import full_24_8
+from alp.cv11.adam7_data import quarter_24_8, input_1_16_24_24, input_1_8_24_24
 
 adam7_pattern = [[1, 6, 4, 6, 2, 6, 4, 6],
                  [7, 7, 7, 7, 7, 7, 7, 7],
@@ -18,7 +18,7 @@ def empty_image(w, h):
     return b
 
 
-def idx_of_pass(p):
+def sample_positions(p):
     all_rows = []
     for i in range(len(adam7_pattern)):
         one_row = []
@@ -29,13 +29,27 @@ def idx_of_pass(p):
     return all_rows
 
 
-idx_of_passes = {}
+# prepare samples positions once
+samples_positions = {}
 for p in range(1, 8):
-    idx_of_passes[p] = idx_of_pass(p)
+    samples_positions[p] = sample_positions(p)
 
 
 def column(matrix, i):
     return [row[i] for row in matrix]
+
+
+def all_image_samples(col_range, row_range):
+    all_samples = []
+    for p in range(1, 8):
+        for r in row_range:
+            for row_samples in samples_positions[p]:
+                for c in col_range:
+                    for row_sample in row_samples:
+                        n_r = row_sample[0] + r
+                        n_c = row_sample[1] + c
+                        all_samples += [[n_r, n_c]]
+    return all_samples
 
 
 def adam7_decode(test_input):
@@ -53,20 +67,6 @@ def adam7_decode(test_input):
         coord = all_samples[i]
         decoded_image[coord[0]][coord[1]] = val
     return decoded_image
-
-
-def all_image_samples(col_range, row_range):
-    all_samples = []
-    for p in range(1, 8):
-        samples = idx_of_passes[p]
-        for r in row_range:
-            for row_samples in samples:
-                for c in col_range:
-                    for row_sample in row_samples:
-                        n_r = row_sample[0] + r
-                        n_c = row_sample[1] + c
-                        all_samples += [[n_r, n_c]]
-    return all_samples
 
 
 def print_image(decoded_image):

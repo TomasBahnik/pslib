@@ -1,6 +1,6 @@
 import sys
 
-from alp.cv11.adam7_alg import column, idx_of_passes, empty_image
+from alp.cv11.adam7_alg import column, samples_positions, empty_image
 
 
 def adam7_encode(input_data, orig_image):
@@ -24,7 +24,7 @@ def adam7_encode(input_data, orig_image):
     col_range = [x * 8 for x in range(0, w_r)]
     encoded_image = []
     for p in range(1, 8):
-        samples = idx_of_passes[p]
+        samples = samples_positions[p]
         for r in row_range:
             for row_samples in samples:
                 for c in col_range:
@@ -60,7 +60,7 @@ def test_adam(img_w, img_h):
     all_samples = []
     pruchody = []
     for p in range(1, 8):
-        samples = idx_of_passes[p]
+        samples = samples_positions[p]
         for r in row_range:
             for c in col_range:
                 for s in samples:
