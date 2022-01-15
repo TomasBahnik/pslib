@@ -69,12 +69,14 @@ def img_pass(i, p):
 
 
 def idx_of_pass(p):
-    x = []
+    all_rows = []
     for i in range(len(pattern)):
+        one_row = []
         for j in range(len(pattern[i])):
             if pattern[i][j] == p:
-                x += [[i, j]]
-    return x
+                one_row += [[i, j]]
+        all_rows.append(one_row)
+    return all_rows
 
 
 idx_of_passes = {}
@@ -145,14 +147,16 @@ def test_decode(input_data, orig_image):
     all_samples = []
     encoded_image = []
     for p in range(1, 8):
+        # TODO correct order as used by adam7
         samples = idx_of_passes[p]
         for r in row_range:
-            for c in col_range:
-                for s in samples:
-                    n_r = s[0] + r
-                    n_c = s[1] + c
-                    encoded_image.append(orig_image[n_r][n_c])
-                    all_samples += [[n_r, n_c]]
+            for row_samples in samples:
+                for row_sample in row_samples:
+                    for c in col_range:
+                        n_r = row_sample[0] + r
+                        n_c = row_sample[1] + c
+                        encoded_image.append(orig_image[n_r][n_c])
+                        all_samples += [[n_r, n_c]]
     if len(encoded_image) != len(input_data):
         print("ERROR encoded image has different length")
     if encoded_image.count(0) != input_data.count(0):
