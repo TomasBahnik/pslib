@@ -86,31 +86,29 @@ for p in passes:
 pass_ratio = {2 ** 6: 1, 2 ** 5: 2, 2 ** 4: 3, 2 ** 3: 4, 2 ** 2: 5, 2 ** 1: 6, 2 ** 0: 7}
 
 
-def test2(i):
-    img_w = i[0][0]
-    img_h = i[0][1]
+def column(matrix, i):
+    return [row[i] for row in matrix]
+
+
+def adam7_decode(test_input):
+    img_w = test_input[0][0]
+    img_h = test_input[0][1]
     e_i = empty_image(img_w, img_h)
-    img_size = img_w * img_h
-    img_coded = i[1]
-    num_of_patterns = (img_w // len(pattern[0])) * (img_h // len(pattern[0]))
-    power_of_2 = img_size // len(img_coded)
-    max_pass = pass_ratio[power_of_2]
+    img_coded = test_input[1]
     w_r = img_w // 8
     r_r = img_h // 8
     row_range = [x * 8 for x in range(0, r_r)]
     col_range = [x * 8 for x in range(0, w_r)]
     all_samples = []
-    for p in range(1, max_pass + 1):
+    for p in range(1, 8):
         samples = idx_of_passes[p]
         for r in row_range:
-            for c in col_range:
-                for s in samples:
-                    n_r = s[0] + r
-                    n_c = s[1] + c
-                    all_samples += [[n_r, n_c]]
-    decode = [all_samples, img_coded]
-    # sorted_list = sorted(list, key=lambda x: (x[0], -x[1]))
-    all_samples.sort(key=lambda x: (x[0], x[1]))
+            for row_samples in samples:
+                for c in col_range:
+                    for row_sample in row_samples:
+                        n_r = row_sample[0] + r
+                        n_c = row_sample[1] + c
+                        all_samples += [[n_r, n_c]]
     if len(all_samples) != len(img_coded):
         print("ERROR - coded length mismatch exiting")
         sys.exit(1)
@@ -119,10 +117,6 @@ def test2(i):
         coord = all_samples[i]
         e_i[coord[0]][coord[1]] = val
     print(e_i)
-
-
-def column(matrix, i):
-    return [row[i] for row in matrix]
 
 
 def adam7_encode(input_data, orig_image):
@@ -238,5 +232,5 @@ def test(i):
 
 if __name__ == "__main__":
     # test_adam(24, 8)
-    adam7_encode(input_3[1], image_3_orig)
-    # test2(input_3)
+    # adam7_encode(input_3[1], image_3_orig)
+    adam7_decode(input_3)
