@@ -110,6 +110,34 @@ def test2(i):
     print(e_i)
 
 
+def test_adam(img_w, img_h):
+    e_i = empty_image(img_w, img_h)
+    w_r = img_w // 8
+    r_r = img_h // 8
+    row_range = [x * 8 for x in range(0, r_r)]
+    col_range = [x * 8 for x in range(0, w_r)]
+    all_samples = []
+    pruchody = []
+    for p in range(1, 8):
+        samples = idx_of_passes[p]
+        for r in row_range:
+            for c in col_range:
+                for s in samples:
+                    n_r = s[0] + r
+                    n_c = s[1] + c
+                    pruchody.append(p)
+                    all_samples += [[n_r, n_c]]
+    # all_samples.sort(key=lambda x: (x[0], x[1]))
+    if len(all_samples) != len(pruchody):
+        print("ERROR - length mismatch exiting")
+        sys.exit(1)
+    for i in range(len(all_samples)):
+        coord = all_samples[i]
+        pruchod = pruchody[i]
+        e_i[coord[0]][coord[1]] = pruchod
+    print(e_i)
+
+
 def test(i):
     tot = 0
     img_w = i[0][0]
@@ -144,6 +172,5 @@ def test(i):
 
 
 if __name__ == "__main__":
-    test2(input_3)
-    print("\n")
-    # test(input_2)
+    test_adam(24, 8)
+    # test2(input_3)
