@@ -125,7 +125,7 @@ def column(matrix, i):
     return [row[i] for row in matrix]
 
 
-def test_decode(input_data, orig_image):
+def adam7_encode(input_data, orig_image):
     zeroes = input_data.count(0)
     ones = input_data.count(1)
     img_zeroes = 0
@@ -147,12 +147,11 @@ def test_decode(input_data, orig_image):
     all_samples = []
     encoded_image = []
     for p in range(1, 8):
-        # TODO correct order as used by adam7
         samples = idx_of_passes[p]
         for r in row_range:
             for row_samples in samples:
-                for row_sample in row_samples:
-                    for c in col_range:
+                for c in col_range:
+                    for row_sample in row_samples:
                         n_r = row_sample[0] + r
                         n_c = row_sample[1] + c
                         encoded_image.append(orig_image[n_r][n_c])
@@ -172,6 +171,8 @@ def test_decode(input_data, orig_image):
         print("ERROR encoded image is different from provided input")
         print("encoded image {}".format(encoded_image))
         print("input data {}".format(input_data))
+    else:
+        print("encoded image == input data!!")
 
 
 def test_adam(img_w, img_h):
@@ -237,5 +238,5 @@ def test(i):
 
 if __name__ == "__main__":
     # test_adam(24, 8)
-    test_decode(input_3[1], image_3_orig)
+    adam7_encode(input_3[1], image_3_orig)
     # test2(input_3)
