@@ -99,6 +99,18 @@ def adam7_decode(test_input):
     r_r = img_h // 8
     row_range = [x * 8 for x in range(0, r_r)]
     col_range = [x * 8 for x in range(0, w_r)]
+    all_samples = all_image_samples(col_range, row_range)
+    if len(all_samples) != len(img_coded):
+        print("ERROR - coded length mismatch exiting")
+        sys.exit(1)
+    for i in range(len(img_coded)):
+        val = img_coded[i]
+        coord = all_samples[i]
+        e_i[coord[0]][coord[1]] = val
+    print(e_i)
+
+
+def all_image_samples(col_range, row_range):
     all_samples = []
     for p in range(1, 8):
         samples = idx_of_passes[p]
@@ -109,14 +121,7 @@ def adam7_decode(test_input):
                         n_r = row_sample[0] + r
                         n_c = row_sample[1] + c
                         all_samples += [[n_r, n_c]]
-    if len(all_samples) != len(img_coded):
-        print("ERROR - coded length mismatch exiting")
-        sys.exit(1)
-    for i in range(len(img_coded)):
-        val = img_coded[i]
-        coord = all_samples[i]
-        e_i[coord[0]][coord[1]] = val
-    print(e_i)
+    return all_samples
 
 
 def adam7_encode(input_data, orig_image):
