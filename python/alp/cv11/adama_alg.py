@@ -1,6 +1,5 @@
 import sys
 
-passes = [1, 2, 3, 4, 5, 6, 7]
 pattern = [[1, 6, 4, 6, 2, 6, 4, 6],
            [7, 7, 7, 7, 7, 7, 7, 7],
            [5, 6, 5, 6, 5, 6, 5, 6],
@@ -80,7 +79,7 @@ def idx_of_pass(p):
 
 
 idx_of_passes = {}
-for p in passes:
+for p in range(1, 8):
     idx_of_passes[p] = idx_of_pass(p)
 
 pass_ratio = {2 ** 6: 1, 2 ** 5: 2, 2 ** 4: 3, 2 ** 3: 4, 2 ** 2: 5, 2 ** 1: 6, 2 ** 0: 7}
@@ -93,7 +92,7 @@ def column(matrix, i):
 def adam7_decode(test_input):
     img_w = test_input[0][0]
     img_h = test_input[0][1]
-    e_i = empty_image(img_w, img_h)
+    decoded_image = empty_image(img_w, img_h)
     img_coded = test_input[1]
     w_r = img_w // 8
     r_r = img_h // 8
@@ -106,8 +105,8 @@ def adam7_decode(test_input):
     for i in range(len(img_coded)):
         val = img_coded[i]
         coord = all_samples[i]
-        e_i[coord[0]][coord[1]] = val
-    print(e_i)
+        decoded_image[coord[0]][coord[1]] = val
+    return decoded_image
 
 
 def all_image_samples(col_range, row_range):
@@ -143,7 +142,6 @@ def adam7_encode(input_data, orig_image):
     r_r = img_h // 8
     row_range = [x * 8 for x in range(0, r_r)]
     col_range = [x * 8 for x in range(0, w_r)]
-    all_samples = []
     encoded_image = []
     for p in range(1, 8):
         samples = idx_of_passes[p]
@@ -154,7 +152,6 @@ def adam7_encode(input_data, orig_image):
                         n_r = row_sample[0] + r
                         n_c = row_sample[1] + c
                         encoded_image.append(orig_image[n_r][n_c])
-                        all_samples += [[n_r, n_c]]
     if len(encoded_image) != len(input_data):
         print("ERROR encoded image has different length")
     if encoded_image.count(0) != input_data.count(0):
@@ -202,40 +199,14 @@ def test_adam(img_w, img_h):
     print(e_i)
 
 
-def test(i):
-    tot = 0
-    img_w = i[0][0]
-    img_h = i[0][1]
-    e_i = empty_image(img_w, img_h)
-    img_size = img_w * img_h
-    img_sample = i[1]
-    samples = {}
-    idx_pass = {}
-    prev = 0
-    for p in range(1, 8):
-        s = img_pass(i, p)
-        tot += s
-        debug_print("total samples_in_pass {}: {}, fraction {}".format(p, tot, img_size // tot), DEBUG_PRINTS)
-        samples[p] = img_sample[prev:tot]
-        prev = tot
-
-    w_r = img_w // 8
-    r_r = img_h // 8
-    # [0, 8, 16]
-    row_range = [x * 8 for x in range(0, r_r)]
-    col_range = [x * 8 for x in range(0, w_r)]
-    for pruchod in passes:
-        sam = samples[pruchod]
-        pos_pruchod = idx_of_passes[pruchod]
-        if len(sam) > 0 and len(pos_pruchod) > 0:
-            for r, c in pos_pruchod:
-                for f in row_range:
-                    for g in col_range:
-                        e_i[r + f][c + g] = sam.pop(0)
-    print(e_i)
+def print_image(decoded_image):
+    for r in decoded_image:
+        s1 = str(r).replace('1', '*').replace('0', ' ').replace(',', '').replace('[', '').replace(']', '')
+        print(s1)
 
 
 if __name__ == "__main__":
     # test_adam(24, 8)
     # adam7_encode(input_3[1], image_3_orig)
-    adam7_decode(input_3)
+    image = adam7_decode(input_3)
+    print_image(image)
