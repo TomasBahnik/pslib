@@ -25,6 +25,15 @@ input_3 = [[24, 8],
             0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
 
+image_3_orig = [[0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
+                [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0],
+                [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
+                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
+                [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0],
+                [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
 
 def empty_image(w, h):
     b = []
@@ -110,6 +119,20 @@ def test2(i):
     print(e_i)
 
 
+def test_decode(input_data, orig_image):
+    zeroes = input_data.count(0)
+    ones = input_data.count(1)
+    img_zeroes = 0
+    img_ones = 0
+    for r in orig_image:
+        img_zeroes += r.count(0)
+        img_ones += r.count(1)
+    if zeroes != img_zeroes or ones != img_ones:
+        print("ERROR : pocty nul a jednicek jsou ruzne")
+    else:
+        print("pocty nul a jednicek jsou stejne")
+
+
 def test_adam(img_w, img_h):
     e_i = empty_image(img_w, img_h)
     w_r = img_w // 8
@@ -172,5 +195,6 @@ def test(i):
 
 
 if __name__ == "__main__":
-    test_adam(24, 8)
+    # test_adam(24, 8)
+    test_decode(input_3[1], image_3_orig)
     # test2(input_3)
