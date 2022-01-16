@@ -1,6 +1,3 @@
-from alp.cv11.adam7_data import input_1_1_24_8, input_1_4_24_24, input_1_2_24_8, input_1_2_24_24, input_1_1_24_24
-from alp.cv11.adam7_data import input_1_4_24_8, input_1_16_24_24, input_1_8_24_24
-
 adam7_pattern = [[1, 6, 4, 6, 2, 6, 4, 6],
                  [7, 7, 7, 7, 7, 7, 7, 7],
                  [5, 6, 5, 6, 5, 6, 5, 6],
@@ -69,41 +66,36 @@ def adam7_decode(test_input):
     return decoded_image
 
 
-def print_image(decoded_image):
-    for r in decoded_image:
+def add_pixels(image):
+    print("Adding pixels")
+    return image
+
+
+def print_image(decoded_image, add_pix):
+    img = add_pixels(decoded_image) if add_pix else decoded_image
+    for r in img:
         s1 = str(r).replace('1', '*').replace('0', ' ').replace(',', '').replace('[', '').replace(']', '')
         print(s1)
 
 
-def adam7_test():
-    # test_adam(24, 8)
-    # adam7_encode(input_3[1], image_3_orig)
-    print("1/4 24x8")
-    image = adam7_decode(input_1_4_24_8)
-    print_image(image)
-    print("1/2 24x8")
-    image = adam7_decode(input_1_2_24_8)
-    print_image(image)
-    print("1/1 24x8")
-    image = adam7_decode(input_1_1_24_8)
-    print_image(image)
-    # 24x24
-    print("1/16 24x24")
-    image = adam7_decode(input_1_16_24_24)
-    print_image(image)
-    print("1/8 24x24")
-    image = adam7_decode(input_1_8_24_24)
-    print_image(image)
-    print("1/4 24x24")
-    image = adam7_decode(input_1_4_24_24)
-    print_image(image)
-    print("1/2 24x24")
-    image = adam7_decode(input_1_2_24_24)
-    print_image(image)
-    print("1/1 24x24")
-    image = adam7_decode(input_1_1_24_24)
-    print_image(image)
+def adam7_test(test_inputs):
+    for i in test_inputs:
+        w = i[0][0]
+        h = i[0][1]
+        i_d = i[1]
+        f = w * h // len(i_d)
+        print("{}/{} {}x{}".format(1, f, w, h))
+        image = adam7_decode(i)
+        print_image(image, f > 1)
 
 
 if __name__ == "__main__":
-    adam7_test()
+    img_width, img_height = list(map(int, input().split()))
+    img_encoded = list(map(int, input().split()))
+    img_input = [[img_width, img_height], img_encoded]
+    img_size = img_width * img_height
+    img_decoded = adam7_decode(img_input)
+    add = img_size > len(img_encoded)
+    print_image(img_decoded, add)
+    # adam7_test(test_inputs_24_8)
+    # adam7_test(test_inputs_24_24)
