@@ -74,7 +74,10 @@ def add_pixels(image):
 def print_image(decoded_image, add_pix):
     img = add_pixels(decoded_image) if add_pix else decoded_image
     for r in img:
-        s1 = str(r).replace('1', '*').replace('0', ' ').replace(',', '').replace('[', '').replace(']', '')
+        s = ''
+        for pixel in r:
+            s += str(pixel)
+        s1 = s.replace('1', '*').replace('0', ' ')
         print(s1)
 
 
