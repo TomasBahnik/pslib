@@ -1,5 +1,5 @@
-from alp.cv11.adam7_data import full_24_8
-from alp.cv11.adam7_data import quarter_24_8, input_1_16_24_24, input_1_8_24_24
+from alp.cv11.adam7_data import input_1_1_24_8, input_1_4_24_24, input_1_2_24_8, input_1_2_24_24, input_1_1_24_24
+from alp.cv11.adam7_data import input_1_4_24_8, input_1_16_24_24, input_1_8_24_24
 
 adam7_pattern = [[1, 6, 4, 6, 2, 6, 4, 6],
                  [7, 7, 7, 7, 7, 7, 7, 7],
@@ -75,18 +75,35 @@ def print_image(decoded_image):
         print(s1)
 
 
-if __name__ == "__main__":
+def adam7_test():
     # test_adam(24, 8)
     # adam7_encode(input_3[1], image_3_orig)
     print("1/4 24x8")
-    image = adam7_decode(quarter_24_8)
+    image = adam7_decode(input_1_4_24_8)
     print_image(image)
-    print("full 24x8")
-    image = adam7_decode(full_24_8)
+    print("1/2 24x8")
+    image = adam7_decode(input_1_2_24_8)
     print_image(image)
+    print("1/1 24x8")
+    image = adam7_decode(input_1_1_24_8)
+    print_image(image)
+    # 24x24
     print("1/16 24x24")
     image = adam7_decode(input_1_16_24_24)
     print_image(image)
     print("1/8 24x24")
     image = adam7_decode(input_1_8_24_24)
     print_image(image)
+    print("1/4 24x24")
+    image = adam7_decode(input_1_4_24_24)
+    print_image(image)
+    print("1/2 24x24")
+    image = adam7_decode(input_1_2_24_24)
+    print_image(image)
+    print("1/1 24x24")
+    image = adam7_decode(input_1_1_24_24)
+    print_image(image)
+
+
+if __name__ == "__main__":
+    adam7_test()
