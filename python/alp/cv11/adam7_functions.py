@@ -1,6 +1,6 @@
 import sys
 
-from alp.cv11.adam7_alg import column, samples_positions, empty_image
+from alp.cv11.adam7 import column, samples_positions, empty_image
 
 
 def adam7_encode(input_data, orig_image):
