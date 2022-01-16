@@ -7,11 +7,13 @@ adam7_pattern = [[1, 6, 4, 6, 2, 6, 4, 6],
                  [5, 6, 5, 6, 5, 6, 5, 6],
                  [7, 7, 7, 7, 7, 7, 7, 7]]
 
+UNDEFINED_PIXEL = -1
+
 
 def empty_image(w, h):
     b = []
     for i in range(h):
-        b.append([0] * w)
+        b.append([UNDEFINED_PIXEL] * w)
     return b
 
 
@@ -66,8 +68,21 @@ def adam7_decode(test_input):
     return decoded_image
 
 
+def add_pixels_row(r):
+    for i in range(len(r)):
+        pixel = r[i]
+        if pixel == UNDEFINED_PIXEL:
+            r[i] = r[i - 1]  # TODO i > 0 ??
+
+
 def add_pixels(image):
-    print("Adding pixels")
+    h = len(column(image, 0))
+    for r in range(h):
+        if 0 in image[r] or 1 in image[r]:
+            add_pixels_row(image[r])
+        else:
+            if r > 0:  # must not be first row
+                image[r] = image[r - 1][:]
     return image
 
 
@@ -100,5 +115,5 @@ if __name__ == "__main__":
     img_decoded = adam7_decode(img_input)
     add = img_size > len(img_encoded)
     print_image(img_decoded, add)
-    # adam7_test(test_inputs_24_8)
+    # adam7_test(test_inputs_24_24)
     # adam7_test(test_inputs_24_24)
