@@ -2,8 +2,6 @@ import sys
 
 from sympy import *
 
-latex_new_line = "\\\\"
-
 x, y, z, t, a = symbols('x y z t a')
 p_1, p_2, p_3, p_4, p_5 = symbols('p_1 p_2 p_3 p_4 p_5')
 k, m, n = symbols('k m n', integer=True)
@@ -43,16 +41,20 @@ symbols_p812 = [p_1, p_2, p_3, p_4, p_5]
 
 
 def p812():
-    matrix_properties(matrix_p812, b_p812, symbols_p812)
-
-
-matrix_cv9 = Matrix([[a, 1, 1, 1], [1, a, 1, 1], [1, 1, a, 1], [1, 1, 1, a]])
-b_cv9 = Matrix([1, 1, 1, 1])
-symbols_cv9 = [p_1, p_2, p_3, p_4]
+    A = Matrix([[1, 1, 1, 1, 0], [1, -1, -1, 0, 0], [1, 1, -1, -1, -1], [2, 2, 0, 0, -1], [1, 1, 5, 5, 2]])
+    b = Matrix([3, 4, 5, 8, -1])
+    print("\\mA={}".format(latex(A)))
+    return linsolve((A, b), [p_1, p_2, p_3, p_4, p_5])
 
 
 def cv9():
-    matrix_properties(matrix_cv9, b_cv9, symbols_cv9)
+    m_a = Matrix([[a, 1, 1, 1], [1, a, 1, 1], [1, 1, a, 1], [1, 1, 1, a]])
+    b = Matrix([1, 1, 1, 1])
+    det_a = m_a.det()
+    p_s = linsolve((m_a, b), [p_1, p_2, p_3, p_4])
+    print("\\mA={} \\\\".format(latex(m_a)))
+    print("det(A)={}={} \\\\".format(latex(det_a), latex(factor(det_a))))
+    print("p={}".format(latex(p_s)))
 
 
 def matrices():
@@ -69,4 +71,6 @@ if __name__ == '__main__':
     cv9()
     print("\nProblem 8.1.2")
     p812()
+    # cv9()
+    print(latex(p812()))
     sys.exit(0)
