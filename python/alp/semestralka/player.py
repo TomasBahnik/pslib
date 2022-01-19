@@ -1,9 +1,13 @@
 import time
 
-# import alp.semestralka.base as base
-# from alp.semestralka.draw import Drawer
-import base
-from draw import Drawer
+import numpy as np
+
+import alp.semestralka.base as base
+from alp.semestralka.draw import Drawer
+
+# import base
+# import game_1_5
+# from draw import Drawer
 
 MAX_PERF = 2100
 MIN_USED_STONES = 7
@@ -12,12 +16,14 @@ ALGORITHM = str(MIN_USED_STONES) + '.' + str(MAX_PERF)
 CELL_COLUMN = 1
 CELL_ROW = 0
 EMPTY_CELL_COLOR = 0
-DEBUG_PRINTS = False
+DEBUG_PRINTS = True
+BOARD = 0
+MARKS = 1
 
 
-# def debug_print(message, print_debug):
-#     if print_debug:
-#         print(message)
+def debug_print(message, print_debug):
+    if print_debug:
+        print(message)
 
 
 def move_cells_top_left(stone_cells):
@@ -109,6 +115,22 @@ class Player(base.BasePlayer):
         self.algorithm = ALGORITHM
         self.board_size = len(self.board[1]) * len(column(self.board, 0))
         self.max_stones_size = MAX_PERF // self.board_size
+        self.game = np.empty((2, len(self.board), len(self.marks)), dtype=int)
+
+        self.game[BOARD] = self.board
+        self.stones_on_board = np.nonzero(self.game[BOARD] > 0)
+        self.empty_board = np.nonzero(self.game[BOARD] == 0)
+        self.empty_board_coord = list(zip(self.empty_board[0], self.empty_board[1]))
+
+        # fixed no need to update
+        self.game[MARKS] = self.marks
+        self.my_marks = np.nonzero(self.game[MARKS] == self.player)
+        self.my_marks_coord = list(zip(self.my_marks[0], self.my_marks[1]))
+        self.opp_marks = np.nonzero(self.game[MARKS] == - self.player)
+        self.opp_marks_coord = list(zip(self.opp_marks[0], self.opp_marks[1]))
+
+    def recalc_board(self):
+        self.game[BOARD] = self.board
 
     def free_stones_indexes(self):
         """ limit number of used stones to largest"""
@@ -199,6 +221,7 @@ class Player(base.BasePlayer):
             return []
         """
         # t0 = time.perf_counter()
+        self.recalc_board()
         scores = self.all_stone_scores()
         # duration = time.perf_counter() - t0
         # debug_print("{} : scores calculation duration = {} sec".format(self.name, duration), DEBUG_PRINTS)
@@ -356,7 +379,10 @@ if __name__ == "__main__":
         p1play = True
         p2play = True
 
+        t0 = time.perf_counter()
         move = p1.move()  # first player, we assume that a corrent output is returned
+        duration = time.perf_counter() - t0
+        debug_print("{} : move duration = {} sec".format(p1.name, duration), DEBUG_PRINTS)
 
         # the following if/else is simplified. On Brute, we will check if return value
         # from move() is valid ...
@@ -373,7 +399,11 @@ if __name__ == "__main__":
             d.draw(p2.board, p2.marks, "move-{:02d}a.png".format(moveidx))  # draw to png
 
         # now we call player2 and update boards/freeStones of both players
+
+        t0 = time.perf_counter()
         move = p2.move()
+        duration = time.perf_counter() - t0
+        debug_print("{} : move duration = {} sec".format(p2.name, duration), DEBUG_PRINTS)
         if not is_move_valid(p2, move):
             p2play = False
         else:
