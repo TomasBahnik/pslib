@@ -48,8 +48,8 @@ def plot_3d():
 
 
 def plot_2d():
-    x = np.linspace(-5, 5, 100)
-    y = (x + 1) * abs(x - 3) + 2
+    x = np.linspace(0, 1.5, 100)
+    y = x ** 2 * np.log(x)
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.spines['left'].set_position('center')
