@@ -10,7 +10,7 @@ def f(x, y):
 
 
 def lin_f(x, y):
-    return 5 * x + 3 * y
+    return 5 * x ** 2 + 3 * y ** 3
 
 
 def plot_f():
@@ -48,12 +48,21 @@ def plot_3d():
 
 
 def plot_2d():
-    plt.style.use('seaborn-whitegrid')
+    x = np.linspace(-5, 5, 100)
+    y = (x + 1) * abs(x - 3) + 2
     fig = plt.figure()
-    ax = plt.axes()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.spines['left'].set_position('center')
+    ax.spines['bottom'].set_position('zero')
+    ax.spines['right'].set_color('none')
+    ax.spines['top'].set_color('none')
+    ax.xaxis.set_ticks_position('bottom')
+    ax.yaxis.set_ticks_position('left')
+    plt.style.use('seaborn-whitegrid')
+    plt.plot(x, y, 'r')
     plt.show()
 
 
 if __name__ == '__main__':
-    plot_f()
+    plot_2d()
     sys.exit(0)
