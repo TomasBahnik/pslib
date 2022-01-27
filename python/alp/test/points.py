@@ -18,6 +18,8 @@
 '''
 reseni
 '''
+import sys
+
 nums = list(map(float, input().strip().split()))
 pts = []
 pole_x = []
@@ -39,7 +41,7 @@ for point in pts:
     vzdalenost = dx ** 2 + dy ** 2
     vzdalenosti_od_T.append(vzdalenost)
 
-nejblizsi = pts.index(min(vzdalenosti_od_T))
+nejblizsi = vzdalenosti_od_T.index(min(vzdalenosti_od_T))
 
 vzdalenosti_od_S = []
 for point in pts:
@@ -51,7 +53,15 @@ for point in pts:
 org = vzdalenosti_od_S[:]
 vzdalenosti_od_S.sort()
 half = len(vzdalenosti_od_S) // 2
-org.index(vzdalenosti_od_S[half])
+sude = len(vzdalenosti_od_S) % 2 == 0
+if sude:
+    kruznice_idx = org.index(vzdalenosti_od_S[half]) + 1
+else:
+    kruznice_idx = org.index(vzdalenosti_od_S[half])
+
+print(nejblizsi, kruznice_idx)
+sys.exit(0)
+
 
 cx = 0
 cy = 0
@@ -80,7 +90,7 @@ for i in range(len(pts)):
         dx = pts[j][0] - 0
         dy = pts[j][1] - 0
         r2 = dx * dx + dy * dy
-        if r2 <= r: # dulezite mensi nebo rovno !!
+        if r2 <= r:  # dulezite mensi nebo rovno !!
             cnt += 1
     if cnt == len(pts) // 2:
         print(minInd, i)
