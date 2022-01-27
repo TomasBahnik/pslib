@@ -20,9 +20,38 @@ reseni
 '''
 nums = list(map(float, input().strip().split()))
 pts = []
+pole_x = []
+pole_y = []
 for i in range(len(nums) // 2):
     x = nums[2 * i + 0]
     y = nums[2 * i + 1]
+    pts.append([x, y])
+    pole_x.append(x)
+    pole_y.append(y)
+
+x_t = sum(pole_x) / len(pole_x)
+y_t = sum(pole_y) / len(pole_y)
+
+vzdalenosti_od_T = []
+for point in pts:
+    dx = point[0] - x_t
+    dy = point[1] - y_t
+    vzdalenost = dx ** 2 + dy ** 2
+    vzdalenosti_od_T.append(vzdalenost)
+
+nejblizsi = pts.index(min(vzdalenosti_od_T))
+
+vzdalenosti_od_S = []
+for point in pts:
+    dx = point[0] - 0
+    dy = point[1] - 0
+    vzdalenost = dx ** 2 + dy ** 2
+    vzdalenosti_od_S.append(vzdalenost)
+
+org = vzdalenosti_od_S[:]
+vzdalenosti_od_S.sort()
+half = len(vzdalenosti_od_S) // 2
+org.index(vzdalenosti_od_S[half])
 
 cx = 0
 cy = 0
