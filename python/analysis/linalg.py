@@ -5,6 +5,7 @@ from sympy import *
 x, y, z, t, a = symbols('x y z t a')
 p_1, p_2, p_3, p_4, p_5 = symbols('p_1 p_2 p_3 p_4 p_5')
 k, m, n = symbols('k m n', integer=True)
+latex_new_line = '\\'
 
 
 def lin_equations():
@@ -35,9 +36,9 @@ def matrix_properties(matrix, b, p):
     print("solution (b=0)={}".format(latex(homog_sol)))
 
 
-matrix_p812 = Matrix([[1, 1, 1, 1, 0], [1, -1, -1, 0, 0], [1, 1, -1, -1, -1], [2, 2, 0, 0, -1], [1, 1, 5, 5, 2]])
-b_p812 = Matrix([3, 4, 5, 8, -1])
-symbols_p812 = [p_1, p_2, p_3, p_4, p_5]
+def matrix_det(m):
+    det_a = m.det()
+    print("{}\ndet = {}".format(m, det_a))
 
 
 def p812():
@@ -66,11 +67,14 @@ def matrices():
 
 if __name__ == '__main__':
     init_printing()  # doctest: +SKIP
+
     # matrices()
-    print("\nCviceni 9")
-    cv9()
-    print("\nProblem 8.1.2")
-    p812()
+    # print("\nCviceni 9")
     # cv9()
-    print(latex(p812()))
+    # print("\nProblem 8.1.2")
+    # p812()
+    # cv9()
+    # print(latex(p812()))
+    matrix = Matrix([[3, 2, 1, 0], [1, 2, 4, 2], [0, 1, 2, 2], [3, 3, 2, 1]])
+    matrix_det(matrix)
     sys.exit(0)
