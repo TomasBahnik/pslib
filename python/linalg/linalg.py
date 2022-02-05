@@ -1,6 +1,7 @@
 import sys
 
 from sympy import *
+from sympy.matrices import Matrix
 
 x, y, z, t, a = symbols('x y z t a')
 p_1, p_2, p_3, p_4, p_5 = symbols('p_1 p_2 p_3 p_4 p_5')
@@ -38,7 +39,12 @@ def matrix_properties(matrix, b, p):
 
 def matrix_det(m):
     det_a = m.det()
-    print("{}\ndet = {}".format(m, det_a))
+    print("{} : det = {}".format(m, det_a))
+    print("adj {} : det = {}".format(m.adjugate(), m.adjugate().det()))
+    print("inv {} : det = {}".format(m.inv(), m.inv().det()))
+    print("unit {}".format(m * m.inv()))
+    inverse = (1 / det_a) * m.adjugate()
+    print("inv2 {} : det = {}".format(inverse, inverse.det()))
 
 
 def p812():
