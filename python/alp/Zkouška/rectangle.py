@@ -33,7 +33,7 @@ def red_points_areas(all_points, red_points):
                 y_1 = r_p_1[1]
                 y_2 = r_p_2[1]
                 area = abs(x_2 - x_1) * abs(y_2 - y_1)
-                ret_val.append([[all_points.index(r_p_1), all_points.index(r_p_2)], area])
+                ret_val.append([[idx_1, idx_2], area])
     ret_val.sort(key=lambda x: x[1], reverse=True)
     return ret_val
 
@@ -56,29 +56,32 @@ def red_points_areas(all_points, red_points):
 #         green_points.append(all_points[i][:2])
 # print(green_points)
 # print(red_x[0][0])
-
 # def rectangle(x, y):
-#     x_line = []
-#     y_line = []
+#     min_s = []
+#     min_r = []
+#     max_s = []
+#     max_r = []
 #     rec = []
 #     for i in range(0, len(red_points) - 1):
 #         if x[i][0] < x[i + 1][0]:
-#             min_s = x[i][0]
-#             max_s = x[i + 1][0]
+#             min_s.append([i][0])
+#             max_s.append(x[i+1][0])
 #         if y[i][0] < y[i + 1][0]:
-#             min_r = y[i][0]
-#             max_r = y[i + 1][0]
-#         for j in range(min_s, max_s):
-#             for k in range(y[i][0] - y[i + 1][0]):
-#                 rec.append(k)
-#                 print(rec)
-#             # x_line.append(x[i][0] - x[i + 1][0])
-#             # y_line.append(y[i][0] - y[i + 1][0])
-#         # else:
-#         #     x_line.append(x[i + 1][0] - x[i][0])
-#         #     y_line.append(y[i + 1][0] - y[i][0])
-#         #
-#     # for i in x_line:
+#             min_r.append(y[i][0])
+#             max_r.append(y[i + 1][0])
+#             for j in range(len(min_s), len(max_s)):
+#                 for k in range(len(min_r), len(max_r)):
+#                     rec.append(k)
+#                     print(rec)
+
+
+            # x_line.append(x[i][0] - x[i + 1][0])
+            # y_line.append(y[i][0] - y[i + 1][0])
+        # else:
+        #     x_line.append(x[i + 1][0] - x[i][0])
+        #     y_line.append(y[i + 1][0] - y[i][0])
+        #
+    # for i in x_line:
 
 
 def test(file):
