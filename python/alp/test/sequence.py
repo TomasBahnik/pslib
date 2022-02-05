@@ -18,12 +18,30 @@
 
 
 """
+import sys
+
 
 x = list(map(int, input().split()))
 avg = sum(x) / len(x)
 
 
 # print(prumer)
+def dist_from_avg(input_seq):
+    prumer = sum(input_seq) / len(input_seq)
+    return [abs(p - prumer) for p in input_seq]
+
+
+def nejblizsi(distances):
+    return distances.index(min(distances))
+
+
+def nevzdalenejsi(distances):
+    return distances.index(max(distances))
+
+
+def test(sequence):
+    dist = dist_from_avg(sequence)
+    print(nejblizsi(dist), nevzdalenejsi(dist))
 
 
 def minimum(x):
@@ -80,5 +98,8 @@ def seq_idx(seq):
 
 
 if __name__ == '__main__':
+    # vstup = list(map(int, input().split()))
+    # test(vstup)
     print(minimum(x), maximum(x))
     print(seq_idx(seq(x)), len(seq(x)))
+    sys.exit(0)
