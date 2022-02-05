@@ -39,9 +39,27 @@ def nevzdalenejsi(distances):
     return distances.index(max(distances))
 
 
+def nejdelsi_pod_posloupnst(distances, max_dist):
+    l_d = len(distances)
+    max_l = 0
+    rets = []
+    for j in range(l_d):
+        for k in range(l_d - j):
+            sub_seq = distances[j:l_d - k]
+            if max(sub_seq) < max_dist:
+                if len(sub_seq) > max_l:
+                    rets = (j, len(sub_seq))
+                    max_l = len(sub_seq)
+    if len(rets) > 0:
+        print(rets[0], rets[1])
+    else:
+        print(-1, 0)
+
+
 def test(sequence):
     dist = dist_from_avg(sequence)
     print(nejblizsi(dist), nevzdalenejsi(dist))
+    nejdelsi_pod_posloupnst(dist, 10)
 
 
 def minimum(x):
