@@ -2,16 +2,8 @@ import sys
 
 
 def count_char_in_word(word, char):
-    shift = -1
-    count = 0
-    while True:
-        try:
-            shift = word.index(char, shift + 1)
-            count += 1
-        except ValueError as ve:
-            # print(ve)
-            break
-    return count
+    tmp = [z for z in word if z == char]
+    return len(tmp)
 
 
 def load_input(file):
@@ -35,15 +27,14 @@ def words_contains_letters(file, inp):
     pole = []
     for slovo in p:
         count = 0
-        i = 0
-        for i in range(0, len(inp)):
-            if inp[i] in slovo:
+        for z in inp:
+            if z in slovo:
                 count += 1
             if count == len(inp):
                 count = 0
                 # print(slovo)
                 pole.append(slovo)
-    return pole, inp
+    return pole
 
 
 # def test_output(slovo, znak):
@@ -59,10 +50,10 @@ def max_contained_word(words, inp):
     if len(words) == 0:
         return "NEEXISTUJE"
     compare = []
-    for i in range(0, len(words)):
+    for w in words:
         counter = []
-        for j in range(0, len(inp)):
-            counter.append(count_char_in_word(words[i], inp[j]))
+        for z in inp:
+            counter.append(count_char_in_word(w, z))
         compare.append(sum(counter))
     max_value = max(compare)
     max_index = compare.index(max_value)
@@ -76,6 +67,6 @@ if __name__ == '__main__':
     inp_txt = sys.argv[1]
     inp = input()
     w_c_l = words_contains_letters(inp_txt, inp)
-    print(len(w_c_l[0]))
-    print(max_contained_word(w_c_l[0], w_c_l[1]))
+    print(len(w_c_l))
+    print(max_contained_word(w_c_l, inp))
     sys.exit(0)
