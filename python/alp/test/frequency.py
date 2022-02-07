@@ -7,6 +7,8 @@ def count_char_in_word(word, char):
 
 
 def all_at_once(words, chars):
+    if len(words) == 0:
+        return "NEEXISTUJE"
     tmp = []
     for w in words:
         cnt = 0
@@ -15,8 +17,7 @@ def all_at_once(words, chars):
         tmp.append([w, cnt])
     words_with_chars = [x[0] for x in tmp if x[1] >= len(chars)]
     counts = [x[1] for x in tmp if x[1] >= len(chars)]
-    max_count = max(counts)
-    max_count_idx = counts.index(max_count)
+    max_count_idx = counts.index(max(counts))
     max_count_word = words_with_chars[max_count_idx]
     print(len(words_with_chars))
     print(max_count_word)
