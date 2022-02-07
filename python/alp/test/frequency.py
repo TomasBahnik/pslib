@@ -1,5 +1,19 @@
 import sys
 
+total_count = 0
+
+
+def count_char_in_word(word, char, shift):
+    global total_count
+    try:
+        shift = word.index(char, shift)
+        total_count += 1
+        count_char_in_word(word, char, shift + 1)
+    except ValueError as ve:
+        # print(ve)
+        print("znak {} not in {}".format(char, word))
+    return total_count
+
 
 def load_input(file):
     pole = []
@@ -34,8 +48,10 @@ def words_contains_letters(file):
                     pole.append(slovo)
     return pole
 
+
 if __name__ == '__main__':
-    is_empty(sys.argv[1])
+    # is_empty(sys.argv[1])
     # words_contains_letters(sys.argv[1])
     print(len(words_contains_letters(sys.argv[1])))
-
+    # print(count_char_in_word("abicdfgihni", "i", 0))
+    sys.exit(0)
