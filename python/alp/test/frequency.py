@@ -75,6 +75,7 @@ if __name__ == '__main__':
     inp_txt = sys.argv[1]
     inp = input()
     is_empty(inp_txt)
-    print(len(words_contains_letters(inp_txt, inp)[0]))
-    print(max_contained_word(words_contains_letters(inp_txt, inp)[0], words_contains_letters(inp_txt, inp)[1]))
+    w_c_l = words_contains_letters(inp_txt, inp)
+    print(len(w_c_l[0]))
+    print(max_contained_word(w_c_l[0], w_c_l[1]))
     sys.exit(0)
