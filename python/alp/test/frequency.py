@@ -36,14 +36,13 @@ def words_contains_letters(file, inp):
     for slovo in p:
         count = 0
         i = 0
-        while i + 1 < len(inp):
-            for i in range(0, len(inp)):
-                if inp[i] in slovo:
-                    count += 1
-                if count == len(inp):
-                    count = 0
-                    # print(slovo)
-                    pole.append(slovo)
+        for i in range(0, len(inp)):
+            if inp[i] in slovo:
+                count += 1
+            if count == len(inp):
+                count = 0
+                # print(slovo)
+                pole.append(slovo)
     return pole, inp
 
 
@@ -57,6 +56,8 @@ def words_contains_letters(file, inp):
 
 
 def max_contained_word(words, inp):
+    if len(words) == 0:
+        return "NEEXISTUJE"
     compare = []
     for i in range(0, len(words)):
         counter = []
@@ -74,7 +75,6 @@ if __name__ == '__main__':
     # test()
     inp_txt = sys.argv[1]
     inp = input()
-    is_empty(inp_txt)
     w_c_l = words_contains_letters(inp_txt, inp)
     print(len(w_c_l[0]))
     print(max_contained_word(w_c_l[0], w_c_l[1]))
