@@ -20,6 +20,7 @@ def is_empty(file):
 def words_contains_letters(file):
     p = load_input(file)
     inp = input()  # POLE!!
+    pole = []
     for slovo in p:
         count = 0
         i = 0
@@ -30,8 +31,11 @@ def words_contains_letters(file):
                 if count == len(inp):
                     count = 0
                     print(slovo)
-
+                    pole.append(slovo)
+    return pole
 
 if __name__ == '__main__':
     is_empty(sys.argv[1])
-    words_contains_letters(sys.argv[1])
+    # words_contains_letters(sys.argv[1])
+    print(len(words_contains_letters(sys.argv[1])))
+
