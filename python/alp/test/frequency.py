@@ -6,6 +6,22 @@ def count_char_in_word(word, char):
     return len(tmp)
 
 
+def all_at_once(words, chars):
+    tmp = []
+    for w in words:
+        cnt = 0
+        for ch in chars:
+            cnt += count_char_in_word(w, ch)
+        tmp.append([w, cnt])
+    words_with_chars = [x[0] for x in tmp if x[1] >= len(chars)]
+    counts = [x[1] for x in tmp if x[1] >= len(chars)]
+    max_count = max(counts)
+    max_count_idx = counts.index(max_count)
+    max_count_word = words_with_chars[max_count_idx]
+    print(len(words_with_chars))
+    print(max_count_word)
+
+
 def load_input(file):
     pole = []
     with open(file, 'r') as f:
@@ -66,7 +82,8 @@ if __name__ == '__main__':
     # test()
     inp_txt = sys.argv[1]
     inp = input()
-    w_c_l = words_contains_letters(inp_txt, inp)
-    print(len(w_c_l))
-    print(max_contained_word(w_c_l, inp))
+    all_at_once(load_input(inp_txt), inp)
+    # w_c_l = words_contains_letters(inp_txt, inp)
+    # print(len(w_c_l))
+    # print(max_contained_word(w_c_l, inp))
     sys.exit(0)
