@@ -1,5 +1,5 @@
 """
-Program hledama dvojice anagramu
+Program hleda dvojice anagramu
 
 UVOD
 anagram = textovy retezec(string), ktery pouzitim vsech pismen z puvodniho retezce zmeni jejich poradi
@@ -81,5 +81,11 @@ def load_input(file):
 
 if __name__ == '__main__':
     load_input(sys.argv[1])
+    inp = load_input(sys.argv[1])
+    for i in range(0, len(inp)):
+        for j in range(i + 1, len(inp)):
+            if is_anagram(inp[i], inp[j]) is True:
+                print(i, j)
+
     # all_tests()
     sys.exit(0)
