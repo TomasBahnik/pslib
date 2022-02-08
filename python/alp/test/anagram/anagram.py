@@ -73,8 +73,9 @@ def load_input(file):
     pole = []
     with open(file, 'r') as f:
         for line in f:
-            pole.append(line.strip())
-        # print(pole)
+            line2 = line.replace(" ", "")
+            pole.append(line2.strip())
+        print(pole)
     return pole
 
 
