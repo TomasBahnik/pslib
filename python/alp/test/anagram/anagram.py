@@ -80,16 +80,27 @@ def load_input(file):
 
 
 def anagram_index(inp):
+    count = 0
     for i in range(0, len(inp)):
         for j in range(i + 1, len(inp)):
             if is_anagram(inp[i], inp[j]) is True:
                 print(i, j)
+                count += 1
+    if count != 0:
+        sys.exit(0)
+    return count
+
+
+def without_anagrams(count):
+    if count == 0:
+        print("NONE")
+
 
 
 if __name__ == '__main__':
     load_input(sys.argv[1])
     inp = load_input(sys.argv[1])
     anagram_index(inp)
-
+    without_anagrams(anagram_index(inp))
     # all_tests()
     sys.exit(0)
