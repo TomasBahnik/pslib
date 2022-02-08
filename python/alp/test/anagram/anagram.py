@@ -75,17 +75,21 @@ def load_input(file):
         for line in f:
             line2 = line.replace(" ", "")
             pole.append(line2.strip())
-        print(pole)
+        # print(pole)
     return pole
+
+
+def anagram_index(inp):
+    for i in range(0, len(inp)):
+        for j in range(i + 1, len(inp)):
+            if is_anagram(inp[i], inp[j]) is True:
+                print(i, j)
 
 
 if __name__ == '__main__':
     load_input(sys.argv[1])
     inp = load_input(sys.argv[1])
-    for i in range(0, len(inp)):
-        for j in range(i + 1, len(inp)):
-            if is_anagram(inp[i], inp[j]) is True:
-                print(i, j)
+    anagram_index(inp)
 
     # all_tests()
     sys.exit(0)
