@@ -42,3 +42,17 @@ priklady anagramu :
  - ‘Ac’ a ‘CA’ nejsou anagramy (case-sensitive)
  - ‘forty five’, priklad anagramu:  ‘over fifty’ nebo ‘overfifty’ nebo ‘fiftyover’
 """
+import sys
+
+
+def load_input(file):
+    pole = []
+    with open(file, 'r') as f:
+        for line in f:
+            pole.append(line.strip())
+        # print(pole)
+    return pole
+
+
+if __name__ == '__main__':
+    load_input(sys.argv[1])
