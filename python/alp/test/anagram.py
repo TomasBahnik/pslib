@@ -36,4 +36,9 @@ nebo
      2 6
      3 7
 
+priklady anagramu :
+ - ‘abc’, anagramem je napr.  ‘bca’, ‘cab’, ‘c a b’, ‘ a c b’ (mezery se neuvazuji)
+ - ‘abc’ a ‘ a a b c ’ nejsou anagramy (nesouhlasi pocet pismen)
+ - ‘Ac’ a ‘CA’ nejsou anagramy (case-sensitive)
+ - ‘forty five’, priklad anagramu:  ‘over fifty’ nebo ‘overfifty’ nebo ‘fiftyover’
 """
