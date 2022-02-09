@@ -10,8 +10,7 @@ def load_input(file):
 
 
 def words_with_inp(inp):
-    lenght = len(inp)
-    words = [w for w in load_input(file) if w[-lenght:] == inp]
+    words = [w for w in load_input(file) if w.endswith(inp)]
     return words
 
 
