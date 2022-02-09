@@ -1,19 +1,35 @@
 import sys
 
-pole = []
-f = open(sys.argv[1], "r")
-arg1 = f.read()
-for line in arg1:
-    pole.append(line.strip())
 
-endword = input()
+def load_input(file):
+    pole = []
+    with open(file, 'r') as f:
+        for line in f:
+            pole.append(line.strip())
+    return pole
 
-print(arg1)
-print(endword)
 
-# for i in arg1:
-#     if endword in arg1:
-#         pole.append(i[arg1])
+def words_with_inp(inp):
+    lenght = len(inp)
+    words = [w for w in load_input(file) if w[-lenght:] == inp]
+    return words
 
-print(pole)
-sys.exit(0)
+
+def shortest_word(words):
+    words_len = []
+    for i in range(len(words)):
+        words_len.append(len(words[i]))
+    sequence = words_len.index(min(words_len))
+    return words[sequence]
+
+if __name__ == '__main__':
+    file = sys.argv[1]
+    inp = input()
+    # load_input(file)
+    w_w_i = words_with_inp(inp)
+    print(len(w_w_i))
+    print(shortest_word(w_w_i))
+
+
+
+
