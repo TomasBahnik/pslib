@@ -96,7 +96,7 @@ def test(file):
         print("NONE")
         return
     # numpy version
-    all_points_np = np.zeros((len(all_points), len(all_points)), dtype=int)
+    # all_points_np = np.zeros((len(all_points), len(all_points)), dtype=int)
     areas = red_points_areas(all_points, red_points)
     print(areas[0][0])
 
@@ -106,8 +106,24 @@ files = ['easy_1023.txt', 'easy_2072.txt', 'easy_2970.txt', 'easy_4705.txt', 'ea
 
 reseni = ['1 3', 'NONE', '2 12', '10 15', '18 41', 'NONE', '0 60', 'NONE']
 
+
+def couple_red_in_req(all_points, red_points):
+    req_val = []
+    for r_p_1 in red_points:
+        idx_1 = all_points.index(r_p_1)
+        for r_p_2 in red_points:
+            idx_2 = all_points.index(r_p_2)
+            if idx_1 < idx_2:
+                req_val.append([r_p_1, r_p_2])
+    return req_val
+
+
 if __name__ == '__main__':
-    for i in range(len(files)):
-        test(files[i])
-        print('reseni : {}\n'.format(reseni[i]))
-    sys.exit(0)
+    # for i in range(len(files)):
+    #     test(files[i])
+    #     print('reseni : {}\n'.format(reseni[i]))
+    # sys.exit(0)
+
+    all_points = load_input('easy_1023.txt')
+    red_points = [x for x in all_points if x[2] == RED]
+    green_points = [x for x in all_points if x[2] == GREEN]
