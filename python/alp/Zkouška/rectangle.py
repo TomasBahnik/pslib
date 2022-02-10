@@ -118,7 +118,7 @@ def test(file):
         print("NONE")
         return
     # numpy version
-    all_points_np = np.zeros((len(all_points), len(all_points)), dtype=int)
+    # all_points_np = np.zeros((len(all_points), len(all_points)), dtype=int)
     areas = red_points_areas(all_points, red_points)
     print(areas[0][0])
 
