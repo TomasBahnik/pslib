@@ -38,6 +38,20 @@ def red_points_areas(all_points, red_points):
     return ret_val
 
 
+def is_point_in_rectangle(point, rectangles, all_points):
+    for rectangle in rectangles:
+        r1_idx = rectangle[0][0]
+        r2_idx = rectangle[0][1]
+        x1 = all_points[r1_idx][0]
+        y1 = all_points[r1_idx][1]
+        x2 = all_points[r2_idx][0]
+        y2 = all_points[r2_idx][1]
+        px = point[0]
+        py = point[1]
+        ret_val = x1 <= px <= x2 and y1 <= py <= y2
+        print("point {} in rectangle {}? : {}".format(point, [x1, y1, x2, y2], ret_val))
+
+
 # def split_red_green():
 #     red_x = []
 #     red_y = []
@@ -75,13 +89,21 @@ def red_points_areas(all_points, red_points):
 #                     print(rec)
 
 
-            # x_line.append(x[i][0] - x[i + 1][0])
-            # y_line.append(y[i][0] - y[i + 1][0])
-        # else:
-        #     x_line.append(x[i + 1][0] - x[i][0])
-        #     y_line.append(y[i + 1][0] - y[i][0])
-        #
-    # for i in x_line:
+# x_line.append(x[i][0] - x[i + 1][0])
+# y_line.append(y[i][0] - y[i + 1][0])
+# else:
+#     x_line.append(x[i + 1][0] - x[i][0])
+#     y_line.append(y[i + 1][0] - y[i][0])
+#
+# for i in x_line:
+def test_2(file):
+    print(file)
+    all_points = load_input(file)
+    green_points = [x for x in all_points if x[2] == GREEN]
+    red_points = [x for x in all_points if x[2] == RED]
+    rectangles = red_points_areas(all_points, red_points)
+    for g_p in green_points:
+        is_point_in_rectangle(g_p, rectangles, all_points)
 
 
 def test(file):
@@ -107,7 +129,8 @@ files = ['easy_1023.txt', 'easy_2072.txt', 'easy_2970.txt', 'easy_4705.txt', 'ea
 reseni = ['1 3', 'NONE', '2 12', '10 15', '18 41', 'NONE', '0 60', 'NONE']
 
 if __name__ == '__main__':
-    for i in range(len(files)):
-        test(files[i])
-        print('reseni : {}\n'.format(reseni[i]))
+    test_2('easy_1023.txt')
+    # for i in range(len(files)):
+    #     test(files[i])
+    #     print('reseni : {}\n'.format(reseni[i]))
     sys.exit(0)
