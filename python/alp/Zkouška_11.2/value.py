@@ -24,13 +24,13 @@ import sys
 
 
 def f(x, y):
-    return x * y  # pouze priklad
+    return x * y
 
 
 def function_values(x, y):
     ret_val_abs = []
     ret_val = []
-    for i in range(len(x)):  # x_s a y_s musi mit stejnou delku
+    for i in range(len(x)):
         ret_val_abs.append(abs(f(x[i], y[i])))  # absolutni hodnoty
         ret_val.append(f(x[i], y[i]))  # skutecne hodnoty
     min_idx = ret_val_abs.index(min(ret_val_abs))  # (idx min abs f(x,y))
@@ -42,16 +42,18 @@ def function_values(x, y):
 def test():
     x_s = load_input(input())
     y_s = load_input(input())
-    function_values(x_s, y_s)
-
+    if len(x_s) != len(y_s):
+        print("ERROR")
+    else:
+        function_values(x_s, y_s)
 
 def load_input(inp):
     nums = list(map(float, inp.strip().split()))
-    print(nums)
+    # print(nums)
     return nums
 
 
 if __name__ == '__main__':
-    # test()
-    load_input(input())
+    # load_input(input())
+    test()
     sys.exit(0)
