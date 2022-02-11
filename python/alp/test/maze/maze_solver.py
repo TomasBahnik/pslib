@@ -1,6 +1,6 @@
 import sys
 
-files = ['maze1.txt', 'maze1.txt', 'maze2.txt']
+files = ['maze1.txt', 'maze2.txt', 'maze3.txt']
 
 reseni = ['', '', '', ]
 
