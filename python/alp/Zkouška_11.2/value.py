@@ -28,7 +28,7 @@ import sys
 
 
 def f(x, y):
-    return (x - 1 / 2) * (1 - y) - x ** x + (2 - y) * (2 - y) * (2 - y) - 10
+    return (x - 1 / 2) * (1 - y) - x * x + ((2 - y) * (2 - y) * (2 - y)) - 10
 
 
 def idx_second_max(f_values):
@@ -36,7 +36,7 @@ def idx_second_max(f_values):
     first_max_idx = f_values.index(max(f_values))
     del tmp[first_max_idx]  # aby se naslo druh maximum smazej prvni
     if len(tmp) == 0:
-        return 'NONE'
+        return 'None'
     second_max = max(tmp)  # max after removing fitrts max
     second_max_idx = f_values.index(second_max)
     return second_max_idx
