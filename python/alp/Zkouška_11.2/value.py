@@ -20,9 +20,36 @@ INPUTS
 
 ---> ERROR
 """
+import sys
+
+
+def f(x, y):
+    return x * y  # pouze priklad
+
+
+def function_values(x, y):
+    ret_val = []
+    for i in range(len(x)):  # x_s a y_s musi mit stejnou delku
+        ret_val.append(abs(f(x[i], y[i])))
+    min_idx = ret_val.index(min(ret_val))
+    num_of_positive = len([x for x in ret_val if x > 0])
+    print(ret_val)
+    print(min_idx, num_of_positive)
+
+
+def test():
+    x_s = load_input(input())
+    y_s = load_input(input())
+    function_values(x_s, y_s)
+
+
 def load_input(inp):
     nums = list(map(float, inp.strip().split()))
     print(nums)
+    return nums
+
 
 if __name__ == '__main__':
+    # test()
     load_input(input())
+    sys.exit(0)
