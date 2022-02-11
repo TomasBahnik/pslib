@@ -24,16 +24,18 @@ import sys
 
 
 def f(x, y):
-    return (x - 1/2) * (1 - y) - x**x + (2 - y) * (2 - y) * (2 - y) - 10
+    return (x - 1 / 2) * (1 - y) - x ** x + (2 - y) * (2 - y) * (2 - y) - 10
 
 
 def idx_second_max(f_values):
-    first_max_idx = f_values.index(max(f_values))  # vzdycky bude
-    try:
-        second_max_idx = f_values.index(max(f_values), first_max_idx + 1)
-        return second_max_idx
-    except ValueError as ve:
-        return 'NONE'  # neni uz druhy max
+    tmp = f_values[:] # keep orig value
+    first_max_idx = f_values.index(max(f_values))
+    del tmp[first_max_idx]  # aby se naslo druh maximum smazej prvni
+    if len(tmp) == 0:
+        return 'NONE'
+    second_max = max(tmp)  # max after removing fitrts max
+    second_max_idx = f_values.index(second_max)
+    return second_max_idx
 
 
 def test_second_max():
@@ -64,6 +66,7 @@ def test():
         print("ERROR")
     else:
         function_values(x_s, y_s)
+
 
 def load_input(inp):
     nums = list(map(float, inp.strip().split()))
