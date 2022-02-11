@@ -28,17 +28,17 @@ def f(x, y):
 
 
 def idx_second_max(f_values):
-    first_max_idx = f_values.index(max(f_values)) # vzdycky bude
+    first_max_idx = f_values.index(max(f_values))  # vzdycky bude
     try:
         second_max_idx = f_values.index(max(f_values), first_max_idx + 1)
-        print(second_max_idx)
+        return second_max_idx
     except ValueError as ve:
-        print('NONE')  # neni uz druhy max
+        return 'NONE'  # neni uz druhy max
 
 
 def test_second_max():
-    v = [2, 3, 4, 5, 7.7, 8.9, 10.2, 5, 6, 8.9, 10.2, 134]
-    idx_second_max(v)
+    v = [2, 3, 4, 5, 7.7, 8.9, 10.2, 5, 6, 8.9, 10.2]
+    print(idx_second_max(v))
 
 
 def function_values(x, y):
@@ -49,8 +49,12 @@ def function_values(x, y):
         ret_val.append(f(x[i], y[i]))  # skutecne hodnoty
     min_idx = ret_val_abs.index(min(ret_val_abs))  # (idx min abs f(x,y))
     num_of_positive = len([x for x in ret_val if x > 0])  # pocet kladnych hodnot puvodni funkce
+    second_max_idx = idx_second_max(ret_val)
+    print(ret_val)
     print(ret_val_abs)
-    print(min_idx, num_of_positive)
+    print(min_idx)
+    print(second_max_idx)
+    print(num_of_positive)
 
 
 def test():
