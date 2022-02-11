@@ -28,12 +28,14 @@ def f(x, y):
 
 
 def function_values(x, y):
+    ret_val_abs = []
     ret_val = []
     for i in range(len(x)):  # x_s a y_s musi mit stejnou delku
-        ret_val.append(abs(f(x[i], y[i])))
-    min_idx = ret_val.index(min(ret_val))
-    num_of_positive = len([x for x in ret_val if x > 0])
-    print(ret_val)
+        ret_val_abs.append(abs(f(x[i], y[i])))  # absolutni hodnoty
+        ret_val.append(f(x[i], y[i]))  # skutecne hodnoty
+    min_idx = ret_val_abs.index(min(ret_val_abs))  # (idx min abs f(x,y))
+    num_of_positive = len([x for x in ret_val if x > 0])  # pocet kladnych hodnot puvodni funkce
+    print(ret_val_abs)
     print(min_idx, num_of_positive)
 
 
