@@ -27,6 +27,20 @@ def f(x, y):
     return (x - 1/2) * (1 - y) - x**x + (2 - y) * (2 - y) * (2 - y) - 10
 
 
+def idx_second_max(f_values):
+    first_max_idx = f_values.index(max(f_values)) # vzdycky bude
+    try:
+        second_max_idx = f_values.index(max(f_values), first_max_idx + 1)
+        print(second_max_idx)
+    except ValueError as ve:
+        print('NONE')  # neni uz druhy max
+
+
+def test_second_max():
+    v = [2, 3, 4, 5, 7.7, 8.9, 10.2, 5, 6, 8.9, 10.2, 134]
+    idx_second_max(v)
+
+
 def function_values(x, y):
     ret_val_abs = []
     ret_val = []
