@@ -24,7 +24,7 @@ import sys
 
 
 def f(x, y):
-    return x * y
+    return (x - 1/2) * (1 - y) - x**x + (2 - y) * (2 - y) * (2 - y) - 10
 
 
 def function_values(x, y):
