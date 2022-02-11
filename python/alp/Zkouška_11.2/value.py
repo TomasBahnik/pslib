@@ -4,7 +4,7 @@ INPUTS
 1. 0. -1. -1.5
 
 ---> 1 (idx min abs f(x,y))
-     2 (idx druhe max hodnoty)
+     2 (idx maxminalni druhe hodnoty v ret_val, pokud neni druha tiskne NONE)
      2 (pocet kladnych hodnot)
 
 
@@ -19,6 +19,10 @@ INPUTS
 2.0
 
 ---> ERROR
+
+BRUTE chyba:
+1.95 3.45 1.0 3.05 4.35 -3.05 -0.05 -2.4 4.6 4.0 3.5 1.9 3.55 1.75 4.75 -3.1 3.7 -2.55
+4.25 3.15 0.85 1.45 -2.15 4.5 2.5 1.75 3.85 1.9 -2.45 -2.9 -2.45 4.8 4.7 3.4 -1.45 -2.45
 """
 import sys
 
@@ -50,8 +54,8 @@ def function_values(x, y):
     min_idx = ret_val_abs.index(min(ret_val_abs))  # (idx min abs f(x,y))
     num_of_positive = len([x for x in ret_val if x > 0])  # pocet kladnych hodnot puvodni funkce
     second_max_idx = idx_second_max(ret_val)
-    print(ret_val)
-    print(ret_val_abs)
+    # print(ret_val)
+    # print(ret_val_abs)
     print(min_idx)
     print(second_max_idx)
     print(num_of_positive)
