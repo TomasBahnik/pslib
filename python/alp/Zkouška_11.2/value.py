@@ -32,7 +32,7 @@ def f(x, y):
 
 
 def idx_second_max(f_values):
-    tmp = f_values[:] # keep orig value
+    tmp = f_values[:]  # keep orig value
     first_max_idx = f_values.index(max(f_values))
     del tmp[first_max_idx]  # aby se naslo druh maximum smazej prvni
     if len(tmp) == 0:
@@ -64,16 +64,16 @@ def function_values(x, y):
 
 
 def test():
-    x_s = load_input(input())
-    y_s = load_input(input())
+    x_s = load_input()
+    y_s = load_input()
     if len(x_s) != len(y_s):
         print("ERROR")
     else:
         function_values(x_s, y_s)
 
 
-def load_input(inp):
-    nums = list(map(float, inp.strip().split()))
+def load_input():
+    nums = list(map(float, input().strip().split()))
     # print(nums)
     return nums
 
