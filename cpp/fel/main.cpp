@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <sstream>
+#include "functions.h"
 
 using namespace std;
 
@@ -42,5 +43,13 @@ int findArea(int l, int w) {
 
 int main() {
 //    cout << get_compiler_info() << '\n';
-    test();
+//    test();
+    float soucet;
+    float x;
+    float y;
+    std::cin >> x;
+    std::cin >> y;
+    soucet= add(x, y);
+    std::cout << "The sum is " << soucet << "\n\n";
+
 }
