@@ -4,11 +4,11 @@
 int main() {
     int i, j;
     float x, y;
-    scanf("%d%d%f%f", &i, &j, &x, &y);
-    printf("%d\n", i);
-    printf("%d\n", j);
-    printf("%f\n", x);
-    printf("%f\n", y);
+//    scanf("%d%d%f%f", &i, &j, &x, &y);
+//    printf("%d\n", i);
+//    printf("%d\n", j);
+//    printf("%f\n", x);
+//    printf("%f\n", y);
 
     printf(" d/d/==== \n");
     scanf("%d/%d", &i, &j);
