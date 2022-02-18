@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 
 void test_print_1();
@@ -19,7 +20,7 @@ int main() {
 void test_print_1() {
     char c = 'a';
     int i = 1000, j;
-    float x, y = 3.1415;
+    float x, y = 5454545.1415;
 
     printf("%c\n", c);
     printf("%i\n", c);
