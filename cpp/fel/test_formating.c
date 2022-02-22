@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 {
     int ret = ERROR_OK;
     int v;
-    int c; // counter
+    int c; // counter change comment iiii
     int sum;
     c = sum = 0;
     while (ret == ERROR_OK) {
