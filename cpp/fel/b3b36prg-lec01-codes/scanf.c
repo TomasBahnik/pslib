@@ -15,7 +15,7 @@ int main(int argc, char **argv)
         printf("Enter a double value: ");
     }
     if (scanf("%lf", &d) == 1) {
-        printf("You entered %02i and %0.1f\n", i, d);
+        printf("You entered %i and %f\n", i, d);
     }
     return 0; // return value of main() -- zero is exit success
 }
@@ -28,18 +28,18 @@ void read_agrs(int count, char **args)
     switch (count) {
     case 1:
         printf("no agrs\n");
-        printf("first %i, second %f\n", first, second);
+        printf("first arg %i, second arg %f\n", first, second);
         break;
     case 2:
         printf("1 arg\n");
         first = atoi(args[1]);
-        printf("first %i, second %f\n", first, second);
+        printf("first arg %i, second arg %f\n", first, second);
         break;
     case 3:
         printf("2 args\n");
         first = atoi(args[1]);
         second = strtod(args[2], &eptr);
-        printf("first %i, second %f\n", first, second);
+        printf("first arg %i, second arg %f\n", first, second);
         break;
     default:
         break;
