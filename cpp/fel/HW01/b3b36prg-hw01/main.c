@@ -11,8 +11,8 @@ const int house_dim_max = 69;
 
 enum { MANDATORY, OPTIONAL, ERROR };
 
-int test_house_dim(int, int);
-int test_fence_dim(int, int, int);
+int test_house_dim(int w, int h);
+int test_fence_dim(int h, int f_w);
 
 int print_house(int, int);
 int print_fence(int, int, int);
@@ -41,6 +41,7 @@ int read_input(int *w, int *h, int *f_w)
         ret = MANDATORY;
     }
     if (ret == MANDATORY && *w == *h && scanf("%d", f_w) == 1) {
+        test_fence_dim(*h, *f_w);
         ret = OPTIONAL;
     }
     return ret;
@@ -58,7 +59,7 @@ int print_fence(int w, int h, int f_w)
 {
     int ret = test_house_dim(w, h);
     if (ret == 0) {
-        ret = test_fence_dim(w, h, f_w);
+        ret = test_fence_dim(h, f_w);
     }
     if (ret == 0) {
     }
@@ -79,12 +80,13 @@ int test_house_dim(int w, int h)
     return ret;
 }
 
-int test_fence_dim(int w, int h, int f_w)
+int test_fence_dim(int h, int f_w)
 {
     int ret = 0;
     if (f_w > 0 && f_w < h) {
         // OK
     } else {
+        printf("ERROR_FENCE_WIDTH_INVALID\n");
         ret = ERROR_FENCE_WIDTH_INVALID
     }
     return ret;
