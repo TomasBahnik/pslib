@@ -4,61 +4,69 @@
 
 #define ERROR_WRONG_INPUT 100;
 
-int Test_house_dim(int, int);
-int Test_fence_dim(int, int, int);
+enum { MANDATORY, OPTIONAL, ERROR };
 
-int Print_house(int, int);
-int Print_fence(int, int, int);
+int test_house_dim(int, int);
+int test_fence_dim(int, int, int);
+
+int print_house(int, int);
+int print_fence(int, int, int);
+
+int read_input(int *w, int *h, int *f_w);
 
 int main(int argc, char *argv[])
 {
     int ret = 0;
     int w, h, f_w;
-    _Bool fence = false;
-
-    if (scanf("%d %d", &w, &h) == 2) {
-        if (w == h && scanf("%d", &f_w) == 1) {
-            fence = true;
-        }
+    int read = read_input(&w, &h, &f_w);
+    if (read == MANDATORY) {
+        printf("House dim is: %d x %d\n", w, h);
+    } else if (read == OPTIONAL) {
+        printf("House dim is: %d x %d + %d\n", w, h, f_w);
     } else {
         ret = ERROR_WRONG_INPUT;
     }
-
-    if (!fence) {
-        printf("House dim is: %d x %d\n", w, h);
-    } else {
-        printf("House dim is: %d x %d + %d\n", w, h, f_w);
-    }
-
     return ret;
 }
 
-int Print_house(int w, int h)
+int read_input(int *w, int *h, int *f_w)
 {
-    int ret = Test_house_dim(w, h);
-    if (ret == 0) {
+    int ret = ERROR;
+    if (scanf("%d %d", w, h) == 2) {
+        ret = MANDATORY;
+    }
+    if (ret == MANDATORY && *w == *h && scanf("%d", f_w) == 1) {
+        ret = OPTIONAL;
     }
     return ret;
 }
 
-int Print_fence(int w, int h, int f_w)
+int print_house(int w, int h)
 {
-    int ret = Test_house_dim(w, h);
+    int ret = test_house_dim(w, h);
     if (ret == 0) {
-        ret = Test_fence_dim(w, h, f_w);
+    }
+    return ret;
+}
+
+int print_fence(int w, int h, int f_w)
+{
+    int ret = test_house_dim(w, h);
+    if (ret == 0) {
+        ret = test_fence_dim(w, h, f_w);
     }
     if (ret == 0) {
     }
     return ret;
 }
 
-int Test_house_dim(int w, int h)
+int test_house_dim(int w, int h)
 {
     int ret = 0;
     return ret;
 }
 
-int Test_fence_dim(int w, int h, int f_w)
+int test_fence_dim(int w, int h, int f_w)
 {
     int ret = 0;
     if (f_w > 0 && f_w < h) {
