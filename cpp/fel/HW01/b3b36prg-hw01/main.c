@@ -41,11 +41,11 @@ int Print_house(int w, int h)
     return ret;
 }
 
-int Print_fence(int w, int h, int fw)
+int Print_fence(int w, int h, int f_w)
 {
     int ret = Test_house_dim(w, h);
     if (ret == 0) {
-        ret = Test_fence_dim(w, h, fw);
+        ret = Test_fence_dim(w, h, f_w);
     }
     if (ret == 0) {
     }
@@ -58,10 +58,10 @@ int Test_house_dim(int w, int h)
     return ret;
 }
 
-int Test_fence_dim(int w, int h, int fw)
+int Test_fence_dim(int w, int h, int f_w)
 {
     int ret = 0;
-    if (fw > 0 && fw < h) {
+    if (f_w > 0 && f_w < h) {
         // OK
     } else {
         // CHYBA Error: Neplatna velikost plotu!
