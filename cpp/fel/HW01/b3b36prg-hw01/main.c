@@ -3,9 +3,14 @@
 #include <stdlib.h>
 
 #define ERROR_WRONG_INPUT 100;
+#define ERROR_HOUSE_DIM_OUT_OF_RANGE 101;
+#define ERROR_HOUSE_WITH_IS_NOT_ODD 102;
+#define ERROR_FENCE_WIDTH_INVALID 103;
+const int house_dim_min = 3;
+const int house_dim_max = 69;
 
-int Test_house_dim(int, int);
-int Test_fence_dim(int, int, int);
+int test_house_dim(int w, int h);
+int test_fence_dim(int h, int f_w);
 
 int Print_house(int, int);
 int Print_fence(int, int, int);
@@ -17,7 +22,9 @@ int main(int argc, char *argv[])
     _Bool fence = false;
 
     if (scanf("%d %d", &w, &h) == 2) {
+        test_house_dim(w, h);
         if (w == h && scanf("%d", &f_w) == 1) {
+            test_fence_dim(h, f_w);
             fence = true;
         }
     } else {
@@ -35,7 +42,7 @@ int main(int argc, char *argv[])
 
 int Print_house(int w, int h)
 {
-    int ret = Test_house_dim(w, h);
+    int ret = test_house_dim(w, h);
     if (ret == 0) {
     }
     return ret;
@@ -43,28 +50,36 @@ int Print_house(int w, int h)
 
 int Print_fence(int w, int h, int f_w)
 {
-    int ret = Test_house_dim(w, h);
+    int ret = test_house_dim(w, h);
     if (ret == 0) {
-        ret = Test_fence_dim(w, h, f_w);
+        ret = test_fence_dim(h, f_w);
     }
     if (ret == 0) {
     }
     return ret;
 }
 
-int Test_house_dim(int w, int h)
+int test_house_dim(int w, int h)
 {
     int ret = 0;
+    int dim_ok = (house_dim_min <= w <= house_dim_max) &&
+                 (house_dim_min <= h <= house_dim_max);
+    if (!dim_ok) {
+        ret = ERROR_HOUSE_DIM_OUT_OF_RANGE
+    }
+    if (w % 2 == 0) {
+        ret = ERROR_HOUSE_WITH_IS_NOT_ODD
+    }
     return ret;
 }
 
-int Test_fence_dim(int w, int h, int f_w)
+int test_fence_dim(int h, int f_w)
 {
     int ret = 0;
     if (f_w > 0 && f_w < h) {
         // OK
     } else {
-        // CHYBA Error: Neplatna velikost plotu!
+        ret = ERROR_FENCE_WIDTH_INVALID
     }
     return ret;
 }
