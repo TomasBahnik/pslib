@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     _Bool fence = false;
 
     if (scanf("%d %d", &w, &h) == 2) {
-        if (scanf("%d", &f_w) == 1) {
+        if (w == h && scanf("%d", &f_w) == 1) {
             fence = true;
         }
     } else {
@@ -61,5 +61,10 @@ int Test_house_dim(int w, int h)
 int Test_fence_dim(int w, int h, int fw)
 {
     int ret = 0;
+    if (fw > 0 && fw < h) {
+        // OK
+    } else {
+        // CHYBA Error: Neplatna velikost plotu!
+    }
     return ret;
 }
