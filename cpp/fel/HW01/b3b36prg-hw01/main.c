@@ -5,7 +5,7 @@
 #define ERROR_WRONG_INPUT 100;
 
 int Test_house_dim(int, int);
-int Test_fence_dim(int);
+int Test_fence_dim(int, int, int);
 
 int Print_house(int, int);
 int Print_fence(int, int, int);
@@ -45,7 +45,7 @@ int Print_fence(int w, int h, int fw)
 {
     int ret = Test_house_dim(w, h);
     if (ret == 0) {
-        ret = Test_fence_dim(fw);
+        ret = Test_fence_dim(w, h, fw);
     }
     if (ret == 0) {
     }
@@ -58,7 +58,7 @@ int Test_house_dim(int w, int h)
     return ret;
 }
 
-int Test_fence_dim(int fw)
+int Test_fence_dim(int w, int h, int fw)
 {
     int ret = 0;
     return ret;
