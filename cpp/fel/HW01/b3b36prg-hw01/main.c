@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define ERROR_WRONG_INPUT 100;
+#define ERROR_WRONG_INPUT 100
 #define ERROR_HOUSE_DIM_OUT_OF_RANGE 101;
 #define ERROR_HOUSE_WITH_IS_NOT_ODD 102;
 #define ERROR_FENCE_WIDTH_INVALID 103;
@@ -31,6 +31,9 @@ int main(int argc, char *argv[])
     } else {
         ret = ERROR_WRONG_INPUT;
     }
+    if (ret == ERROR_WRONG_INPUT) {
+        fprintf(stderr, "Error: Chybny vstup!\n"); // tiskne pokus
+    }
     return ret;
 }
 
@@ -40,9 +43,12 @@ int read_input(int *w, int *h, int *f_w)
     if (scanf("%d %d", w, h) == 2) {
         ret = MANDATORY;
     }
-    if (ret == MANDATORY && *w == *h && scanf("%d", f_w) == 1) {
-        test_fence_dim(*h, *f_w);
-        ret = OPTIONAL;
+    if (ret == MANDATORY && *w == *h) {
+        if (scanf("%d", f_w) == 1) { // overi jestli je 3 vstup cele cislo
+            ret = OPTIONAL;
+        } else {
+            ret = ERROR_WRONG_INPUT;
+        }
     }
     return ret;
 }
