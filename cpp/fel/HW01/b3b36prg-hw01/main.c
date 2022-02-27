@@ -23,8 +23,12 @@ int main(int argc, char *argv[])
 {
     int ret = 0;
     int w, h, f_w;
-    int readInput = read_input(&w, &h, &f_w);
-    switch (readInput) {
+    ret = read_input(&w, &h, &f_w);
+    switch (ret) {
+    case ERROR_WRONG_INPUT:
+        fprintf(stderr,
+                "Error: Chybny vstup!\n"); // tiskne pokud vstup neni cislo
+        break;
     case MANDATORY:
         ret = print_house(h, w);
         break;
@@ -34,12 +38,6 @@ int main(int argc, char *argv[])
     default:
         printf("None");
     }
-    switch (ret) {
-    case ERROR_WRONG_INPUT:
-        fprintf(stderr,
-                "Error: Chybny vstup!\n"); // tiskne pokud vstup neni cislo
-        break;
-    };
     return ret;
 }
 
