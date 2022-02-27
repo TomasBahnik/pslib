@@ -23,7 +23,8 @@ int main(int argc, char *argv[])
 {
     int ret = 0;
     int w, h, f_w;
-    switch (read_input(&w, &h, &f_w)) {
+    int readInput = read_input(&w, &h, &f_w);
+    switch (readInput) {
     case MANDATORY:
         ret = print_house(h, w);
         break;
@@ -82,13 +83,15 @@ int print_fence(int w, int h, int f_w)
 int test_house_dim(int w, int h)
 {
     int ret = 0;
-    int dim_ok = (house_dim_min <= w <= house_dim_max) &&
-                 (house_dim_min <= h <= house_dim_max);
+    int dim_ok = (house_dim_min <= w) && (w <= house_dim_max) &&
+                 (house_dim_min <= h) && (h <= house_dim_max);
     if (!dim_ok) {
-        ret = ERROR_HOUSE_DIM_OUT_OF_RANGE
+        ret = ERROR_HOUSE_DIM_OUT_OF_RANGE;
+        return ret;
     }
     if (w % 2 == 0) {
-        ret = ERROR_HOUSE_WITH_IS_NOT_ODD
+        ret = ERROR_HOUSE_WITH_IS_NOT_ODD;
+        return ret;
     }
     return ret;
 }
