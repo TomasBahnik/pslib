@@ -3,9 +3,10 @@
 #include <stdlib.h>
 
 #define ERROR_WRONG_INPUT 100
-#define ERROR_HOUSE_DIM_OUT_OF_RANGE 101;
-#define ERROR_HOUSE_WITH_IS_NOT_ODD 102;
-#define ERROR_FENCE_WIDTH_INVALID 103;
+#define ERROR_HOUSE_DIM_OUT_OF_RANGE 101
+#define ERROR_HOUSE_WITH_IS_NOT_ODD 102
+#define ERROR_FENCE_WIDTH_INVALID 103
+#define ERROR_NONE_OF_THE_SWITCH_CASES 104
 const int house_dim_min = 3;
 const int house_dim_max = 69;
 
@@ -18,6 +19,7 @@ int print_house(int, int);
 int print_fence(int, int, int);
 
 int read_input(int *w, int *h, int *f_w);
+int assign_ret_val(char *message, int value);
 
 int main(int argc, char *argv[])
 {
@@ -26,8 +28,7 @@ int main(int argc, char *argv[])
     ret = read_input(&w, &h, &f_w);
     switch (ret) {
     case ERROR_WRONG_INPUT:
-        fprintf(stderr,
-                "Error: Chybny vstup!\n"); // tiskne pokud vstup neni cislo
+        ret = assign_ret_val("ERROR_WRONG_INPUT",ERROR_WRONG_INPUT);
         break;
     case MANDATORY:
         ret = print_house(h, w);
@@ -36,7 +37,8 @@ int main(int argc, char *argv[])
         ret = print_fence(h, w, f_w);
         break;
     default:
-        printf("None");
+        ret = assign_ret_val("ERROR_NONE_OF_THE_SWITCH_CASES",ERROR_NONE_OF_THE_SWITCH_CASES);
+        break;
     }
     return ret;
 }
@@ -84,11 +86,11 @@ int test_house_dim(int w, int h)
     int dim_ok = (house_dim_min <= w) && (w <= house_dim_max) &&
                  (house_dim_min <= h) && (h <= house_dim_max);
     if (!dim_ok) {
-        ret = ERROR_HOUSE_DIM_OUT_OF_RANGE;
+        ret = assign_ret_val("ERROR_HOUSE_DIM_OUT_OF_RANGE",ERROR_HOUSE_DIM_OUT_OF_RANGE);
         return ret;
     }
     if (w % 2 == 0) {
-        ret = ERROR_HOUSE_WITH_IS_NOT_ODD;
+        ret = assign_ret_val("ERROR_HOUSE_WITH_IS_NOT_ODD",ERROR_HOUSE_WITH_IS_NOT_ODD);
         return ret;
     }
     return ret;
@@ -100,8 +102,13 @@ int test_fence_dim(int h, int f_w)
     if (f_w > 0 && f_w < h) {
         // OK
     } else {
-        printf("ERROR_FENCE_WIDTH_INVALID\n");
-        ret = ERROR_FENCE_WIDTH_INVALID
+        ret = assign_ret_val("ERROR_FENCE_WIDTH_INVALID",ERROR_FENCE_WIDTH_INVALID);
     }
     return ret;
+}
+
+int assign_ret_val(char *message, int value)
+{
+    printf("%s\n", message);
+    return value;
 }
