@@ -23,17 +23,22 @@ int main(int argc, char *argv[])
 {
     int ret = 0;
     int w, h, f_w;
-    int read = read_input(&w, &h, &f_w);
-    if (read == MANDATORY) {
-        printf("House dim is: %d x %d\n", w, h);
-    } else if (read == OPTIONAL) {
-        printf("House dim is: %d x %d + %d\n", w, h, f_w);
-    } else {
-        ret = ERROR_WRONG_INPUT;
+    switch (read_input(&w, &h, &f_w)) {
+    case MANDATORY:
+        ret = print_house(h, w);
+        break;
+    case OPTIONAL:
+        ret = print_fence(h, w, f_w);
+        break;
+    default:
+        printf("None");
     }
-    if (ret == ERROR_WRONG_INPUT) {
-        fprintf(stderr, "Error: Chybny vstup!\n"); // tiskne pokus
-    }
+    switch (ret) {
+    case ERROR_WRONG_INPUT:
+        fprintf(stderr,
+                "Error: Chybny vstup!\n"); // tiskne pokud vstup neni cislo
+        break;
+    };
     return ret;
 }
 
@@ -57,6 +62,7 @@ int print_house(int w, int h)
 {
     int ret = test_house_dim(w, h);
     if (ret == 0) {
+        printf("House dim is: %d x %d\n", w, h);
     }
     return ret;
 }
@@ -67,7 +73,8 @@ int print_fence(int w, int h, int f_w)
     if (ret == 0) {
         ret = test_fence_dim(h, f_w);
     }
-    if (ret == 0) {
+    if (ret == 0) { // all test passed
+        printf("House dim is: %d x %d + %d\n", w, h, f_w);
     }
     return ret;
 }
