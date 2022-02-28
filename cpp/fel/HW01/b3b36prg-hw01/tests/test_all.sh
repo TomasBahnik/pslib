@@ -5,7 +5,7 @@ function message() {
 }
 
 TEST_FILES=(*.txt)
-message "compiling : clang main.c -o main"
+message "compiling clang ../main.c -o main"
 clang ../main.c -o main
 message "running ${#TEST_FILES[@]} tests"
 
@@ -13,13 +13,13 @@ FORMAT="%-12s %-10s %s\n"
 
 printf "%s\n"    "------------------------------"
 # shellcheck disable=SC2059
-printf "$FORMAT" "test_data" "exit_code" "output"
+printf "$FORMAT" "test_data" "exit_code" "error"
 printf "%s\n"    "------------------------------"
 
 for test_file in "${TEST_FILES[@]}"; do
   test_data=$(<"./$test_file")
-  output=$(./main <"$test_file")
+  error="$(./main <"$test_file" 2>&1 > /dev/null)"
   exit_code=$?
   # shellcheck disable=SC2059
-  printf "$FORMAT" "[$test_data]" "$exit_code" "$output"
+  printf "$FORMAT" "[$test_data]" "$exit_code" "$error"
 done
