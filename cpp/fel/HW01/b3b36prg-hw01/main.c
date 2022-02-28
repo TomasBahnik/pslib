@@ -25,10 +25,10 @@ int main(int argc, char *argv[])
     int w, h, f_w;
     switch (ret = read_input(&w, &h, &f_w)) {
     case MANDATORY:
-        ret = print_house(h, w);
+        ret = print_house(w, h);
         break;
     case OPTIONAL:
-        ret = print_fence(h, w, f_w);
+        ret = print_fence(w, h, f_w);
         break;
     }
     switch (ret) {
@@ -38,6 +38,11 @@ int main(int argc, char *argv[])
         break;
     case ERROR_HOUSE_DIM_OUT_OF_RANGE:
         fprintf(stderr, "Error: Vstup mimo interval!\n");
+        break;
+
+    case ERROR_HOUSE_WITH_IS_NOT_ODD:
+        fprintf(stderr, "Error: Sirka neni liche cislo!\n");
+        break;
     }
     return ret;
 }
