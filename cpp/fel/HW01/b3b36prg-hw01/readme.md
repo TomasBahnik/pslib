@@ -22,7 +22,23 @@ test_data    exit_code  error
 [xyz]        100        Error: Chybny vstup!
 [3 69 11]    0
 [13 13 11]   0
+```
+Data s **exit_code=0** by mela vykresilt domecek a data s **exit_code != 0** by mela
+vypsat pouze error
 
+Priklad (chybny)
+
+[ERROR_HOUSE_DIM_OUT_OF_RANGE](tests/ERROR_HOUSE_DIM_OUT_OF_RANGE.txt)
+
+```shell
+./main < ERROR_HOUSE_DIM_OUT_OF_RANGE.txt 
+  X
+ X X
+Error: Vstup mimo interval!
+```
+```shell
+./main < NO_ERROR_2.txt 
+House dim is: 13 x 13 + 11
 ```
 
 
