@@ -26,8 +26,8 @@ int main(int argc, char *argv[])
     int w, h, f_w;
     switch (ret = read_input(&w, &h, &f_w)) {
     case MANDATORY:
-        ret = print_house(w, h);
         ret = print_roof(w, h);
+        ret = print_house(w, h);
         break;
     case OPTIONAL:
         ret = print_fence(w, h, f_w);
@@ -85,7 +85,14 @@ int print_house(int w, int h)
 {
     int ret = test_house_dim(w, h);
     if (ret == 0) {
-        printf("House dim is: %d x %d\n", w, h);
+        // printf("House dim is: %d x %d\n", w, h);
+        for (int i = 0; i < h; ++i) {
+            for (int j = 0; j < w; ++j) {
+                if ((i == 0) || (i == h - 1))
+                    printf("X");
+            }
+            printf("\n");
+        }
     }
     return ret;
 }
