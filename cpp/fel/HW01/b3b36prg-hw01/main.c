@@ -3,13 +3,13 @@
 #include <stdlib.h>
 
 #define ERROR_WRONG_INPUT 100
-#define ERROR_HOUSE_DIM_OUT_OF_RANGE 101;
-#define ERROR_HOUSE_WITH_IS_NOT_ODD 102;
-#define ERROR_FENCE_WIDTH_INVALID 103;
+#define ERROR_HOUSE_DIM_OUT_OF_RANGE 101
+#define ERROR_HOUSE_WITH_IS_NOT_ODD 102
+#define ERROR_FENCE_WIDTH_INVALID 103
 const int house_dim_min = 3;
 const int house_dim_max = 69;
 
-enum { MANDATORY, OPTIONAL, ERROR };
+enum { MANDATORY, OPTIONAL }; //, ERROR_WRONG_INPUT = 100 };
 
 int test_house_dim(int w, int h);
 int test_fence_dim(int h, int f_w);
@@ -23,37 +23,34 @@ int main(int argc, char *argv[])
 {
     int ret = 0;
     int w, h, f_w;
-    switch (read_input(&w, &h, &f_w)) {
+    switch (ret = read_input(&w, &h, &f_w)) {
     case MANDATORY:
         ret = print_house(h, w);
         break;
     case OPTIONAL:
         ret = print_fence(h, w, f_w);
         break;
-    default:
-        printf("None");
     }
     switch (ret) {
     case ERROR_WRONG_INPUT:
         fprintf(stderr,
                 "Error: Chybny vstup!\n"); // tiskne pokud vstup neni cislo
         break;
-    };
+    case ERROR_HOUSE_DIM_OUT_OF_RANGE:
+        fprintf(stderr, "Error: Vstup mimo interval!\n");
+    }
     return ret;
 }
 
 int read_input(int *w, int *h, int *f_w)
 {
-    int ret = ERROR;
+    int ret = ERROR_WRONG_INPUT;
     if (scanf("%d %d", w, h) == 2) {
         ret = MANDATORY;
     }
-    if (ret == MANDATORY && *w == *h) {
-        if (scanf("%d", f_w) == 1) { // overi jestli je 3 vstup cele cislo
-            ret = OPTIONAL;
-        } else {
-            ret = ERROR_WRONG_INPUT;
-        }
+    if (ret == MANDATORY && *w == *h &&
+        scanf("%d", f_w) == 1) { // overi jestli je 3 vstup cele cislo
+        ret = OPTIONAL;
     }
     return ret;
 }
@@ -82,13 +79,13 @@ int print_fence(int w, int h, int f_w)
 int test_house_dim(int w, int h)
 {
     int ret = 0;
-    int dim_ok = (house_dim_min <= w <= house_dim_max) &&
-                 (house_dim_min <= h <= house_dim_max);
+    int dim_ok = (house_dim_min <= w) && (w <= house_dim_max) &&
+                 (house_dim_min <= h) && (h <= house_dim_max);
     if (!dim_ok) {
-        ret = ERROR_HOUSE_DIM_OUT_OF_RANGE
+        ret = ERROR_HOUSE_DIM_OUT_OF_RANGE;
     }
     if (w % 2 == 0) {
-        ret = ERROR_HOUSE_WITH_IS_NOT_ODD
+        ret = ERROR_HOUSE_WITH_IS_NOT_ODD;
     }
     return ret;
 }
@@ -100,7 +97,7 @@ int test_fence_dim(int h, int f_w)
         // OK
     } else {
         printf("ERROR_FENCE_WIDTH_INVALID\n");
-        ret = ERROR_FENCE_WIDTH_INVALID
+        ret = ERROR_FENCE_WIDTH_INVALID;
     }
     return ret;
 }
