@@ -14,6 +14,7 @@ enum { MANDATORY, OPTIONAL }; //, ERROR_WRONG_INPUT = 100 };
 int test_house_dim(int w, int h);
 int test_fence_dim(int h, int f_w);
 
+int print_roof(int, int);
 int print_house(int, int);
 int print_fence(int, int, int);
 
@@ -25,6 +26,7 @@ int main(int argc, char *argv[])
     int w, h, f_w;
     switch (ret = read_input(&w, &h, &f_w)) {
     case MANDATORY:
+        ret = print_roof(w, h);
         ret = print_house(w, h);
         break;
     case OPTIONAL:
@@ -43,6 +45,10 @@ int main(int argc, char *argv[])
     case ERROR_HOUSE_WITH_IS_NOT_ODD:
         fprintf(stderr, "Error: Sirka neni liche cislo!\n");
         break;
+
+    case ERROR_FENCE_WIDTH_INVALID:
+        fprintf(stderr, "Error: Neplatna velikost plotu!\n");
+        break;
     }
     return ret;
 }
@@ -50,21 +56,52 @@ int main(int argc, char *argv[])
 int read_input(int *w, int *h, int *f_w)
 {
     int ret = ERROR_WRONG_INPUT;
-    if (scanf("%d %d", w, h) == 2) {
+    if (scanf("%i %i", w, h) == 2) {
         ret = MANDATORY;
     }
     if (ret == MANDATORY && *w == *h &&
-        scanf("%d", f_w) == 1) { // overi jestli je 3 vstup cele cislo
+        scanf("%i", f_w) == 1) { // overi jestli je 3 vstup cele cislo
         ret = OPTIONAL;
     }
     return ret;
+}
+
+int print_roof(int w, int h)
+{
+    int ret = test_house_dim(w, h);
+    if (ret == 0) {
+        int roof_height = (w - 1) / 2; // height of roof
+        for (int i = 0; i < roof_height; ++i) {
+            for (int j = 0; j < roof_height + i + 1; ++j) {
+                if ((j == roof_height + i) || ((j == roof_height - i)))
+                    printf("X");
+                else
+                    printf(" ");
+            }
+            printf("\n");
+        }
+    }
+    return 1;
 }
 
 int print_house(int w, int h)
 {
     int ret = test_house_dim(w, h);
     if (ret == 0) {
-        printf("House dim is: %d x %d\n", w, h);
+        // printf("House dim is: %d x %d\n", w, h);
+        for (int i = 0; i < h; ++i) {
+            for (int j = 0; j < w; ++j) {
+                if ((i == 0) || (i == h - 1))
+                    printf("X");
+                if ((j == 0) && (i >= 1) && (i < h - 1))
+                    printf("X");
+                if ((j < w - 2) && (i >= 1) && (i < h - 1))
+                    printf(" ");
+                if ((j == w - 1) && (i >= 1) && (i < h - 1))
+                    printf("X");
+            }
+            printf("\n");
+        }
     }
     return ret;
 }
@@ -101,7 +138,6 @@ int test_fence_dim(int h, int f_w)
     if (f_w > 0 && f_w < h) {
         // OK
     } else {
-        printf("ERROR_FENCE_WIDTH_INVALID\n");
         ret = ERROR_FENCE_WIDTH_INVALID;
     }
     return ret;
