@@ -93,6 +93,12 @@ int print_house(int w, int h)
             for (int j = 0; j < w; ++j) {
                 if ((i == 0) || (i == h - 1))
                     printf("X");
+                if ((j == 0) && (i >= 1) && (i < h - 1))
+                    printf("X");
+                if ((j < w - 2) && (i >= 1) && (i < h - 1))
+                    printf(" ");
+                if ((j == w - 1) && (i >= 1) && (i < h - 1))
+                    printf("X");
             }
             printf("\n");
         }
