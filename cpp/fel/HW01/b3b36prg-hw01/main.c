@@ -56,11 +56,11 @@ int main(int argc, char *argv[])
 int read_input(int *w, int *h, int *f_w)
 {
     int ret = ERROR_WRONG_INPUT;
-    if (scanf("%d %d", w, h) == 2) {
+    if (scanf("%i %i", w, h) == 2) {
         ret = MANDATORY;
     }
     if (ret == MANDATORY && *w == *h &&
-        scanf("%d", f_w) == 1) { // overi jestli je 3 vstup cele cislo
+        scanf("%i", f_w) == 1) { // overi jestli je 3 vstup cele cislo
         ret = OPTIONAL;
     }
     return ret;
@@ -68,15 +68,18 @@ int read_input(int *w, int *h, int *f_w)
 
 int print_roof(int w, int h)
 {
-    int roof_height = (w - 1) / 2; // height of roof
-    for (int i = 0; i < roof_height; ++i) {
-        for (int j = 0; j < roof_height + i + 1; ++j) {
-            if ((j == roof_height + i) || ((j == roof_height - i)))
-                printf("X");
-            else
-                printf(" ");
+    int ret = test_house_dim(w, h);
+    if (ret == 0) {
+        int roof_height = (w - 1) / 2; // height of roof
+        for (int i = 0; i < roof_height; ++i) {
+            for (int j = 0; j < roof_height + i + 1; ++j) {
+                if ((j == roof_height + i) || ((j == roof_height - i)))
+                    printf("X");
+                else
+                    printf(" ");
+            }
+            printf("\n");
         }
-        printf("\n");
     }
     return 1;
 }
