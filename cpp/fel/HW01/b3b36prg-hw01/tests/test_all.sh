@@ -9,7 +9,7 @@ message "compiling clang ../main.c -o main"
 clang ../main.c -o main
 message "running ${#TEST_FILES[@]} tests"
 
-FORMAT="%-12s %-10s %s\n"
+FORMAT="%-15s %-10s %s\n"
 
 printf "%s\n"    "------------------------------"
 # shellcheck disable=SC2059
