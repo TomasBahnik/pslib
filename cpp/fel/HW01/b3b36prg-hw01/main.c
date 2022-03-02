@@ -103,9 +103,20 @@ int print_house(int w, int h)
                     printf("X");
                 if (((j == 0) || (j == w - 1)) && (i >= 1) && (i < h - 1))
                     printf("X");
-                fill_house(w, h);
-                // if ((j < w - 2) && (i >= 1) && (i < h - 1))
-                //    printf(" ");
+                // fill_house(w, h);
+                if (ret == 0) {
+                    if ((j < w - 2) && (i >= 1) && (i < h - 1)) {
+                        if ((i % 2 != 0) && (j % 2 == 0))
+                            printf("o");
+                        else if ((i % 2 == 0) && ((j + 1) % 2 == 0))
+                            printf("o");
+                        else
+                            printf("*");
+                    }
+                } else {
+                    if ((j < w - 2) && (i >= 1) && (i < h - 1))
+                        printf(" ");
+                }
             }
             printf("\n");
         }
