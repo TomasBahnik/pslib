@@ -20,8 +20,8 @@ enum { MANDATORY, OPTIONAL }; //, ERROR_WRONG_INPUT = 100 };
 int test_house_dim(int w, int h);
 int test_fence_dim(int h, int f_w);
 
-int print_roof(int, int);
-int print_house(int, int);
+int print_roof(int w, int h);
+int print_house(int w, int h, bool fence);
 int print_fence(int, int, int);
 
 int read_input(int *w, int *h, int *f_w);
@@ -54,10 +54,11 @@ int main(int argc, char *argv[])
      */
     case MANDATORY:
         print_roof(w, h);
-        ret = print_house(w, h);
+        ret = print_house(w, h, false);
         break;
     case OPTIONAL:
-        ret = print_fence(w, h, f_w);
+        print_roof(w, h);
+        ret = print_house(w, h, true);
         break;
     // Just for sure
     default:
@@ -120,19 +121,28 @@ int print_roof(int w, int h)
 /*
  * Only printing, no validity checks
  */
-int print_house(int w, int h)
+int print_house(int w, int h, bool fence)
 {
-    // printf("House dim is: %d x %d\n", w, h);
     for (int i = 0; i < h; ++i) {
         for (int j = 0; j < w; ++j) {
             if ((i == 0) || (i == h - 1))
                 printf("X");
-            if ((j == 0) && (i >= 1) && (i < h - 1))
+            if (((j == 0) || (j == w - 1)) && (i >= 1) && (i < h - 1))
                 printf("X");
-            if ((j < w - 2) && (i >= 1) && (i < h - 1))
-                printf(" ");
-            if ((j == w - 1) && (i >= 1) && (i < h - 1))
-                printf("X");
+            // fill_house(w, h);
+            if (fence) {
+                if ((j < w - 2) && (i >= 1) && (i < h - 1)) {
+                    if ((i % 2 != 0) && (j % 2 == 0))
+                        printf("o");
+                    else if ((i % 2 == 0) && ((j + 1) % 2 == 0))
+                        printf("o");
+                    else
+                        printf("*");
+                }
+            } else {
+                if ((j < w - 2) && (i >= 1) && (i < h - 1))
+                    printf(" ");
+            }
         }
         printf("\n");
     }
