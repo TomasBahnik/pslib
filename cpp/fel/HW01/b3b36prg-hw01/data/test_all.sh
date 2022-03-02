@@ -10,12 +10,12 @@ message "compiling with 'clang -pedantic -Wall -Werror -std=c99 ../main.c -o $OU
 clang -pedantic -Wall -Werror -std=c99 ../main.c -o $OUTPUT_FILE
 message "running ${#TEST_FILES[@]} tests"
 
-FORMAT="%-15s %-10s %-10s %s\n"
-FORMAT_OUT="%-15s %-10s \n\n%s \n%s\n\n"
+FORMAT="%-15s %-10s %-5s %s\n"
+FORMAT_OUT="%-15s %-10s \n%s \n%s\n\n"
 
 printf "%s\n" "--------------------------------------------------"
 # shellcheck disable=SC2059
-printf "$FORMAT" "test_data" "exit_code" "error" "expected_error"
+printf "$FORMAT" "test_data" "exit_code" "status" "std error"
 printf "%s\n" "--------------------------------------------------"
 
 for test_input in "${TEST_FILES[@]}"; do
@@ -33,10 +33,15 @@ for test_input in "${TEST_FILES[@]}"; do
       res="FAIL"
     fi
     # shellcheck disable=SC2059
-    printf "$FORMAT" "[$test_data]" "$exit_code" "$error" "$res"
+    printf "$FORMAT" "[$test_data]" "$exit_code" "$res" "$error"
   else
     output="$(./$OUTPUT_FILE <"$test_input")"
+    if [[ "$output" == "$test_output_content" ]]; then
+      res="PASS"
+    else
+      res="FAIL"
+    fi
     # shellcheck disable=SC2059
-    printf "$FORMAT_OUT" "[$test_data]" "$exit_code" "$output" "$test_output_content"
+    printf "$FORMAT_OUT" "[$test_data]" "$exit_code" "$res" "$test_output_content"
   fi
 done
