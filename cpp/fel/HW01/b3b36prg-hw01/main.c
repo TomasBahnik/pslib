@@ -12,12 +12,12 @@ const int house_dim_max = 69;
 enum { MANDATORY, OPTIONAL };
 
 int test_house_dim(int w, int h);
-int test_fence_dim(int h, int f_w);
+int test_fence_dim(int w, int h, int f_w);
 
 int print_roof(int, int);
-int print_house(int, int);
+int print_house(int, int, int);
 int print_fence(int, int, int);
-void fill_house(int, int);
+void fill_house(int, int, int);
 
 int read_input(int *w, int *h, int *f_w);
 
@@ -28,12 +28,12 @@ int main(int argc, char *argv[])
     switch (ret = read_input(&w, &h, &f_w)) {
     case MANDATORY: // occurs if input has 2 numbers
         ret = print_roof(w, h);
-        ret = print_house(w, h);
+        ret = print_house(w, h, f_w);
         break;
     case OPTIONAL: // occurs if input has 3 numbers
-        ret = print_fence(w, h, f_w);
+        // ret = print_fence(w, h, f_w);
         ret = print_roof(w, h);
-        ret = print_house(w, h);
+        ret = print_house(w, h, f_w);
         // ret = fill_house(w, h);
         break;
     } // end switch
@@ -64,11 +64,11 @@ int main(int argc, char *argv[])
 int read_input(int *w, int *h, int *f_w)
 {
     int ret = ERROR_WRONG_INPUT;
-    if (scanf("%i %i", w, h) == 2) {
+    if (scanf("%d %d", w, h) == 2) {
         ret = MANDATORY;
     }
     if (ret == MANDATORY && *w == *h &&
-        scanf("%i", f_w) == 1) { // verify if third input is an integer
+        scanf("%d", f_w) == 1) { // verify if third input is an integer
         ret = OPTIONAL;
     }
     return ret;
@@ -92,7 +92,7 @@ int print_roof(int w, int h)
     return 1;
 }
 
-int print_house(int w, int h)
+int print_house(int w, int h, int f_w)
 {
     int ret = test_house_dim(w, h);
     if (ret == 0) {
@@ -124,25 +124,30 @@ int print_house(int w, int h)
     return ret;
 }
 
-void fill_house(int w, int h)
+void fill_house(int w, int h, int f_w)
 {
     int j;
     int i;
-
-    if (test_fence_dim(w, h == true)) {
-        if ((j < w - 2) && (i >= 1) && (i < h - 1))
-            printf("o");
+    int ret = test_fence_dim(w, h, f_w);
+    if (ret == 0) {
+        if ((j < w - 2) && (i >= 1) && (i < h - 1)) {
+            if ((i % 2 != 0) && (j % 2 == 0))
+                printf("o");
+            else if ((i % 2 == 0) && ((j + 1) % 2 == 0))
+                printf("o");
+            else
+                printf("*");
+        }
     } else {
         if ((j < w - 2) && (i >= 1) && (i < h - 1))
             printf(" ");
     }
 }
-
 int print_fence(int w, int h, int f_w)
 {
     int ret = test_house_dim(w, h);
     if (ret == 0) {
-        ret = test_fence_dim(h, f_w);
+        ret = test_fence_dim(w, h, f_w);
     }
     return ret;
 }
@@ -161,10 +166,10 @@ int test_house_dim(int w, int h)
     return ret;
 }
 
-int test_fence_dim(int h, int f_w)
+int test_fence_dim(int w, int h, int f_w)
 {
     int ret = 0;
-    if (f_w > 0 && f_w < h) {
+    if ((f_w > 0) && (f_w < h)) {
         // OK
     } else {
         ret = ERROR_FENCE_WIDTH_INVALID;
