@@ -5,8 +5,9 @@ function message() {
 }
 
 TEST_FILES=(example*.txt)
-message "compiling clang ../main.c -o main"
-clang ../main.c -o main
+message "compiling with 'clang -pedantic -Wall -Werror -std=c99 ../main.c -o main'"
+message "compiling with 'clang -pedantic -Wall -Werror -std=c99 ../main.c -o main'"
+clang -pedantic -Wall -Werror -std=c99 ../main.c -o main
 message "running ${#TEST_FILES[@]} tests"
 
 FORMAT="%-15s %-10s %s\n"
