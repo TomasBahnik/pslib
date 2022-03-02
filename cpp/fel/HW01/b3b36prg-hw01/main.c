@@ -26,6 +26,8 @@ int print_fence(int, int, int);
 
 int read_input(int *w, int *h, int *f_w);
 
+int fill_house(int w, int h, int i, int j);
+
 int main(int argc, char *argv[])
 {
     int ret = NO_ERROR;
@@ -129,16 +131,8 @@ int print_house(int w, int h, bool fence)
                 printf("X");
             if (((j == 0) || (j == w - 1)) && (i >= 1) && (i < h - 1))
                 printf("X");
-            // fill_house(w, h);
             if (fence) {
-                if ((j < w - 2) && (i >= 1) && (i < h - 1)) {
-                    if ((i % 2 != 0) && (j % 2 == 0))
-                        printf("o");
-                    else if ((i % 2 == 0) && ((j + 1) % 2 == 0))
-                        printf("o");
-                    else
-                        printf("*");
-                }
+                fill_house(w, h, i, j);
             } else {
                 if ((j < w - 2) && (i >= 1) && (i < h - 1))
                     printf(" ");
@@ -181,5 +175,17 @@ int test_fence_dim(int h, int f_w)
         return NO_ERROR;
     } else {
         return ERROR_FENCE_WIDTH_INVALID;
+    }
+}
+
+int fill_house(int w, int h, int i, int j)
+{
+    if ((j < w - 2) && (i >= 1) && (i < h - 1)) {
+        if ((i % 2 != 0) && (j % 2 == 0))
+            printf("o");
+        else if ((i % 2 == 0) && ((j + 1) % 2 == 0))
+            printf("o");
+        else
+            printf("*");
     }
 }
