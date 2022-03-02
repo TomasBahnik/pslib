@@ -7,6 +7,11 @@
 #define ERROR_HOUSE_DIM_OUT_OF_RANGE 101
 #define ERROR_HOUSE_WITH_IS_NOT_ODD 102
 #define ERROR_FENCE_WIDTH_INVALID 103
+// std error outputs
+#define CHYBNY_VSTUP "Error: Chybny vstup!\n"
+#define VSTUP_MIMO_INTERVAL "Error: Vstup mimo interval!\n"
+#define SIRKA_NENI_LICHE_CISLO "Error: Sirka neni liche cislo!\n"
+#define NEPLATNA_VELIKOST_PLOTU "Error: Neplatna velikost plotu!\n"
 const int house_dim_min = 3;
 const int house_dim_max = 69;
 
@@ -28,17 +33,16 @@ int main(int argc, char *argv[])
     ret = read_input(&w, &h, &f_w);
     switch (ret) {
     case ERROR_WRONG_INPUT:
-        fprintf(stderr,
-                "Error: Chybny vstup!\n"); // tiskne pokud vstup neni cislo
+        fprintf(stderr, CHYBNY_VSTUP); // tiskne pokud vstup neni cislo
         break;
     case ERROR_HOUSE_DIM_OUT_OF_RANGE:
-        fprintf(stderr, "Error: Vstup mimo interval!\n");
+        fprintf(stderr, VSTUP_MIMO_INTERVAL);
         break;
     case ERROR_HOUSE_WITH_IS_NOT_ODD:
-        fprintf(stderr, "Error: Sirka neni liche cislo!\n");
+        fprintf(stderr, SIRKA_NENI_LICHE_CISLO);
         break;
     case ERROR_FENCE_WIDTH_INVALID:
-        fprintf(stderr, "Error: Neplatna velikost plotu!\n");
+        fprintf(stderr, NEPLATNA_VELIKOST_PLOTU);
         break;
     /*
      * All errors handled => only printing.
