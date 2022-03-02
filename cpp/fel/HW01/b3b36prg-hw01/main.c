@@ -188,4 +188,5 @@ int fill_house(int w, int h, int i, int j)
         else
             printf("*");
     }
+    return NO_ERROR;
 }
