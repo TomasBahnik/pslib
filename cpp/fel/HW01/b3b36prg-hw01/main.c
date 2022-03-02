@@ -9,7 +9,7 @@
 const int house_dim_min = 3;
 const int house_dim_max = 69;
 
-enum { MANDATORY, OPTIONAL }; //, ERROR_WRONG_INPUT = 100 };
+enum { MANDATORY, OPTIONAL };
 
 int test_house_dim(int w, int h);
 int test_fence_dim(int h, int f_w);
@@ -17,6 +17,7 @@ int test_fence_dim(int h, int f_w);
 int print_roof(int, int);
 int print_house(int, int);
 int print_fence(int, int, int);
+void fill_house(int, int);
 
 int read_input(int *w, int *h, int *f_w);
 
@@ -25,31 +26,38 @@ int main(int argc, char *argv[])
     int ret = 0;
     int w, h, f_w;
     switch (ret = read_input(&w, &h, &f_w)) {
-    case MANDATORY:
+    case MANDATORY: // occurs if input has 2 numbers
         ret = print_roof(w, h);
         ret = print_house(w, h);
         break;
-    case OPTIONAL:
+    case OPTIONAL: // occurs if input has 3 numbers
         ret = print_fence(w, h, f_w);
+        ret = print_roof(w, h);
+        ret = print_house(w, h);
+        // ret = fill_house(w, h);
         break;
-    }
+    } // end switch
     switch (ret) {
     case ERROR_WRONG_INPUT:
-        fprintf(stderr,
-                "Error: Chybny vstup!\n"); // tiskne pokud vstup neni cislo
+        fprintf(stderr, "Error: Chybny vstup!\n");
+        // prints if the input is not a number
         break;
+
     case ERROR_HOUSE_DIM_OUT_OF_RANGE:
         fprintf(stderr, "Error: Vstup mimo interval!\n");
+        // print if input is out of range
         break;
 
     case ERROR_HOUSE_WITH_IS_NOT_ODD:
         fprintf(stderr, "Error: Sirka neni liche cislo!\n");
+        // print if width is not odd number
         break;
 
     case ERROR_FENCE_WIDTH_INVALID:
         fprintf(stderr, "Error: Neplatna velikost plotu!\n");
+        // print if fence width is not smaller then house width
         break;
-    }
+    } // end switch
     return ret;
 }
 
@@ -60,7 +68,7 @@ int read_input(int *w, int *h, int *f_w)
         ret = MANDATORY;
     }
     if (ret == MANDATORY && *w == *h &&
-        scanf("%i", f_w) == 1) { // overi jestli je 3 vstup cele cislo
+        scanf("%i", f_w) == 1) { // verify if third input is an integer
         ret = OPTIONAL;
     }
     return ret;
@@ -93,12 +101,11 @@ int print_house(int w, int h)
             for (int j = 0; j < w; ++j) {
                 if ((i == 0) || (i == h - 1))
                     printf("X");
-                if ((j == 0) && (i >= 1) && (i < h - 1))
+                if (((j == 0) || (j == w - 1)) && (i >= 1) && (i < h - 1))
                     printf("X");
-                if ((j < w - 2) && (i >= 1) && (i < h - 1))
-                    printf(" ");
-                if ((j == w - 1) && (i >= 1) && (i < h - 1))
-                    printf("X");
+                fill_house(w, h);
+                // if ((j < w - 2) && (i >= 1) && (i < h - 1))
+                //    printf(" ");
             }
             printf("\n");
         }
@@ -106,14 +113,25 @@ int print_house(int w, int h)
     return ret;
 }
 
+void fill_house(int w, int h)
+{
+    int j;
+    int i;
+
+    if (test_fence_dim(w, h == true)) {
+        if ((j < w - 2) && (i >= 1) && (i < h - 1))
+            printf("o");
+    } else {
+        if ((j < w - 2) && (i >= 1) && (i < h - 1))
+            printf(" ");
+    }
+}
+
 int print_fence(int w, int h, int f_w)
 {
     int ret = test_house_dim(w, h);
     if (ret == 0) {
         ret = test_fence_dim(h, f_w);
-    }
-    if (ret == 0) { // all test passed
-        printf("House dim is: %d x %d + %d\n", w, h, f_w);
     }
     return ret;
 }
