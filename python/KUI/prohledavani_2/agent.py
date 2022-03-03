@@ -7,7 +7,6 @@ Very simple example how to use gym_wrapper and BaseAgent class for state space s
 '''
 
 import os
-import random
 import time
 
 import kuimaze
@@ -29,24 +28,28 @@ class Agent(kuimaze.BaseAgent):
         observation = self.environment.reset()  # must be called first, it is necessary for maze initialization
         goal = observation[1][0:2]
         position = observation[0][0:2]  # initial state (x, y)
+        path = [position]  # add start position
         print("Starting random searching")
         while True:
             new_positions = self.environment.expand(position)  # [[(x1, y1), cost], [(x2, y2), cost], ... ]
             # print(new_positions)
-            position = random.choice(new_positions)[0]  # select next at random, ignore the cost infor
+            # do no visit previous positions
+            position_not_in_path = [x for x in new_positions if x[0] not in path]
+            costs = [x[1] for x in position_not_in_path]
+            min_cost_idx = costs.index(min(costs))
+            position = position_not_in_path[min_cost_idx][0]  # select next at min cost
             print(position)
+            path.append(position)
             if position == goal:  # break the loop when the goal position is reached
                 print("goal reached")
                 break
             self.environment.render()  # show enviroment's GUI       DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
             time.sleep(0.1)  # sleep for demonstartion     DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
 
-        path = [(4, 0), (4, 1)]  # create path as list of tuples in format: [(x1, y1), (x2, y2), ... ]
         return path
 
 
 if __name__ == '__main__':
-
     MAP = 'maps/easy/easy3.bmp'
     MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), MAP)
     GRAD = (0, 0)
