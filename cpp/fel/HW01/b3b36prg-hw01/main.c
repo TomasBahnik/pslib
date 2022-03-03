@@ -15,7 +15,7 @@
 const int house_dim_min = 3;
 const int house_dim_max = 69;
 
-enum { MANDATORY, OPTIONAL }; //, ERROR_WRONG_INPUT = 100 };
+enum { MANDATORY, OPTIONAL };
 
 int test_house_dim(int w, int h);
 int test_fence_dim(int h, int f_w);
@@ -34,17 +34,23 @@ int main(int argc, char *argv[])
     ret = read_input(&w, &h, &f_w);
     switch (ret) {
     case ERROR_WRONG_INPUT:
-        fprintf(stderr, CHYBNY_VSTUP); // tiskne pokud vstup neni cislo
+        fprintf(stderr, CHYBNY_VSTUP);
+        // prints if the input is not a number
         break;
     case ERROR_HOUSE_DIM_OUT_OF_RANGE:
         fprintf(stderr, VSTUP_MIMO_INTERVAL);
+        // print if input is out of range
         break;
     case ERROR_HOUSE_WITH_IS_NOT_ODD:
         fprintf(stderr, SIRKA_NENI_LICHE_CISLO);
+        // print if width is not odd number
         break;
     case ERROR_FENCE_WIDTH_INVALID:
         fprintf(stderr, NEPLATNA_VELIKOST_PLOTU);
+        // print if fence width is not smaller then house width
         break;
+        // end switch
+
     /*
      * All errors handled => only printing.
      * MANDATORY is value 0 same as NO_ERROR
@@ -53,11 +59,11 @@ int main(int argc, char *argv[])
      * But in previous cases 0 (NO_ERROR) and 1 are not checked so this the
      * only place where 0 and 1 can fall
      */
-    case MANDATORY:
+    case MANDATORY: // occurs if input has 2 numbers
         print_roof(w, h);
         ret = print_house(w, h, f_w);
         break;
-    case OPTIONAL:
+    case OPTIONAL: // occurs if input has 3 numbers
         print_roof(w, h);
         ret = print_house(w, h, f_w);
         break;
@@ -65,7 +71,7 @@ int main(int argc, char *argv[])
     default:
         printf("Default case");
         break;
-    }
+    } // end switch
     return ret;
 }
 
@@ -169,10 +175,17 @@ int print_fence(int w, int h, int f_w, int i, int j)
     int min_fence = h - 1;
     int len_fence = w + f_w / 2 + 1;
     for (j = w + 1; j < (len_fence); ++j) {
-        if ((i == max_fence) || (i == min_fence))
+        if ((i == max_fence) || (i == min_fence)) {
+            if ((f_w % 2 != 0) && (j == w + 1)) {
+                printf("|");
+            }
             printf("-|");
-        else
+        } else {
+            if ((f_w % 2 != 0) && (j == w + 1)) {
+                printf("|");
+            }
             printf(" |");
+        }
     }
     return NO_ERROR;
 }
