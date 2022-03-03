@@ -147,6 +147,22 @@ int print_house(int w, int h, int f_w)
 /*
  * Only printing, no validity checks
  */
+int fill_house(int w, int h, int f_w, int i, int j)
+{
+    if ((j < w - 2) && (i >= 1) && (i < h - 1)) {
+        if ((i % 2 != 0) && (j % 2 == 0))
+            printf("o");
+        else if ((i % 2 == 0) && ((j + 1) % 2 == 0))
+            printf("o");
+        else
+            printf("*");
+    }
+    return NO_ERROR;
+}
+
+/*
+ * Only printing, no validity checks
+ */
 int print_fence(int w, int h, int f_w, int i, int j)
 {
     int max_fence = h - f_w;
@@ -160,6 +176,9 @@ int print_fence(int w, int h, int f_w, int i, int j)
     }
     return NO_ERROR;
 }
+
+// testing if input is in range
+// testing if first input is odd number
 int test_house_dim(int w, int h)
 {
     int ret = NO_ERROR;
@@ -177,6 +196,7 @@ int test_house_dim(int w, int h)
     return ret;
 }
 
+// testing if third input is smaller than high of house
 int test_fence_dim(int h, int f_w)
 {
     if (f_w > 0 && f_w < h) {
@@ -184,17 +204,4 @@ int test_fence_dim(int h, int f_w)
     } else {
         return ERROR_FENCE_WIDTH_INVALID;
     }
-}
-
-int fill_house(int w, int h, int f_w, int i, int j)
-{
-    if ((j < w - 2) && (i >= 1) && (i < h - 1)) {
-        if ((i % 2 != 0) && (j % 2 == 0))
-            printf("o");
-        else if ((i % 2 == 0) && ((j + 1) % 2 == 0))
-            printf("o");
-        else
-            printf("*");
-    }
-    return NO_ERROR;
 }
