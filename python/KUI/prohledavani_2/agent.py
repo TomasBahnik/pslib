@@ -30,6 +30,15 @@ def euclidean_distance(node1, node2):
     return math.sqrt(((node1.state[0] - node2.state[0]) ** 2 + (node1.state[1] - node2.state[1]) ** 2))
 
 
+def return_path(end_node):
+    n = end_node
+    ret_val = [n.state]
+    while n.parent is not None:
+        ret_val.append(n.parent.state)
+        n = n.parent
+    return list(reversed(ret_val))
+
+
 class Agent(kuimaze.BaseAgent):
     """
     Simple example of agent class that inherits kuimaze.BaseAgent class
@@ -37,9 +46,6 @@ class Agent(kuimaze.BaseAgent):
 
     def __init__(self, environment):
         self.environment = environment
-
-    def return_path(self):
-        return 0
 
     def find_path(self):
         """
@@ -76,10 +82,9 @@ class Agent(kuimaze.BaseAgent):
 
             # test if goal is reached or not, if yes then return the path
             if current_node == end_node:
-                return self.return_path()
+                return return_path(current_node)
 
-            # Generate children from all adjacent squares
-            # [[(x1, y1), cost], [(x2, y2), cost], ... ]
+            # Generate children [[(x1, y1), cost], [(x2, y2), cost], ... ]
             expanded = self.environment.expand(current_node.state)
 
             for child in expanded:
@@ -91,9 +96,8 @@ class Agent(kuimaze.BaseAgent):
                 child_node.g = step_cost + current_node.g
                 child_node.h = euclidean_distance(child_node, end_node)
                 child_node.f = child_node.g + child_node.h
-
                 # Child is already in the frontiers and there is lower cost
-                # TODO simplify
+                # TODO simplify ?? compare f not g
                 if len([node for node in frontiers if child_node == node and child_node.g > node.g]) > 0:
                     continue
 
@@ -105,12 +109,11 @@ class Agent(kuimaze.BaseAgent):
             self.environment.render()
             # sleep for demonstration
             # DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
-            time.sleep(0.5)
-        return self.return_path()
+            time.sleep(0.2)
 
 
 if __name__ == '__main__':
-    MAP = 'maps/easy/easy3.bmp'
+    MAP = 'maps/easy/easy7.bmp'
     GRAD = (0, 0)
     SAVE_PATH = False
     SAVE_EPS = False
