@@ -62,22 +62,23 @@ class Agent(kuimaze.BaseAgent):
         frontiers = [start_node]  # init by start node
         explored = []
 
-        # Adding a stop condition. This is to avoid any infinite loop and stop
-        # execution after some reasonable number of steps
-        outer_iterations = 0
+        # Adding a stop condition (infinite loops or long time.)
+        # TODO remove before submit
+        iteration = 0
         max_iterations = (self.environment._xsize // 2) ** 10
 
         while len(frontiers) > 0:
-            outer_iterations += 1
-
-            if outer_iterations > max_iterations:
-                print("too many iterations")
-                break
-
             # sort by evaluation function
             frontiers.sort(key=lambda node: node.f)
             # remove and get node with smallest f
             current_node = frontiers.pop(0)
+
+            # TODO remove before submit
+            iteration += 1
+            if iteration > max_iterations:
+                print("too many iterations")
+                return return_path(current_node)
+
             explored.append(current_node)
 
             # test if goal is reached or not, if yes then return the path
@@ -97,23 +98,22 @@ class Agent(kuimaze.BaseAgent):
                 child_node.h = euclidean_distance(child_node, end_node)
                 child_node.f = child_node.g + child_node.h
                 # Child is already in the frontiers and there is lower cost
-                # TODO simplify ?? compare f not g
-                if len([node for node in frontiers if child_node == node and child_node.g > node.g]) > 0:
+                # TODO simplify
+                if len([node for node in frontiers if child_node == node and child_node.f > node.f]) > 0:
                     continue
-
-                # Add the child to the yet_to_visit list
                 frontiers.append(child_node)
 
             # show environment GUI
-            # DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
+            # TODO DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
             self.environment.render()
             # sleep for demonstration
-            # DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
+            # TODO DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
             time.sleep(0.2)
+        return None
 
 
 if __name__ == '__main__':
-    MAP = 'maps/easy/easy7.bmp'
+    MAP = 'maps/normal/normal10b.bmp'
     GRAD = (0, 0)
     SAVE_PATH = False
     SAVE_EPS = False
