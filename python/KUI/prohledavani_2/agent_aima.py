@@ -77,16 +77,16 @@ class Agent(kuimaze.BaseAgent):
         start_node.g = 0
         start_node.f = start_node.g + start_node.h
         end_node.g = end_node.h = end_node.f = 0
-        frontiers = [start_node]  # init by start node
+        frontier = [start_node]  # init by start node
         explored = []
 
         while True:
-            if len(frontiers) == 0:
+            if len(frontier) == 0:
                 return None
             # sort by evaluation function
-            frontiers.sort(key=lambda node: node.f)
+            frontier.sort(key=lambda node: node.f)
             # remove and get node with smallest f
-            current_node = frontiers.pop(0)
+            current_node = frontier.pop(0)
             # test if goal is reached or not, if yes then return the path
             if current_node == end_node:
                 return return_path(current_node)
@@ -101,21 +101,21 @@ class Agent(kuimaze.BaseAgent):
                 child_node.f = child_node.g + child_node.h
                 # if child.STATE is not in explored or frontier then
                 # frontier ← INSERT(child,frontier)
-                if (child_node not in explored) or (child_node not in explored):
-                    frontiers.append(child_node)
+                if (child_node not in explored) or (child_node not in frontier):
+                    frontier.append(child_node)
                 # else if child.STATE is in frontier with higher PATH-COST then
                 # TODO check len must be 0 or 1
-                elif len([node for node in frontiers if child_node == node and node.f > child_node.f]) > 0:
+                elif len([node for node in frontier if child_node == node and node.f > child_node.f]) > 0:
                     # replace that frontier node with child
-                    frontier_states = [x.state for x in frontiers]
+                    frontier_states = [x.state for x in frontier]
                     state_idx = frontier_states.index(child_node.state)
-                    frontiers[state_idx] = child_node
+                    frontier[state_idx] = child_node
             # show environment GUI
             # TODO DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
             self.environment.render()
             # sleep for demonstration
             # TODO DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
-            time.sleep(0.2)
+            time.sleep(0.1)
 
 
 if __name__ == '__main__':
@@ -135,4 +135,4 @@ if __name__ == '__main__':
     if SAVE_EPS:
         env.save_eps()  # save rendered image to eps
     env.render(mode='human')
-    time.sleep(10)
+    time.sleep(8)
