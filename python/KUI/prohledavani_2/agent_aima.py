@@ -115,7 +115,7 @@ class Agent(kuimaze.BaseAgent):
             self.environment.render()
             # sleep for demonstration
             # TODO DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
-            time.sleep(0.1)
+            # time.sleep(0.1)
 
 
 if __name__ == '__main__':
