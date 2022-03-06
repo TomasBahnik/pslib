@@ -11,6 +11,11 @@ python agent.py maps_difficult/maze50x50_empty03.png
 maps_difficult/maze50x50_empty03.png : path len 93, takes 0.21545350000000002 sec
 path
 [(100, 45), (99, 44), (99, 43), (99, 42), (99, 41), (99, 40), (99, 39), (99, 38) ...
+
+python agent.py maps_difficult/maze50x50_empty03.png 10
+maps_difficult/maze50x50_empty03.png : path len 93, takes 33.5901506 sec
+path
+[(100, 45), (99, 44), (99, 43), (99, 42), (99, 41), (99, 40), (99, 39), (99, 38), (99, 37)
 ```
 
 Time comparison with and without GUI ~ 55x (normal)... ~290 (difficult)
