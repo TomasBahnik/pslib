@@ -13,7 +13,7 @@ path
 [(100, 45), (99, 44), (99, 43), (99, 42), (99, 41), (99, 40), (99, 39), (99, 38) ...
 ```
 
-Comparison with and without GUI ~ 55x
+Time comparison with and without GUI ~ 55x (normal)... ~290 (difficult)
 
 ```text
 python agent.py maps/normal/normal11.bmp
@@ -36,4 +36,15 @@ python agent.py maps/normal/normal12.bm
 maps/normal/normal12.bmp : path len 27, takes 0.04336119999999999 sec
 path
 [(13, 10), (12, 11), (11, 12), (10, 13), (9, 13), (8, 13),
-``` 
+
+python agent.py maps_difficult/maze50x50.png
+maps_difficult/maze50x50.png : path len 1013, takes 3.7849461 sec
+path
+[(100, 45), (99, 44), (99, 43), (99, 42), (99, 41), (99, 40), (99, 39), (99, 38), (99, 37),
+
+python agent.py maps_difficult/maze50x50.png 10
+maps_difficult/maze50x50.png : path len 1013, takes 1081.2968205 sec
+path
+[(100, 45), (99, 44), (99, 43), (99, 42), (99, 41), (99, 40), (99, 39), (99, 38), (99, 37),
+```
+![50x50](maze50x50.jpg) 
