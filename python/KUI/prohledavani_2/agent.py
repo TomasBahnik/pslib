@@ -112,8 +112,8 @@ class Agent(kuimaze.BaseAgent):
                     frontier[state_idx] = child_node
             # show environment GUI
             # TODO DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
-            if SHOW:
-                self.environment.render()
+            # if SHOW:
+            #     self.environment.render()
             # sleep for demonstration
             # TODO DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
             # time.sleep(0.01)
