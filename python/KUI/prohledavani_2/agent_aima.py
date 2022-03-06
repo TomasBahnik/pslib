@@ -101,11 +101,8 @@ class Agent(kuimaze.BaseAgent):
                 child_node.f = child_node.g + child_node.h
                 # if child.STATE is not in explored or frontier then
                 # frontier ← INSERT(child,frontier)
-                ch_state = child_node.state
-                explored_states = [x.state for x in explored]
-                frontier_states = [x.state for x in frontier]
-                states = explored_states + frontier_states
-                if ch_state not in states:
+                all_nodes = explored + frontier
+                if child_node not in all_nodes:  # equal uses node state for comparison
                     frontier.append(child_node)
                 # else if child.STATE is in frontier with higher PATH-COST then
                 # TODO check len must be 0 or 1
@@ -119,7 +116,7 @@ class Agent(kuimaze.BaseAgent):
             self.environment.render()
             # sleep for demonstration
             # TODO DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
-            time.sleep(0.01)
+            # time.sleep(0.01)
 
 
 if __name__ == '__main__':
