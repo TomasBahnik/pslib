@@ -101,8 +101,7 @@ class Agent(kuimaze.BaseAgent):
                 child_node.f = child_node.g + child_node.h
                 # if child.STATE is not in explored or frontier then
                 # frontier ← INSERT(child,frontier)
-                all_nodes = explored + frontier
-                if child_node not in all_nodes:  # equal uses node state for comparison
+                if (child_node not in explored) and (child_node not in frontier):  # state is used for comparison
                     frontier.append(child_node)
                 # else if child.STATE is in frontier with higher PATH-COST then
                 # TODO check len must be 0 or 1
@@ -113,27 +112,26 @@ class Agent(kuimaze.BaseAgent):
                     frontier[state_idx] = child_node
             # show environment GUI
             # TODO DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
-            self.environment.render()
+            if SHOW:
+                self.environment.render()
             # sleep for demonstration
             # TODO DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
             # time.sleep(0.01)
 
 
+SHOW = 10  # enables env GUI and show the resulting image for SHOW sec
 if __name__ == '__main__':
     MAP = sys.argv[1]  # 'maps/normal/normal11.bmp'
+    SHOW = int(sys.argv[2]) if len(sys.argv) > 2 else 10
     GRAD = (0, 0)
-    SAVE_PATH = False
-    SAVE_EPS = False
-
     env = kuimaze.InfEasyMaze(map_image=MAP, grad=GRAD)  # For using random map set: map_image=None
     agent = Agent(env)
-
+    t0 = time.perf_counter()
     path = agent.find_path()
+    delta = time.perf_counter() - t0
     print(path)
-    env.set_path(path)  # set path it should go from the init state to the goal state
-    # if SAVE_PATH:
-    #     env.save_path()  # save path of agent to current directory
-    # if SAVE_EPS:
-    #     env.save_eps()  # save rendered image to eps
-    env.render(mode='human')
-    time.sleep(8)
+    print("{} : path len {}, takes {} sec".format(MAP, len(path), delta))
+    if SHOW:
+        env.set_path(path)  # set path it should go from the init state to the goal state
+        env.render(mode='human')
+        time.sleep(SHOW)
