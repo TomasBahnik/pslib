@@ -129,8 +129,8 @@ if __name__ == '__main__':
     t0 = time.perf_counter()
     path = agent.find_path()
     delta = time.perf_counter() - t0
-    print(path)
     print("{} : path len {}, takes {} sec".format(MAP, len(path), delta))
+    print("path\n{}".format(path))
     if SHOW:
         env.set_path(path)  # set path it should go from the init state to the goal state
         env.render(mode='human')
