@@ -101,7 +101,11 @@ class Agent(kuimaze.BaseAgent):
                 child_node.f = child_node.g + child_node.h
                 # if child.STATE is not in explored or frontier then
                 # frontier ← INSERT(child,frontier)
-                if (child_node not in explored) or (child_node not in frontier):
+                ch_state = child_node.state
+                explored_states = [x.state for x in explored]
+                frontier_states = [x.state for x in frontier]
+                states = explored_states + frontier_states
+                if ch_state not in states:
                     frontier.append(child_node)
                 # else if child.STATE is in frontier with higher PATH-COST then
                 # TODO check len must be 0 or 1
@@ -115,7 +119,7 @@ class Agent(kuimaze.BaseAgent):
             self.environment.render()
             # sleep for demonstration
             # TODO DO NOT FORGET TO COMMENT THIS LINE BEFORE FINAL SUBMISSION!
-            # time.sleep(0.1)
+            time.sleep(0.01)
 
 
 if __name__ == '__main__':
@@ -130,9 +134,9 @@ if __name__ == '__main__':
     path = agent.find_path()
     print(path)
     env.set_path(path)  # set path it should go from the init state to the goal state
-    if SAVE_PATH:
-        env.save_path()  # save path of agent to current directory
-    if SAVE_EPS:
-        env.save_eps()  # save rendered image to eps
+    # if SAVE_PATH:
+    #     env.save_path()  # save path of agent to current directory
+    # if SAVE_EPS:
+    #     env.save_eps()  # save rendered image to eps
     env.render(mode='human')
     time.sleep(8)
