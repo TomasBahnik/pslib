@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include "erat_sieve.h"
+#include <stdio.h>
 int *e_s()
 {
     int i, j;
@@ -21,6 +21,19 @@ int *e_s()
             }
         }
         i++;
+    }
+    return primes;
+}
+
+int *prime_numbers_fce()
+{
+    static int primes[MAX_NUM] = {0};
+    for (int i = 2; i < MAX_NUM; ++i) {
+        if (primes[i] == 0) {
+            for (int j = i; j < MAX_NUM; j += i) {
+                primes[j] = 1;
+            }
+        }
     }
     return primes;
 }
