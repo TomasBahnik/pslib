@@ -1,5 +1,4 @@
 #include "erat_sieve.h"
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,8 +32,11 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error: Chybny vstup!\n");
         return ERROR_INPUT;
     }
-    //    prime_numbers();
+    // prime_numbers();
+    // function from module erat_sieve.c
+    // MAX_NUM is set in header file erat_sieve.h
     primes = e_s();
+    // count the nuber of primes in order to create array with primes only
     int prime_count = 0;
     int i;
     for (i = 2; i <= MAX_NUM; ++i) {
@@ -42,6 +44,7 @@ int main(int argc, char *argv[])
         if (primes[i] != 0)
             prime_count++;
     }
+    // create array with primes only
     int primes_only[prime_count];
     int j = 0;
     for (i = 2; i < MAX_NUM; ++i) {
@@ -51,7 +54,7 @@ int main(int argc, char *argv[])
         }
     }
     int prime_size = sizeof(primes_only) / sizeof(primes_only[0]);
-    printf("size of primes only = %d", prime_size);
+    printf("for %i : size of primes only = %i", MAX_NUM, prime_size);
     return ret;
 }
 
