@@ -42,3 +42,25 @@ int *prime_numbers_fce()
     printf("for %i : number of primes = %i", MAX_NUM, prime_count);
     return primes;
 }
+
+int prime_numbers_dec(int n)
+{
+    int primes[MAX_NUM] = {0};
+    int j, i;
+    int prime_count = 0;
+    for (i = 2; i < MAX_NUM; ++i) {
+        if (primes[i] == 0) {
+            for (j = i; j < MAX_NUM; j += i) {
+                primes[j] = 1;
+            }
+            primes[i] = 0; // set the prime index back to 0
+            while (n % i == 0) {
+                printf("%i has factor %i\n", n, i);
+                n = n - n / i;
+            }
+            prime_count++;
+        }
+    }
+//    printf("for %i : number of primes = %i", MAX_NUM, prime_count);
+    return 0;
+}

@@ -35,7 +35,9 @@ int main(int argc, char *argv[])
     // prime_numbers();
     // function from module erat_sieve.c
     // MAX_NUM is set in header file erat_sieve.h
-    primes = prime_numbers_fce();
+//    primes = prime_numbers_fce();
+    prime_numbers_dec(96);
+    return 0;
     // count the nuber of primes in order to create array with primes only
     int prime_count = 0;
     for (i = 2; i <= MAX_NUM; ++i) {
@@ -78,19 +80,19 @@ void prime_numbers()
     }
     printf("\nprimes count = %i for %i.", cnt, milion);
 }
-// void decompose(int n)
-// {
-//     int array[milion] = {0};
-//     array[2] = 1;
-//     for (int i = 2; i < milion; ++i) {
-//         if (array[i] == 0) {
-//             for (int j = 2; j < milion; ++j) {
-//                 if (j % i == 0) {
-//                     array[j] = 1;
-//                 }
-//             }
-//         }
-//         if (array[i] == 0)
-//             printf("%d\n", i);
-//     }
-// }
+void decompose(int n)
+{
+    int array[milion] = {0};
+    array[2] = 1;
+    for (int i = 2; i < milion; ++i) {
+        if (array[i] == 0) {
+            for (int j = 2; j < milion; ++j) {
+                if (j % i == 0) {
+                    array[j] = 1;
+                }
+            }
+        }
+        if (array[i] == 0)
+            printf("%d\n", i);
+    }
+}
