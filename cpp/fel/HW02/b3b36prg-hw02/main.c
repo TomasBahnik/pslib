@@ -69,14 +69,17 @@ int read_number(void)
 
 void prime_numbers()
 {
+    int cnt = 0;
     for (int i = 2; i < milion; ++i) {
         if (array[i] == 0) {
             for (int j = i; j < milion; j += i) {
                 array[j] = 1;
             }
-            printf("%d\n", i);
+            printf("prime[%i] = %d\n", cnt, i);
+            cnt++;
         }
     }
+    printf("\nprimes count = %i for %i.", cnt, milion);
 }
 // void decompose(int n)
 // {
