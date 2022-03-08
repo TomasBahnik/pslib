@@ -28,12 +28,17 @@ int *e_s()
 int *prime_numbers_fce()
 {
     static int primes[MAX_NUM] = {0};
-    for (int i = 2; i < MAX_NUM; ++i) {
+    int j, i;
+    int prime_count = 0;
+    for (i = 2; i < MAX_NUM; ++i) {
         if (primes[i] == 0) {
-            for (int j = i; j < MAX_NUM; j += i) {
+            for (j = i; j < MAX_NUM; j += i) {
                 primes[j] = 1;
             }
+            primes[i] = 0; // set the prime index back to 0
+            prime_count++;
         }
     }
+    printf("for %i : number of primes = %i", MAX_NUM, prime_count);
     return primes;
 }
