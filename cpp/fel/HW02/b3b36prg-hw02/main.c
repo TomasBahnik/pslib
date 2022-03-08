@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
     // prime_numbers();
     // function from module erat_sieve.c
     // MAX_NUM is set in header file erat_sieve.h
-//    primes = prime_numbers_fce();
-    prime_numbers_dec(96);
+    // primes = prime_numbers_fce();
+    prime_numbers_dec(751);
     return 0;
     // count the nuber of primes in order to create array with primes only
     int prime_count = 0;
