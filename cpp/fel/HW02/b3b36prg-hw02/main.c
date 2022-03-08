@@ -1,3 +1,4 @@
+#include "erat_sieve.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,6 +6,7 @@
 #define ERROR_INPUT 100
 #define milion 1000000 // milion is 10 ** 6
 int array[milion] = {0};
+int *primes;
 // solution 1 // mandatory
 // deviding input by smaller number than input number
 
@@ -31,7 +33,25 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error: Chybny vstup!\n");
         return ERROR_INPUT;
     }
-    prime_numbers();
+    //    prime_numbers();
+    primes = e_s();
+    int prime_count = 0;
+    int i;
+    for (i = 2; i <= MAX_NUM; ++i) {
+        // If number is not 0 then it is prime
+        if (primes[i] != 0)
+            prime_count++;
+    }
+    int primes_only[prime_count];
+    int j = 0;
+    for (i = 2; i < MAX_NUM; ++i) {
+        if (primes[i] != 0) {
+            primes_only[j] = primes[i];
+            j++;
+        }
+    }
+    int prime_size = sizeof(primes_only) / sizeof(primes_only[0]);
+    printf("size of primes only = %d", prime_size);
     return ret;
 }
 
