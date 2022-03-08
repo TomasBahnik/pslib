@@ -23,7 +23,8 @@ void prime_numbers();
 int main(int argc, char *argv[])
 {
     int ret = EXIT_SUCCESS;
-    int n, i, j;
+    int n;
+    scanf("%i", &n);
     // while ((n = read_number()) > 0) {
     //     printf("Prvociselny rozklad cisla %d je:\n", n);
     //     decompose(n);
@@ -32,28 +33,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error: Chybny vstup!\n");
         return ERROR_INPUT;
     }
-    // prime_numbers();
-    // function from module erat_sieve.c
-    // MAX_NUM is set in header file erat_sieve.h
-    // primes = prime_numbers_fce();
-    prime_numbers_dec(34524);
-    return 0;
-    // count the nuber of primes in order to create array with primes only
-    int prime_count = 0;
-    for (i = 2; i <= MAX_NUM; ++i) {
-        // If number is not 0 then it is prime
-        if (primes[i] == 0)
-            prime_count++;
-    }
-    // create array with primes only
-    int primes_only[prime_count];
-    j = 0;
-    for (i = 2; i < MAX_NUM; ++i) {
-        if (primes[i] == 0) {
-            primes_only[j] = primes[i];
-            j++;
-        }
-    }
+    prime_numbers_dec(n);
     return ret;
 }
 

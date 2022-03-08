@@ -64,7 +64,7 @@ int prime_numbers_dec(int n)
                     break;
                 } else {
                     printf("%i*", i);
-                    m = m - m / i;
+                    m = m / i;
                 }
             }
             prime_count++;
