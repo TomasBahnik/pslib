@@ -23,14 +23,14 @@ void prime_numbers();
 int main(int argc, char *argv[])
 {
     int ret = EXIT_SUCCESS;
-    int n;
-    scanf("%i", &n);
+    long n;
+    scanf("%ld", &n);
     // while ((n = read_number()) > 0) {
     //     printf("Prvociselny rozklad cisla %d je:\n", n);
     //     decompose(n);
     // }
     if (n < 0) {
-        fprintf(stderr, "Error: Chybny vstup!\n");
+        fprintf(stderr, "Error: Chybny vstup! %ld\n", n);
         return ERROR_INPUT;
     }
     prime_numbers_dec(n);

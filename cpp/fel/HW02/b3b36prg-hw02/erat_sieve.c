@@ -43,14 +43,14 @@ int *prime_numbers_fce()
     return primes;
 }
 
-int prime_numbers_dec(int n)
+int prime_numbers_dec(long n)
 {
     if (n == 1)
-        printf("%i\n", n);
+        printf("%li\n", n);
     int primes[MAX_NUM] = {0};
     int j, i;
     int prime_count = 0;
-    int m = n;
+    long m = n;
     for (i = 2; i < MAX_NUM; ++i) {
         int exp = 0;
         if (primes[i] == 0) {
