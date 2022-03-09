@@ -50,6 +50,7 @@ int prime_numbers_dec(int n)
     int prime_count = 0;
     int m = n;
     for (i = 2; i < MAX_NUM; ++i) {
+        int exp = 0;
         if (primes[i] == 0) {
             for (j = i; j < MAX_NUM; j += i) {
                 primes[j] = 1;
@@ -63,12 +64,16 @@ int prime_numbers_dec(int n)
                     printf("%i\n", i);
                     break;
                 } else {
-                    printf("%i*", i);
+                    exp++;
                     m = m / i;
+                    if (m % i != 0) {
+                        exp > 1 ? printf("%i^%i x ", i, exp)
+                                : printf("%i x ", i);
+                    }
                 }
             }
-            prime_count++;
         }
+        prime_count++;
     }
     //    printf("for %i : number of primes = %i", MAX_NUM, prime_count);
     return 0;
