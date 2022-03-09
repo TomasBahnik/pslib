@@ -45,6 +45,8 @@ int *prime_numbers_fce()
 
 int prime_numbers_dec(int n)
 {
+    if (n == 1)
+        printf("%i\n", n);
     int primes[MAX_NUM] = {0};
     int j, i;
     int prime_count = 0;
@@ -57,14 +59,11 @@ int prime_numbers_dec(int n)
             }
             primes[i] = 0; // set the prime index back to 0
             while (m % i == 0) {
-                if (m == n) {
-                    printf("%i=", n);
-                }
+                exp++;
                 if (m / i == 1) {
-                    printf("%i\n", i);
+                    exp > 1 ? printf("%i^%i\n", i, exp) : printf("%i\n", i);
                     break;
                 } else {
-                    exp++;
                     m = m / i;
                     if (m % i != 0) {
                         exp > 1 ? printf("%i^%i x ", i, exp)
