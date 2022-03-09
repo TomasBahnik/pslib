@@ -9,8 +9,8 @@ int *primes;
 // solution 1 // mandatory
 // deviding input by smaller number than input number
 
-int read_number(void);
-void decompose(int n);
+long read_number(void);
+void decompose(long n);
 void prime_numbers();
 
 // solution 2 // optional
@@ -24,23 +24,20 @@ int main(int argc, char *argv[])
 {
     int ret = EXIT_SUCCESS;
     long n;
-    scanf("%ld", &n);
-    // while ((n = read_number()) > 0) {
-    //     printf("Prvociselny rozklad cisla %d je:\n", n);
-    //     decompose(n);
-    // }
+    while ((n = read_number()) > 0) {
+        decompose(n);
+    }
     if (n < 0) {
         fprintf(stderr, "Error: Chybny vstup! %ld\n", n);
         return ERROR_INPUT;
     }
-    prime_numbers_dec(n);
     return ret;
 }
 
-int read_number(void)
+long read_number(void)
 {
-    int n = -1;
-    if (scanf("%d", &n) != 1) {
+    long n = -1;
+    if (scanf("%ld", &n) != 1) {
         n = -1;
     }
     return n;
@@ -60,19 +57,9 @@ void prime_numbers()
     }
     printf("\nprimes count = %i for %i.", cnt, milion);
 }
-void decompose(int n)
+
+void decompose(long n)
 {
-    int array[milion] = {0};
-    array[2] = 1;
-    for (int i = 2; i < milion; ++i) {
-        if (array[i] == 0) {
-            for (int j = 2; j < milion; ++j) {
-                if (j % i == 0) {
-                    array[j] = 1;
-                }
-            }
-        }
-        if (array[i] == 0)
-            printf("%d\n", i);
-    }
+    printf("Prvociselny rozklad cisla %ld je:\n", n);
+    prime_numbers_dec(n);
 }
