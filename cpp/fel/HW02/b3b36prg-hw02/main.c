@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
         decompose(n);
     }
     if (n < 0) {
-        fprintf(stderr, "Error: Chybny vstup! %ld\n", n);
+        fprintf(stderr, "Error: Chybny vstup!\n");
         return ERROR_INPUT;
     }
     return ret;
