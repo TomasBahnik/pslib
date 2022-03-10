@@ -17,7 +17,8 @@ message "remove file '$OUTPUT_FILE'"
 rm -f $OUTPUT_FILE
 message "compiling with 'clang -pedantic -Wall -Werror -std=c99 -O3 -lm $COMPILE_FILES -o $OUTPUT_FILE'"
 clang -pedantic -Wall -Werror -std=c99 -O3 -lm $COMPILE_FILES -o $OUTPUT_FILE
-message "running ${#TEST_FILES[@]} tests"
+num_of_tests=${#TEST_FILES[@]}
+message "running $num_of_tests tests"
 
 FORMAT="%-10s %-5s %s\n"
 FORMAT_OUT="%-10s %-5s\n"
@@ -62,6 +63,7 @@ elapsed_ms=$((elapsed / 1000000))
 if ((elapsed_ms < 0)); then
   elapsed_ms=$((1000 + elapsed_ms))
 fi
-message "Elapsed time = $elapsed_ms ms"
+time_per_test=$((elapsed_ms / num_of_tests))
+message "Elapsed time = $elapsed_ms ms, time per test = $time_per_test ms"
 timing "Test end"
 exit 0
