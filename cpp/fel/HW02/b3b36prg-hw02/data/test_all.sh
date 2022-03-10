@@ -9,8 +9,8 @@ OUTPUT_FILE="b3b36prg-hw$HW"
 COMPILE_FILES="../erat_sieve.c ../main.c"
 message "remove file '$OUTPUT_FILE'"
 rm -f $OUTPUT_FILE
-message "compiling with 'clang -pedantic -Wall -Werror -std=c99 $COMPILE_FILES -o $OUTPUT_FILE'"
-clang -pedantic -Wall -Werror -std=c99 $COMPILE_FILES -o $OUTPUT_FILE
+message "compiling with 'clang -pedantic -Wall -Werror -std=c99 -O3 -lm $COMPILE_FILES -o $OUTPUT_FILE'"
+clang -pedantic -Wall -Werror -std=c99 -O3 -lm $COMPILE_FILES -o $OUTPUT_FILE
 message "running ${#TEST_FILES[@]} tests"
 
 FORMAT="%-10s %-5s %s\n"
