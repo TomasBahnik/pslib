@@ -6,12 +6,13 @@
 #define milion 1000000      // milion is 10 ** 6
 #define primes_in_mil 78498 // count of prime numbers in milion
 
+int read_number(void);
+int decompose(int n, int primes[]);
+void prime_numbers(int primes[]);
+int print_output(int counter, int i, int actual_num, int n, int primes[]);
+
 // solution 1 // mandatory
 // deviding input by smaller number than input number
-
-int read_number(void);
-void decompose(int n, int primes[]);
-void prime_numbers(int primes[]);
 
 // solution 2 // optional
 // dividing by smaller numbers && algorithm end when dividend is smaller than
@@ -57,13 +58,11 @@ void prime_numbers(int primes[])
             }
             primes[counter] = i;
             counter += 1;
-            // printf("%d\n", i);
         }
     }
-    // printf("%d\n", primes[3]); // only test for me
 }
 
-void decompose(int n, int primes[])
+int decompose(int n, int primes[])
 {
     int counter = 0;
     int actual_num = n;
@@ -73,19 +72,35 @@ void decompose(int n, int primes[])
             actual_num = actual_num / primes[i];
             counter += 1;
         }
-        if (n == 1) {
-            printf("1\n");
-            return;
-        }
-        if (counter > 1)
-            printf("%d^%d", primes[i], counter);
-        if (counter == 1)
-            printf("%d", primes[i]);
+        // condition true behind last printed number ---> doesn't print x at the
+        // end of row
         if (actual_num == 1) {
+            print_output(counter, i, actual_num, n, primes);
             printf("\n");
-            return;
+            return EXIT_SUCCESS;
         }
-        if (counter != 0)
-            printf(" x ");
+        print_output(counter, i, actual_num, n, primes);
     }
+    return EXIT_SUCCESS;
+}
+
+int print_output(int counter, int i, int actual_num, int n, int primes[])
+{
+    // condition true only if input number is 1
+    if (n == 1) {
+        printf("1");
+        return EXIT_SUCCESS;
+    }
+    // condition true if input number has prime numbers only once
+    if (counter == 1)
+        printf("%d", primes[i]);
+    // condition true if input number has multiple of same prime number
+    if (counter > 1)
+        printf("%d^%d", primes[i], counter);
+
+    // condition true if while cyclus run at least once
+    if (counter != 0 && actual_num != 1)
+        printf(" x ");
+
+    return EXIT_SUCCESS;
 }
