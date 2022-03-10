@@ -6,7 +6,6 @@
 
 long read_number(void);
 void decompose(long n);
-void prime_numbers_dec(long n);
 
 // solution 2 // optional
 // dividing by smaller numbers && algorithm end when dividend is smaller than
@@ -20,6 +19,7 @@ int main(int argc, char *argv[])
     int ret = EXIT_SUCCESS;
     long n;
     while ((n = read_number()) > 0) {
+        printf("Prvociselny rozklad cisla %ld je:\n", n);
         decompose(n);
     }
     if (n < 0) {
@@ -38,7 +38,7 @@ long read_number(void)
     return n;
 }
 
-void prime_numbers_dec(long n)
+void decompose(long n)
 {
     if (n == 1) {
         printf("%li\n", n);
@@ -69,10 +69,4 @@ void prime_numbers_dec(long n)
             }
         }
     }
-}
-
-void decompose(long n)
-{
-    printf("Prvociselny rozklad cisla %ld je:\n", n);
-    prime_numbers_dec(n);
 }
