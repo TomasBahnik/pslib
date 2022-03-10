@@ -6,7 +6,7 @@
 
 long read_number(void);
 void decompose(long n);
-int prime_numbers_dec(long n);
+void prime_numbers_dec(long n);
 
 // solution 2 // optional
 // dividing by smaller numbers && algorithm end when dividend is smaller than
@@ -38,13 +38,14 @@ long read_number(void)
     return n;
 }
 
-int prime_numbers_dec(long n)
+void prime_numbers_dec(long n)
 {
-    if (n == 1)
+    if (n == 1) {
         printf("%li\n", n);
+        return;
+    }
     int primes[MAX_NUM] = {0};
     int j, i;
-    int prime_count = 0;
     long m = n;
     for (i = 2; i < MAX_NUM; ++i) {
         int exp = 0;
@@ -67,10 +68,7 @@ int prime_numbers_dec(long n)
                 }
             }
         }
-        prime_count++;
     }
-    //    printf("for %i : number of primes = %i", MAX_NUM, prime_count);
-    return 0;
 }
 
 void decompose(long n)
