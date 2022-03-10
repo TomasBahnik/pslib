@@ -28,12 +28,13 @@ printf "$FORMAT" "exit_code" "status" "std error"
 printf "%s\n" "-------------------------------"
 
 timing "Test start"
+start_time="$(date '+%N')"
 for test_input in "${TEST_FILES[@]}"; do
   test_output_file=${test_input//in/out}
   test_output=$(cat "$test_output_file")
   test_error=${test_input//in/err}
   test_err_content=$(cat "$test_error")
-#  test_data=$(<"./$test_input")
+  #  test_data=$(<"./$test_input")
   error="$(./$OUTPUT_FILE <"$test_input" 2>&1 >/dev/null)"
   exit_code=$?
   if ((exit_code > 0)); then
@@ -55,5 +56,8 @@ for test_input in "${TEST_FILES[@]}"; do
     printf "$FORMAT_OUT" "$exit_code" "$res"
   fi
 done
+end_time="$(date '+%N')"
+elapsed="$((end_time - start_time))"
+message "Elapsed time = $elapsed"
 timing "Test end"
 exit 0
