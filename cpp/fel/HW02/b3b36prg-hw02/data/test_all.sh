@@ -6,7 +6,7 @@ function message() {
 
 TIMING_FORMAT='+%s.%N'
 function timing() {
-  printf "%s sec : %s\n" "$1" "$(date $TIMING_FORMAT)"
+  printf "%s : %s sec\n" "$1" "$(date $TIMING_FORMAT)"
 }
 
 HW=02
