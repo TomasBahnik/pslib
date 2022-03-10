@@ -27,9 +27,9 @@ int main(int argc, char *argv[])
     int primes[primes_in_mil];
     int ret = EXIT_SUCCESS;
     long int n;
+    prime_numbers(primes);
     while ((n = read_number()) > 0) {
         printf("Prvociselny rozklad cisla %ld je:\n", n);
-        prime_numbers(primes);
         decompose(n, primes);
     }
     if (n < 0) {
