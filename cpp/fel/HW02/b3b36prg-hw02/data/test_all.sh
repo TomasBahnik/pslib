@@ -57,7 +57,11 @@ for test_input in "${TEST_FILES[@]}"; do
   fi
 done
 end_time="$(date '+%N')"
-elapsed="$((end_time - start_time))"
-message "Elapsed time = $elapsed"
+elapsed=$((end_time - start_time))
+elapsed_ms=$((elapsed / 1000000))
+if ((elapsed_ms < 0)); then
+  elapsed_ms=$((1000 + elapsed_ms))
+fi
+message "Elapsed time = $elapsed_ms ms"
 timing "Test end"
 exit 0
