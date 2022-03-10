@@ -64,10 +64,12 @@ void prime_numbers(int primes[])
 
 int decompose(int n, int primes[])
 {
-    int counter = 0;
+    int counter = 0; // counting exponent
     int actual_num = n;
     for (int i = 0; i < primes_in_mil; ++i) {
         counter = 0;
+        // while cyclus for every i that is integer divisor for our
+        // number
         while (actual_num % primes[i] == 0) {
             actual_num = actual_num / primes[i];
             counter += 1;
