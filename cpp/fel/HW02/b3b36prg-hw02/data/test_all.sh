@@ -3,6 +3,12 @@ LOGGER_TIMEFORMAT='+%Y-%m-%dT%H:%M:%S%z'
 function message() {
   printf "%s : %s\n" "$(date $LOGGER_TIMEFORMAT)" "$1"
 }
+
+TIMING_FORMAT='+%s.%N'
+function timing() {
+  printf "%s sec : %s\n" "$1" "$(date $TIMING_FORMAT)"
+}
+
 HW=02
 TEST_FILES=(pub*.in)
 OUTPUT_FILE="b3b36prg-hw$HW"
@@ -21,6 +27,7 @@ printf "%s\n" "-------------------------------"
 printf "$FORMAT" "exit_code" "status" "std error"
 printf "%s\n" "-------------------------------"
 
+timing "Test start"
 for test_input in "${TEST_FILES[@]}"; do
   test_output_file=${test_input//in/out}
   test_output=$(cat "$test_output_file")
@@ -48,3 +55,5 @@ for test_input in "${TEST_FILES[@]}"; do
     printf "$FORMAT_OUT" "$exit_code" "$res"
   fi
 done
+timing "Test end"
+exit 0
