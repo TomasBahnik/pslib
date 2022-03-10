@@ -1,17 +1,12 @@
-#include "erat_sieve.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 #define ERROR_INPUT 100
-#define milion 1000000 // milion is 10 ** 6
-int array[milion] = {0};
-int *primes;
-// solution 1 // mandatory
-// deviding input by smaller number than input number
+#define MAX_NUM 1000000
 
 long read_number(void);
 void decompose(long n);
-void prime_numbers();
+int prime_numbers_dec(long n);
 
 // solution 2 // optional
 // dividing by smaller numbers && algorithm end when dividend is smaller than
@@ -43,19 +38,39 @@ long read_number(void)
     return n;
 }
 
-void prime_numbers()
+int prime_numbers_dec(long n)
 {
-    int cnt = 0;
-    for (int i = 2; i < milion; ++i) {
-        if (array[i] == 0) {
-            for (int j = i; j < milion; j += i) {
-                array[j] = 1;
+    if (n == 1)
+        printf("%li\n", n);
+    int primes[MAX_NUM] = {0};
+    int j, i;
+    int prime_count = 0;
+    long m = n;
+    for (i = 2; i < MAX_NUM; ++i) {
+        int exp = 0;
+        if (primes[i] == 0) {
+            for (j = i; j < MAX_NUM; j += i) {
+                primes[j] = 1;
             }
-            printf("prime[%i] = %d\n", cnt, i);
-            cnt++;
+            primes[i] = 0; // set the prime index back to 0
+            while (m % i == 0) {
+                exp++;
+                if (m / i == 1) {
+                    exp > 1 ? printf("%i^%i\n", i, exp) : printf("%i\n", i);
+                    break;
+                } else {
+                    m = m / i;
+                    if (m % i != 0) {
+                        exp > 1 ? printf("%i^%i x ", i, exp)
+                                : printf("%i x ", i);
+                    }
+                }
+            }
         }
+        prime_count++;
     }
-    printf("\nprimes count = %i for %i.", cnt, milion);
+    //    printf("for %i : number of primes = %i", MAX_NUM, prime_count);
+    return 0;
 }
 
 void decompose(long n)
