@@ -9,6 +9,10 @@ char *read_input_message(int *str_len);
 char rotate(char original, int offset);
 void shift(const char *src, char *dst, int offset);
 int compare(const char *str1, const char *str2);
+void print_error(int error);
+
+// only for test
+void print_str(char *str, int len);
 
 enum { ERROR_INPUT = 100, ERROR_LENGHT = 101 };
 const char *const error_str_input = "Error: Chybny vstup!";
@@ -16,7 +20,7 @@ const char *const error_str_lenght = "Error: Chybna delka vstupu!";
 
 int main(int argc, char *argv[])
 { //
-    int ret;
+    int ret = EXIT_SUCCESS;
     char *str_enc, *str, *str_tmp;
     int str_enc_len, str_len, str_tmp_len;
 
@@ -33,15 +37,23 @@ int main(int argc, char *argv[])
         ret = ERROR_LENGHT;
     }
 
-    switch (ret) {
-    case ERROR_INPUT:
-        fprintf(stderr, "%s\n", error_str_input);
-        break;
+    if (ret == EXIT_SUCCESS) {
+        printf("Input enc message size %d\n", str_enc_len);
+        print_str(str_enc, str_enc_len);
 
-    case ERROR_LENGHT:
-        fprintf(stderr, "%s\n", error_str_lenght);
-        break;
+        printf("\nInput message size %d\n", str_len);
+        print_str(str, str_len);
     }
+
+    // TODO - write for cyclus
+    // a-zA-Z
+    char c = 'a';
+    for (int i = 'a'; i <= 'z'; ++i) {
+        printf("i: %d - %c ---> %c\n", i, c, c + (i - 'a'));
+    }
+
+    // TODO - check if print errors
+    print_error(ret);
 
     free(str_enc);
     free(str);
@@ -60,14 +72,25 @@ char *read_input_message(int *str_len)
     } else {
         int a;
         while ((a = getchar()) != EOF && a != '\n') {
+            if (!((a >= 'a' && a <= 'z') ||
+                  (a >= 'A' && a <= 'Z'))) { // input out of range
+                free(str);
+                str = NULL;
+                len = 0;
+                break;
+            }
+
             if (capacity == len) { // reallocate
                 char *tmp = realloc(str, capacity * 2);
                 if (tmp == NULL) {
+                    fprintf(stderr, "ERROR REALLOC\n");
                     free(str);
                     str = NULL;
                     len = 0;
                     break;
                 }
+                capacity *= 2;
+                str = tmp;
             }
             str[len++] = a;
         }
@@ -91,4 +114,27 @@ int compare(const char *str1, const char *str2)
 {
     //
     return 0;
+}
+
+void print_str(char *str, int len)
+{
+    if (str) {
+        for (int i = 0; i < len; ++i) {
+            putchar(str[i]);
+        }
+        putchar('\n');
+    }
+}
+
+void print_error(int error)
+{
+    switch (error) {
+    case ERROR_INPUT:
+        fprintf(stderr, "%s\n", error_str_input);
+        break;
+
+    case ERROR_LENGHT:
+        fprintf(stderr, "%s\n", error_str_lenght);
+        break;
+    }
 }
