@@ -6,7 +6,7 @@
 
 // [a-z_A-Z]
 char *read_input_message(int *str_len);
-char rotate(char original, int offset);
+char rotate(char original[], int len_org);
 void shift(const char *src, char *dst, int offset);
 int compare(const char *str1, const char *str2);
 void print_error(int error);
@@ -46,32 +46,9 @@ int main(int argc, char *argv[])
     //     print_str(str, str_len);
     // }
 
-    // TODO - write for cyclus
-    // a-zA-Z
-    // char c = getchar();
-    int counter = 0;
-    char c;
-    char str_rot[str_enc_len];
-    for (int i = 'a'; i <= 'z'; ++i) {
-        c = str_enc[counter];
-        str_rot[counter] = c + 1;
-        counter++;
-        if (c == 0)
-            break;
-        printf("c = %d; i = %d; counter = %d\n", c, i, counter);
-    }
-    print_str(str_enc, str_enc_len);
-    print_str_rot(str_rot, str_enc_len);
-    // char c = 'a';
-    // for (int i = 'a'; i <= 'z'; ++i) {
-    //     printf("i: %d - %c ---> %c\n", i, c, c + (i - c));
-    // }
+    rotate(str_enc, str_enc_len);
 
-    // for (int i = 0; i <= str_enc_len; ++i) {
-    //     int a;
-    //     a = getchar();
-    //     printf("%d\n", a);
-    // }
+    // TODO add comapere function
 
     // TODO - check if print errors
     // print_error(ret);
@@ -120,10 +97,23 @@ char *read_input_message(int *str_len)
     return str;
 }
 
-char rotate(char original, int offset)
+char rotate(char original[], int len_org)
 {
-    //
-    return 0;
+    int counter = 0;
+    char c;
+    char str_rot[len_org];
+    for (int i = 'a'; i <= 'z'; ++i) {
+        c = original[counter];
+        str_rot[counter] = c + 1;
+        counter++;
+        if (c == 0)
+            break;
+        printf("c = %d; i = %d; counter = %d\n", c, i, counter);
+    }
+    print_str(original, len_org);
+    printf("--->\n");
+    print_str_rot(str_rot, len_org);
+    return str_rot;
 }
 
 void shift(const char *src, char *dst, int offset)
