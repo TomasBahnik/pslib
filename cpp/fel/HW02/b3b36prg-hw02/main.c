@@ -6,10 +6,11 @@
 #define milion 1000000      // milion is 10 ** 6
 #define primes_in_mil 78498 // count of prime numbers in milion
 
-int read_number(void);
-int decompose(int n, int primes[]);
+long int read_number(void);
+int decompose(long int n, int primes[]);
 void prime_numbers(int primes[]);
-int print_output(int counter, int i, int actual_num, int n, int primes[]);
+int print_output(int counter, int i, long int actual_num, long int n,
+                 int primes[]);
 
 // solution 1 // mandatory
 // deviding input by smaller number than input number
@@ -25,10 +26,10 @@ int main(int argc, char *argv[])
 {
     int primes[primes_in_mil];
     int ret = EXIT_SUCCESS;
-    int n;
+    long int n;
+    prime_numbers(primes);
     while ((n = read_number()) > 0) {
-        printf("Prvociselny rozklad cisla %d je:\n", n);
-        prime_numbers(primes);
+        printf("Prvociselny rozklad cisla %ld je:\n", n);
         decompose(n, primes);
     }
     if (n < 0) {
@@ -38,10 +39,10 @@ int main(int argc, char *argv[])
     return ret;
 }
 
-int read_number(void)
+long int read_number(void)
 {
-    int n = -1;
-    if (scanf("%d", &n) != 1) {
+    long int n = -1;
+    if (scanf("%ld", &n) != 1) {
         n = -1;
     }
     return n;
@@ -62,10 +63,10 @@ void prime_numbers(int primes[])
     }
 }
 
-int decompose(int n, int primes[])
+int decompose(long int n, int primes[])
 {
     int counter = 0; // counting exponent
-    int actual_num = n;
+    long int actual_num = n;
     for (int i = 0; i < primes_in_mil; ++i) {
         counter = 0;
         // while cyclus for every i that is integer divisor for our
@@ -86,7 +87,8 @@ int decompose(int n, int primes[])
     return EXIT_SUCCESS;
 }
 
-int print_output(int counter, int i, int actual_num, int n, int primes[])
+int print_output(int counter, int i, long int actual_num, long int n,
+                 int primes[])
 {
     // condition true only if input number is 1
     if (n == 1) {
