@@ -13,6 +13,7 @@ void print_error(int error);
 
 // only for test
 void print_str(char *str, int len);
+void print_str_rot(char *str_rot, int len);
 
 enum { ERROR_INPUT = 100, ERROR_LENGHT = 101 };
 const char *const error_str_input = "Error: Chybny vstup!";
@@ -37,29 +38,49 @@ int main(int argc, char *argv[])
         ret = ERROR_LENGHT;
     }
 
-    if (ret == EXIT_SUCCESS) {
-        printf("Input enc message size %d\n", str_enc_len);
-        print_str(str_enc, str_enc_len);
+    // if (ret == EXIT_SUCCESS) {
+    //     printf("Input enc message size %d\n", str_enc_len);
+    //     print_str(str_enc, str_enc_len);
 
-        printf("\nInput message size %d\n", str_len);
-        print_str(str, str_len);
-    }
+    //     printf("\nInput message size %d\n", str_len);
+    //     print_str(str, str_len);
+    // }
 
     // TODO - write for cyclus
     // a-zA-Z
-    char c = 'a';
+    // char c = getchar();
+    int counter = 0;
+    char c;
+    char str_rot[str_enc_len];
     for (int i = 'a'; i <= 'z'; ++i) {
-        printf("i: %d - %c ---> %c\n", i, c, c + (i - 'a'));
+        c = str_enc[counter];
+        str_rot[counter] = c + 1;
+        counter++;
+        if (c == 0)
+            break;
+        printf("c = %d; i = %d; counter = %d\n", c, i, counter);
     }
+    print_str(str_enc, str_enc_len);
+    print_str_rot(str_rot, str_enc_len);
+    // char c = 'a';
+    // for (int i = 'a'; i <= 'z'; ++i) {
+    //     printf("i: %d - %c ---> %c\n", i, c, c + (i - c));
+    // }
+
+    // for (int i = 0; i <= str_enc_len; ++i) {
+    //     int a;
+    //     a = getchar();
+    //     printf("%d\n", a);
+    // }
 
     // TODO - check if print errors
-    print_error(ret);
+    // print_error(ret);
 
     free(str_enc);
     free(str);
     free(str_tmp);
 
-    return 0;
+    return ret;
 }
 
 char *read_input_message(int *str_len)
@@ -121,6 +142,15 @@ void print_str(char *str, int len)
     if (str) {
         for (int i = 0; i < len; ++i) {
             putchar(str[i]);
+        }
+        putchar('\n');
+    }
+}
+void print_str_rot(char *str_rot, int len)
+{
+    if (str_rot) {
+        for (int i = 0; i < len; ++i) {
+            putchar(str_rot[i]);
         }
         putchar('\n');
     }
