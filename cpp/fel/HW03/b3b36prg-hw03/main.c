@@ -22,10 +22,10 @@ const char *const error_str_lenght = "Error: Chybna delka vstupu!";
 int main(int argc, char *argv[])
 { //
     int ret = EXIT_SUCCESS;
-    char *str_enc, *str, *str_tmp;
+    char *str_enc, *str, *str_rot;
     int str_enc_len, str_len, str_tmp_len;
 
-    str_enc = str = str_tmp = NULL;
+    str_enc = str = str_rot = NULL;
     str_enc_len = str_len = str_tmp_len = 0;
 
     str_enc = read_input_message(&str_enc_len);
@@ -46,16 +46,38 @@ int main(int argc, char *argv[])
     //     print_str(str, str_len);
     // }
 
-    rotate(str_enc, str_enc_len);
-
     // TODO add comapere function
+
+    int counter = 0;
+    int unity = 0;
+    char *str_tmp = malloc(str_enc_len * sizeof(char));
+    for (int i = 0; i <= str_len; ++i) {
+        str_tmp[i] = str_enc[i];
+    }
+    if (str_tmp == NULL) {
+        fprintf(stderr, "ERROR MALLOC\n");
+        exit(-1);
+    }
+    for (int i = 0; i <= 57; ++i) {
+        for (int j = 0; j <= str_len; ++j) {
+            if (str_rot[j] == str_tmp[j])
+                counter++;
+        }
+        if (unity <= counter)
+            unity = counter;
+        for (int i = 0; i <= str_len; ++i) {
+            str_tmp[i] = rotate(str_tmp, str_enc_len)[i];
+        }
+    }
+    // printf("%d\n", counter);
+    printf("%s\n", str_tmp);
+    free(str_tmp);
 
     // TODO - check if print errors
     // print_error(ret);
 
     free(str_enc);
     free(str);
-    free(str_tmp);
 
     return ret;
 }
@@ -123,6 +145,7 @@ char *rotate(char original[], int len_org)
     print_str(original, len_org);
     printf("--->\n");
     print_str_rot(str_rot, len_org);
+    free(str_rot);
     return str_rot;
 }
 
