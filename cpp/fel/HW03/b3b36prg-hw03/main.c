@@ -6,7 +6,7 @@
 
 // [a-z_A-Z]
 char *read_input_message(int *str_len);
-char rotate(char original[], int len_org);
+char *rotate(char original[], int len_org);
 void shift(const char *src, char *dst, int offset);
 int compare(const char *str1, const char *str2);
 void print_error(int error);
@@ -97,18 +97,28 @@ char *read_input_message(int *str_len)
     return str;
 }
 
-char rotate(char original[], int len_org)
+char *rotate(char original[], int len_org)
 {
     int counter = 0;
     char c;
-    char str_rot[len_org];
+    char *str_rot = malloc(len_org * sizeof(char));
+    if (str_rot == NULL) {
+        fprintf(stderr, "ERROR MALLOC");
+        exit(-1);
+    }
     for (int i = 'a'; i <= 'z'; ++i) {
         c = original[counter];
-        str_rot[counter] = c + 1;
-        counter++;
         if (c == 0)
             break;
-        printf("c = %d; i = %d; counter = %d\n", c, i, counter);
+        if (c == 'Z')
+            c = 'a' - 1;
+        if (c == 'z')
+            c = 'A' - 1;
+        str_rot[counter] = c + 1;
+        counter++;
+
+        printf("c = %d; i = %d; counter = %d; delka %d\n", c, i, counter,
+               len_org);
     }
     print_str(original, len_org);
     printf("--->\n");
