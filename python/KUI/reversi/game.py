@@ -202,5 +202,8 @@ def player(search_algorithm):
 
 
 if __name__ == "__main__":
-    final_state = play_game(TicTacToe(), dict(X=random_player, O=player(alpha_beta_search)), verbose=True).utility
-    print("final state {}".format(final_state))
+    tic_tac_toe = TicTacToe()
+    strategies = dict(X=random_player, O=player(minimax_search))
+    game = play_game(tic_tac_toe, strategies, verbose=True)
+    # final_state = game.utility
+    # print("final state {}".format(final_state))
