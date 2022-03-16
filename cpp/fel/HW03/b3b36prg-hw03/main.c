@@ -6,7 +6,7 @@
 
 // [a-z_A-Z]
 char *read_input_message(int *str_len);
-char *rotate(char original[], int len_org);
+void rotate(char original[], int len_org);
 void shift(const char *src, char *dst, int offset);
 int compare(const char *str1, const char *str2);
 void print_error(int error);
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     int counter = 0;
     int unity = 0;
     char *str_tmp = malloc(str_enc_len * sizeof(char));
-    for (int i = 0; i <= str_len; ++i) {
+    for (int i = 0; i < str_len; ++i) {
         str_tmp[i] = str_enc[i];
     }
     if (str_tmp == NULL) {
@@ -59,18 +59,23 @@ int main(int argc, char *argv[])
         exit(-1);
     }
     for (int i = 0; i <= 57; ++i) {
-        for (int j = 0; j <= str_len; ++j) {
-            if (str_rot[j] == str_tmp[j])
+        for (int j = 0; j < str_len; ++j) {
+            if (str_tmp[j] == str[j])
                 counter++;
+            printf("encode = %d; original = %d\n", str_tmp[j], str[j]);
+            printf("counte = %d; unity = %d\n", counter, unity);
         }
-        if (unity <= counter)
+        if (unity <= counter) {
             unity = counter;
-        for (int i = 0; i <= str_len; ++i) {
-            str_tmp[i] = rotate(str_tmp, str_enc_len)[i];
+            counter = 0;
         }
+        rotate(str_tmp, str_enc_len);
+        // printf("%d\n", k);
+        printf("%s\n", str_tmp);
+        // printf("%d\n", str_rot[k]);
     }
-    // printf("%d\n", counter);
-    printf("%s\n", str_tmp);
+    // printf("counter = %d; unity = %d\n", counter, unity);
+    // printf("%s\n", str_tmp);
     free(str_tmp);
 
     // TODO - check if print errors
@@ -119,34 +124,34 @@ char *read_input_message(int *str_len)
     return str;
 }
 
-char *rotate(char original[], int len_org)
+void rotate(char original[], int len_org)
 {
-    int counter = 0;
+    // int counter = 0;
     char c;
-    char *str_rot = malloc(len_org * sizeof(char));
-    if (str_rot == NULL) {
-        fprintf(stderr, "ERROR MALLOC");
-        exit(-1);
-    }
-    for (int i = 'a'; i <= 'z'; ++i) {
-        c = original[counter];
+    // char *str_rot = malloc(len_org * sizeof(char));
+    // if (str_rot == NULL) {
+    //     fprintf(stderr, "ERROR MALLOC");
+    //     exit(-1);
+    //}
+    for (int i = 0; i < len_org; ++i) {
+        c = original[i];
         if (c == 0)
             break;
         if (c == 'Z')
             c = 'a' - 1;
         if (c == 'z')
             c = 'A' - 1;
-        str_rot[counter] = c + 1;
-        counter++;
+        original[i] = c + 1;
+        // counter++;
 
-        printf("c = %d; i = %d; counter = %d; delka %d\n", c, i, counter,
-               len_org);
+        // printf("c = %d; i = %d; counter = %d; delka %d\n", c, i, counter,
+        //        len_org);
     }
-    print_str(original, len_org);
-    printf("--->\n");
-    print_str_rot(str_rot, len_org);
-    free(str_rot);
-    return str_rot;
+    // print_str(original, len_org);
+    // printf("--->\n");
+    // print_str_rot(str_rot, len_org);
+    // free(original);
+    // return original;
 }
 
 void shift(const char *src, char *dst, int offset)
