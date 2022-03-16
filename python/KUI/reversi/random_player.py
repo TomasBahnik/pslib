@@ -8,6 +8,15 @@ infinity = math.inf
 
 
 # TODO  must use only game board
+# player move function is called in headless_reversi_creator.py as
+# move = self.current_player.move(self.board.get_board_copy())
+# i.e with deep copy of current board initialized as
+# self.board = GameBoard(board_size, player1_color, player2_color)
+# def utility(self, state, player): is defined as
+# def utility(self, board, player):
+#     """Return the value to player; 1 for win, -1 for loss, 0 otherwise."""
+#     return board.utility if player == 'X' else -board.utility
+
 def minimax_search(game, state):
     """
     Search game tree to determine best move; return (value, move) pair.
