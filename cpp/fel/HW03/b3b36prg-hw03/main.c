@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     } else {
         compare(str, str_enc, str_enc_len);
     }
-
+    print_error(ret);
     return ret;
 }
 
@@ -113,10 +113,10 @@ void compare(char str[], char str_enc[], int str_enc_len)
             match = counter;
             counter = 0;
             memset(best_match, 0, str_enc_len);
-            for (int k = 0; str_tmp[k] != '0'; ++k) {
+            for (int k = 0; k < str_enc_len; ++k) {
                 best_match[k] = str_tmp[k];
-                printf("%d\n",
-                       str_tmp[10]); // <--- without this print doesnt work
+//                printf("%d\n",
+//                       str_tmp[10]); // <--- without this print doesnt work
             }
         } else {
             counter = 0;
