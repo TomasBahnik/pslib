@@ -9,7 +9,7 @@ function timing() {
   printf "%s : %s sec\n" "$1" "$(date $TIMING_FORMAT)"
 }
 
-HW=02
+HW=03
 TEST_FILES=(pub*.in)
 OUTPUT_FILE="b3b36prg-hw$HW"
 COMPILE_FILES="../main.c"
