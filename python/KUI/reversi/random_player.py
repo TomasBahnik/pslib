@@ -1,3 +1,4 @@
+import copy
 import random
 from collections import namedtuple
 
@@ -93,9 +94,18 @@ class MyPlayer(player.MyPlayer):
         return state.utility != 0 or len(state.moves) == 0
 
     def compute_utility(self, board, move):
-        game = np.array(board, dtype=int)
-        stones_cnt = np.count_nonzero(game != EMPTY_MARK)
-        empty_cnt = np.count_nonzero(game == EMPTY_MARK) # can be counted as size of board - stones_cnt
-        my_color_cnt = np.count_nonzero(game == self.my_color)
-        opp_color_cnt = np.count_nonzero(game == self.opponent_color)
-        return my_color_cnt - opp_color_cnt
+        b = copy.deepcopy(board)
+        if self.__is_correct_move(move, b):
+            b[move[0]][move[1]] = self.my_color
+            dx = [-1, -1, -1, 0, 1, 1, 1, 0]
+            dy = [-1, 0, 1, 1, 1, 0, -1, -1]
+            for i in range(len(dx)):
+                if self.__confirm_direction(move, dx[i], dy[i], board)[0]:
+                    player.change_stones_in_direction(b, move, dx[i], dy[i], self.my_color)
+            game = np.array(b, dtype=int)
+            stones_cnt = np.count_nonzero(game != EMPTY_MARK)
+            empty_cnt = np.count_nonzero(game == EMPTY_MARK)  # can be counted as size of board - stones_cnt
+            my_color_cnt = np.count_nonzero(game == self.my_color)
+            opp_color_cnt = np.count_nonzero(game == self.opponent_color)
+            return my_color_cnt - opp_color_cnt
+        return 0
