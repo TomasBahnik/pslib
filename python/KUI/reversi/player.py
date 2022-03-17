@@ -1,3 +1,12 @@
+def change_stones_in_direction(board, move, dx, dy, players_color):
+    posx = move[0] + dx
+    posy = move[1] + dy
+    while not (board[posx][posy] == players_color):
+        board[posx][posy] = players_color
+        posx += dx
+        posy += dy
+
+
 class MyPlayer():
     '''Template Docstring for MyPlayer, look at the TODOs''' # TODO a short description of your player
 
@@ -17,7 +26,7 @@ class MyPlayer():
         dy = [-1, 0, 1, 1, 1, 0, -1, -1]
         for i in range(len(dx)):
             if self.__confirm_direction(move, dx[i], dy[i], board)[0]:
-                return True, 
+                return True
         return False
 
     def __confirm_direction(self, move, dx, dy, board):
@@ -50,4 +59,3 @@ class MyPlayer():
             print('No possible move!')
             return None
         return valid_moves
-    
