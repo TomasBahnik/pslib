@@ -8,8 +8,7 @@
 // [a-z_A-Z]
 char *read_input_message(int *str_len);
 void rotate(char original[], int len_org);
-void shift(const char *src, char *dst, int offset);
-int compare(const char *str1, const char *str2);
+void compare(char str[], char str_enc[], int str_enc_len);
 void print_error(int error);
 
 // only for test
@@ -39,50 +38,7 @@ int main(int argc, char *argv[])
         ret = ERROR_LENGHT;
     }
 
-    // if (ret == EXIT_SUCCESS) {
-    //     printf("Input enc message size %d\n", str_enc_len);
-    //     print_str(str_enc, str_enc_len);
-
-    //     printf("\nInput message size %d\n", str_len);
-    //     print_str(str, str_len);
-    // }
-
-    // TODO add comapere function
-
-    int counter = 0;
-    int match = 0;
-    char best_match[str_enc_len];
-    char *str_tmp = malloc(str_enc_len * sizeof(char));
-    for (int i = 0; i < str_len; ++i) {
-        str_tmp[i] = str_enc[i];
-    }
-    if (str_tmp == NULL) {
-        fprintf(stderr, "ERROR MALLOC\n");
-        exit(-1);
-    }
-    for (int i = 0; i < 57; ++i) {
-        for (int j = 0; j < str_enc_len; ++j) {
-            if (str_tmp[j] == str[j])
-                counter++;
-            // printf("encode = %d; original = %d\n", str_tmp[j], str[j]);
-            // printf("counter = %d; unity = %d\n", counter, match);
-        }
-        if (match < counter) {
-            match = counter;
-            counter = 0;
-            memset(best_match, 0, str_enc_len);
-            for (int k = 0; str_tmp[k] != '0'; ++k) {
-                best_match[k] = str_tmp[k];
-                printf("k = %d\n", k);
-                printf("%d\n", str_tmp[10]);
-            }
-        } else
-            counter = 0;
-        rotate(str_tmp, str_enc_len);
-        printf("%s\n", str_tmp);
-    }
-    printf("%s\n", best_match);
-    free(str_tmp);
+    compare(str, str_enc, str_enc_len);
 
     // TODO - check if print errors
     // print_error(ret);
@@ -142,15 +98,41 @@ void rotate(char original[], int len_org)
     }
 }
 
-void shift(const char *src, char *dst, int offset)
+void compare(char str[], char str_enc[], int str_enc_len)
 {
-    //
-}
-
-int compare(const char *str1, const char *str2)
-{
-    //
-    return 0;
+    int counter = 0;
+    int match = 0;
+    char *best_match = malloc(str_enc_len * sizeof(char));
+    char *str_tmp = malloc(str_enc_len * sizeof(char));
+    for (int i = 0; i < str_enc_len; ++i) {
+        str_tmp[i] = str_enc[i];
+    }
+    if ((str_tmp == NULL) || (best_match == NULL)) {
+        fprintf(stderr, "ERROR MALLOC\n");
+        exit(-1);
+    }
+    for (int i = 0; i < 57; ++i) {
+        for (int j = 0; j < str_enc_len; ++j) {
+            if (str_tmp[j] == str[j])
+                counter++;
+        }
+        if (match < counter) {
+            match = counter;
+            counter = 0;
+            memset(best_match, 0, str_enc_len);
+            for (int k = 0; str_tmp[k] != '0'; ++k) {
+                best_match[k] = str_tmp[k];
+                printf("%d\n",
+                       str_tmp[10]); // <--- without this print doesnt work
+            }
+        } else {
+            counter = 0;
+        }
+        rotate(str_tmp, str_enc_len);
+    }
+    printf("%s\n", best_match);
+    free(str_tmp);
+    free(best_match);
 }
 
 void print_str(char *str, int len)
