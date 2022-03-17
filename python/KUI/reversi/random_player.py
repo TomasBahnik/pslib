@@ -62,11 +62,6 @@ class MyPlayer(player.MyPlayer):
 
     # the only function with access to board
     def move(self, board):
-        game = np.array(board, dtype=int)
-        stones_cnt = np.count_nonzero(game != EMPTY_MARK)
-        empty_cnt = np.count_nonzero(game == EMPTY_MARK) # can be counted as size of board - stones_cnt
-        my_color_cnt = np.count_nonzero(game == self.my_color)
-        opp_color_cnt = np.count_nonzero(game == self.opponent_color)
         moves = self.get_all_valid_moves(board)
         # main function to implement
         move = random.choice(moves) if len(moves) > 0 else None
@@ -98,4 +93,9 @@ class MyPlayer(player.MyPlayer):
         return state.utility != 0 or len(state.moves) == 0
 
     def compute_utility(self, board, move):
-        return len(self.state.moves)
+        game = np.array(board, dtype=int)
+        stones_cnt = np.count_nonzero(game != EMPTY_MARK)
+        empty_cnt = np.count_nonzero(game == EMPTY_MARK) # can be counted as size of board - stones_cnt
+        my_color_cnt = np.count_nonzero(game == self.my_color)
+        opp_color_cnt = np.count_nonzero(game == self.opponent_color)
+        return my_color_cnt - opp_color_cnt
