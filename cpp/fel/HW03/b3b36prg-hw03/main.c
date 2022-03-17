@@ -11,10 +11,6 @@ void rotate(char original[], int len_org);
 void compare(char str[], char str_enc[], int str_enc_len);
 void print_error(int error);
 
-// only for test
-void print_str(char *str, int len);
-void print_str_rot(char *str_rot, int len);
-
 enum { ERROR_INPUT = 100, ERROR_LENGHT = 101 };
 const char *const error_str_input = "Error: Chybny vstup!";
 const char *const error_str_lenght = "Error: Chybna delka vstupu!";
@@ -36,12 +32,9 @@ int main(int argc, char *argv[])
         ret = ERROR_INPUT;
     } else if (str_enc_len != str_len) {
         ret = ERROR_LENGHT;
+    } else {
+        compare(str, str_enc, str_enc_len);
     }
-
-    compare(str, str_enc, str_enc_len);
-
-    // TODO - check if print errors
-    // print_error(ret);
 
     return ret;
 }
@@ -133,25 +126,6 @@ void compare(char str[], char str_enc[], int str_enc_len)
     printf("%s\n", best_match);
     free(str_tmp);
     free(best_match);
-}
-
-void print_str(char *str, int len)
-{
-    if (str) {
-        for (int i = 0; i < len; ++i) {
-            putchar(str[i]);
-        }
-        putchar('\n');
-    }
-}
-void print_str_rot(char *str_rot, int len)
-{
-    if (str_rot) {
-        for (int i = 0; i < len; ++i) {
-            putchar(str_rot[i]);
-        }
-        putchar('\n');
-    }
 }
 
 void print_error(int error)
