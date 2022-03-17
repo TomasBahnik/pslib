@@ -5,6 +5,8 @@ import numpy as np
 
 import player
 
+EMPTY_MARK = -1
+
 infinity = np.inf
 GameState = namedtuple('GameState', 'utility, board, moves')
 
@@ -55,10 +57,16 @@ class MyPlayer(player.MyPlayer):
     def __init__(self, my_color, opponent_color, board_size=8):
         super().__init__(my_color, opponent_color, board_size)
         self.name = 'RANDOM'
-        self.state = GameState(utility=0, board={}, moves=[])
+        self.board_size = board_size
+        self.state = GameState(utility=0, board=[], moves=[])
 
     # the only function with access to board
     def move(self, board):
+        game = np.array(board, dtype=int)
+        stones_cnt = np.count_nonzero(game != EMPTY_MARK)
+        empty_cnt = np.count_nonzero(game == EMPTY_MARK) # can be counted as size of board - stones_cnt
+        my_color_cnt = np.count_nonzero(game == self.my_color)
+        opp_color_cnt = np.count_nonzero(game == self.opponent_color)
         moves = self.get_all_valid_moves(board)
         # main function to implement
         move = random.choice(moves) if len(moves) > 0 else None
