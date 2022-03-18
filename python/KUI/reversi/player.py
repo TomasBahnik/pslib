@@ -1,8 +1,8 @@
-def change_stones_in_direction(board, move, dx, dy, players_color):
+def change_stones_in_direction(board, move, dx, dy, player_color):
     posx = move[0] + dx
     posy = move[1] + dy
-    while not (board[posx][posy] == players_color):
-        board[posx][posy] = players_color
+    while not (board[posx][posy] == player_color):
+        board[posx][posy] = player_color
         posx += dx
         posy += dy
 
@@ -57,5 +57,5 @@ class MyPlayer():
 
         if len(valid_moves) <= 0:
             print('No possible move!')
-            return None
+            return []
         return valid_moves
