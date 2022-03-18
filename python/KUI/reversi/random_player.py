@@ -1,5 +1,4 @@
 import copy
-import random
 from collections import namedtuple
 
 import numpy as np
@@ -9,49 +8,34 @@ import player
 EMPTY_MARK = -1
 
 infinity = np.inf
-GameState = namedtuple('GameState', 'utility, board, moves')
+GameState = namedtuple('GameState', 'to_move, utility, board, moves')
 
 
-# TODO  must use only game board
-# player move function is called in headless_reversi_creator.py as
-# move = self.current_player.move(self.board.get_board_copy())
-# i.e with deep copy of current board initialized as
-# self.board = GameBoard(board_size, player1_color, player2_color)
-# def utility(self, state, player): is defined as
-# def utility(self, board, player):
-#     """Return the value to player; 1 for win, -1 for loss, 0 otherwise."""
-#     return board.utility if player == 'X' else -board.utility
+def minmax_decision(state, game):
+    """Given a state in a game, calculate the best move by searching
+    forward all the way to the terminal states. [Figure 5.3]"""
 
-def minimax_search(game, state):
-    """
-    Search game tree to determine best move; return (value, move) pair.
-    Where `value` is the utility that the algorithm computes for the player whose turn it is to move
-    and `move` is the move itself
-    """
-
-    player = state.to_move
+    # player color = 0, -1
+    player = game.to_move(state)
 
     def max_value(state):
-        if game.is_terminal(state):
-            return game.utility(state, player), None
-        v, move = -infinity, None
+        if game.terminal_test(state):
+            return game.utility(state, player)
+        v = -np.inf
         for a in game.actions(state):
-            v2, _ = min_value(game.result(state, a))
-            if v2 > v:
-                v, move = v2, a
-        return v, move
+            v = max(v, min_value(game.result(state, a)))
+        return v
 
     def min_value(state):
-        if game.is_terminal(state):
-            return game.utility(state, player), None
-        v, move = +infinity, None
+        if game.terminal_test(state):
+            return game.utility(state, player)
+        v = np.inf
         for a in game.actions(state):
-            v2, _ = max_value(game.result(state, a))
-            if v2 < v:
-                v, move = v2, a
-        return v, move
+            v = min(v, max_value(game.result(state, a)))
+        return v
 
-    return max_value(state)
+    # Body of minmax_decision:
+    return max(game.actions(state), key=lambda a: min_value(game.result(state, a)))
 
 
 class MyPlayer(player.MyPlayer):
@@ -59,53 +43,63 @@ class MyPlayer(player.MyPlayer):
         super().__init__(my_color, opponent_color, board_size)
         self.name = 'RANDOM'
         self.board_size = board_size
-        self.state = GameState(utility=0, board=[], moves=[])
+        self.state = GameState(to_move=my_color, utility=0, board=[], moves=[])
+
+    def to_move(self, state):
+        """Return the player whose move it is in this state."""
+        return state.to_move
 
     # the only function with access to board
     def move(self, board):
-        moves = self.get_all_valid_moves(board)
+        board_tmp = copy.deepcopy(board)
+        moves = self.get_all_valid_moves(board_tmp)
         # main function to implement
-        move = random.choice(moves) if len(moves) > 0 else None
-        utility = self.compute_utility(board, move)
-        self.state = GameState(utility=utility, board=board, moves=moves)
+        # move = random.choice(moves) if len(moves) > 0 else None
+        # TODO utility is set to 0 ?? new GameState is returned from results
+        self.state = GameState(to_move=self.my_color, utility=0, board=board_tmp, moves=moves)
+        move = minmax_decision(self.state, self)
+        utility = self.compute_utility(board_tmp, move, self.my_color)
+        self.state = GameState(to_move=self.my_color, utility=utility, board=board_tmp, moves=moves)
         return move
 
-    def actions(self):
+    def actions(self, state):
         """Legal moves are any square not yet taken."""
-        return self.state.moves
+        ret_val = self.get_all_valid_moves(state.board)
+        return ret_val
 
     # TODO board is updated by game controller after move
     def result(self, state, move):
         if move not in state.moves:
             return state  # Illegal move has no effect
-        board = state.board.copy()
-        board[move] = state.to_move
-        moves = list(state.moves)
-        moves.remove(move)
-        utility = self.compute_utility(board, move)
-        return GameState(utility=utility, board=board, moves=moves)
+        board = state.board
+        # board[move] = state.to_move
+        moves = self.get_all_valid_moves(board)
+        utility = self.compute_utility(board, move, state.to_move)
+        to_move = self.opponent_color if state.to_move == self.my_color else self.my_color
+        return GameState(to_move=to_move, utility=utility, board=board, moves=moves)
 
     def utility(self, state, player_color):
         """Return the value to player; 1 for win, -1 for loss, 0 otherwise."""
         return state.utility if player_color == self.my_color else -state.utility
 
     def terminal_test(self, state):
-        """A state is terminal if it is won or there are no empty squares."""
-        return state.utility != 0 or len(state.moves) == 0
+        """A state is terminal if there are no moves??."""
+        actions = self.actions(state)
+        ret_val = True if actions is None else False
+        return ret_val
 
-    def compute_utility(self, board, move):
-        b = copy.deepcopy(board)
-        if self.__is_correct_move(move, b):
-            b[move[0]][move[1]] = self.my_color
+    def compute_utility(self, board, move, player_color):
+        # b = copy.deepcopy(board)
+        if self.__is_correct_move(move, board):
+            board[move[0]][move[1]] = self.my_color
             dx = [-1, -1, -1, 0, 1, 1, 1, 0]
             dy = [-1, 0, 1, 1, 1, 0, -1, -1]
             for i in range(len(dx)):
                 if self.__confirm_direction(move, dx[i], dy[i], board)[0]:
-                    player.change_stones_in_direction(b, move, dx[i], dy[i], self.my_color)
-            game = np.array(b, dtype=int)
-            stones_cnt = np.count_nonzero(game != EMPTY_MARK)
-            empty_cnt = np.count_nonzero(game == EMPTY_MARK)  # can be counted as size of board - stones_cnt
-            my_color_cnt = np.count_nonzero(game == self.my_color)
-            opp_color_cnt = np.count_nonzero(game == self.opponent_color)
-            return my_color_cnt - opp_color_cnt
+                    player.change_stones_in_direction(board, move, dx[i], dy[i], self.my_color)
+            board_np = np.array(board, dtype=int)
+            my_color_cnt = np.count_nonzero(board_np == self.my_color)
+            opp_color_cnt = np.count_nonzero(board_np == self.opponent_color)
+            cnt = my_color_cnt - opp_color_cnt
+            return cnt if player_color == self.my_color else -cnt
         return 0
