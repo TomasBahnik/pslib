@@ -44,7 +44,7 @@ char *read_input_message(int *str_len)
 {
     int capacity = INT_STR_LEN;
     int len = 0;
-    char *str = malloc(capacity);
+    char *str = malloc(capacity * sizeof(char));
     if (str == NULL) {
         fprintf(stderr, " ERROR MALLOC\n"); // improbable
         exit(-1);
@@ -134,6 +134,8 @@ void compare(char str[], char str_enc[], int str_enc_len)
     printf("%s\n", best_match);
     free(str_tmp);
     free(best_match);
+    str_tmp = NULL;
+    best_match = NULL;
 }
 
 void print_error(int error)
