@@ -11,31 +11,48 @@ infinity = np.inf
 GameState = namedtuple('GameState', 'to_move, utility, board, moves')
 
 
-def minmax_decision(state, game):
-    """Given a state in a game, calculate the best move by searching
-    forward all the way to the terminal states. [Figure 5.3]"""
+def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
+    """Search game to determine best action; use alpha-beta pruning.
+    This version cuts off search and uses an evaluation function."""
 
-    # player color = 0, -1
     player = game.to_move(state)
 
-    def max_value(state):
-        if game.terminal_test(state):
-            return game.utility(state, player)
+    # Functions used by alpha_beta
+    def max_value(state, alpha, beta, depth):
+        if cutoff_test(state, depth):
+            return eval_fn(state)
         v = -np.inf
         for a in game.actions(state):
-            v = max(v, min_value(game.result(state, a)))
+            v = max(v, min_value(game.result(state, a), alpha, beta, depth + 1))
+            if v >= beta:
+                return v
+            alpha = max(alpha, v)
         return v
 
-    def min_value(state):
-        if game.terminal_test(state):
-            return game.utility(state, player)
+    def min_value(state, alpha, beta, depth):
+        if cutoff_test(state, depth):
+            return eval_fn(state)
         v = np.inf
         for a in game.actions(state):
-            v = min(v, max_value(game.result(state, a)))
+            v = min(v, max_value(game.result(state, a), alpha, beta, depth + 1))
+            if v <= alpha:
+                return v
+            beta = min(beta, v)
         return v
 
-    # Body of minmax_decision:
-    return max(game.actions(state), key=lambda a: min_value(game.result(state, a)))
+    # Body of alpha_beta_cutoff_search starts here:
+    # The default test cuts off at depth d or at a terminal state
+    cutoff_test = (cutoff_test or (lambda state, depth: depth > d or game.terminal_test(state)))
+    eval_fn = eval_fn or (lambda state: game.utility(state, player))
+    best_score = -np.inf
+    beta = np.inf
+    best_action = None
+    for a in game.actions(state):
+        v = min_value(game.result(state, a), best_score, beta, 1)
+        if v > best_score:
+            best_score = v
+            best_action = a
+    return best_action
 
 
 class MyPlayer(player.MyPlayer):
@@ -55,9 +72,8 @@ class MyPlayer(player.MyPlayer):
         moves = self.get_all_valid_moves(board_tmp)
         # main function to implement
         # move = random.choice(moves) if len(moves) > 0 else None
-        # TODO utility is set to 0 ?? new GameState is returned from results
         self.state = GameState(to_move=self.my_color, utility=0, board=board_tmp, moves=moves)
-        move = minmax_decision(self.state, self)
+        move = alpha_beta_cutoff_search(self.state, self, d=2)
         utility = self.compute_utility(board_tmp, move, self.my_color)
         self.state = GameState(to_move=self.my_color, utility=utility, board=board_tmp, moves=moves)
         return move
@@ -89,17 +105,38 @@ class MyPlayer(player.MyPlayer):
         return ret_val
 
     def compute_utility(self, board, move, player_color):
-        # b = copy.deepcopy(board)
         if self.__is_correct_move(move, board):
-            board[move[0]][move[1]] = self.my_color
-            dx = [-1, -1, -1, 0, 1, 1, 1, 0]
-            dy = [-1, 0, 1, 1, 1, 0, -1, -1]
-            for i in range(len(dx)):
-                if self.__confirm_direction(move, dx[i], dy[i], board)[0]:
-                    player.change_stones_in_direction(board, move, dx[i], dy[i], self.my_color)
+            self.play_move(board, move, player_color)
             board_np = np.array(board, dtype=int)
             my_color_cnt = np.count_nonzero(board_np == self.my_color)
             opp_color_cnt = np.count_nonzero(board_np == self.opponent_color)
             cnt = my_color_cnt - opp_color_cnt
             return cnt if player_color == self.my_color else -cnt
         return 0
+
+    def play_move(self, board, move, player_color):
+        board[move[0]][move[1]] = player_color
+        dx = [-1, -1, -1, 0, 1, 1, 1, 0]
+        dy = [-1, 0, 1, 1, 1, 0, -1, -1]
+        for i in range(len(dx)):
+            if self.confirm_direction(board, move, dx[i], dy[i], player_color):
+                player.change_stones_in_direction(board, move, dx[i], dy[i], player_color)
+
+    def confirm_direction(self, board, move, dx, dy, player_color):
+        if player_color == self.my_color:
+            opponents_color = self.opponent_color
+        else:
+            opponents_color = self.my_color
+        posx = move[0] + dx
+        posy = move[1] + dy
+        if (posx >= 0) and (posx < self.board_size) and (posy >= 0) and (posy < self.board_size):
+            if board[posx][posy] == opponents_color:
+                while (posx >= 0) and (posx < self.board_size) and (posy >= 0) and (posy < self.board_size):
+                    posx += dx
+                    posy += dy
+                    if (posx >= 0) and (posx < self.board_size) and (posy >= 0) and (posy < self.board_size):
+                        if board[posx][posy] == EMPTY_MARK:
+                            return False
+                        if board[posx][posy] == player_color:
+                            return True
+        return False
