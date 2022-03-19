@@ -11,9 +11,16 @@ infinity = np.inf
 GameState = namedtuple('GameState', 'to_move, utility, board, moves')
 
 
+def max_utility(state, game):
+    player = game.to_move(state)
+    return max(game.actions(state), key=lambda a: game.utility(state, player))
+
+
 def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
-    """Search game to determine best action; use alpha-beta pruning.
-    This version cuts off search and uses an evaluation function."""
+    """
+    Search game to determine best action; use alpha-beta pruning.
+    This version cuts off search and uses an evaluation function.
+    """
 
     player = game.to_move(state)
 
@@ -55,12 +62,14 @@ def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
     return best_action
 
 
+game_state = GameState(to_move=EMPTY_MARK, utility=0, board=[], moves=[])
+
+
 class MyPlayer(player.MyPlayer):
     def __init__(self, my_color, opponent_color, board_size=8):
         super().__init__(my_color, opponent_color, board_size)
-        self.name = 'RANDOM'
+        self.name = 'Bahnik'
         self.board_size = board_size
-        self.state = GameState(to_move=my_color, utility=0, board=[], moves=[])
 
     def to_move(self, state):
         """Return the player whose move it is in this state."""
@@ -68,46 +77,45 @@ class MyPlayer(player.MyPlayer):
 
     # the only function with access to board
     def move(self, board):
-        board_tmp = copy.deepcopy(board)
-        moves = self.get_all_valid_moves(board_tmp)
-        # main function to implement
-        # move = random.choice(moves) if len(moves) > 0 else None
-        self.state = GameState(to_move=self.my_color, utility=0, board=board_tmp, moves=moves)
-        move = alpha_beta_cutoff_search(self.state, self, d=2)
-        utility = self.compute_utility(board_tmp, move, self.my_color)
-        self.state = GameState(to_move=self.my_color, utility=utility, board=board_tmp, moves=moves)
+        moves = self.get_all_valid_moves(board)
+        global game_state
+        game_state = GameState(to_move=self.my_color, utility=0, board=board, moves=moves)
+        # move = alpha_beta_cutoff_search(game_state, self, d=1)
+        move = max_utility(game_state, self)
         return move
 
     def actions(self, state):
-        """Legal moves are any square not yet taken."""
         ret_val = self.get_all_valid_moves(state.board)
         return ret_val
 
-    # TODO board is updated by game controller after move
     def result(self, state, move):
         if move not in state.moves:
             return state  # Illegal move has no effect
         board = state.board
-        # board[move] = state.to_move
         moves = self.get_all_valid_moves(board)
         utility = self.compute_utility(board, move, state.to_move)
-        to_move = self.opponent_color if state.to_move == self.my_color else self.my_color
+        # TODO when to change player for alpha beta
+        # to_move = self.opponent_color if state.to_move == self.my_color else self.my_color
+        to_move = state.to_move
         return GameState(to_move=to_move, utility=utility, board=board, moves=moves)
 
     def utility(self, state, player_color):
-        """Return the value to player; 1 for win, -1 for loss, 0 otherwise."""
         return state.utility if player_color == self.my_color else -state.utility
 
     def terminal_test(self, state):
-        """A state is terminal if there are no moves??."""
+        """
+        A state is terminal if there are no moves.
+        self.get_all_valid_moves return always array not None
+        """
         actions = self.actions(state)
-        ret_val = True if actions is None else False
+        ret_val = len(actions) == 0
         return ret_val
 
     def compute_utility(self, board, move, player_color):
         if self.__is_correct_move(move, board):
-            self.play_move(board, move, player_color)
-            board_np = np.array(board, dtype=int)
+            board_tmp = copy.deepcopy(board)
+            self.play_move(board_tmp, move, player_color)
+            board_np = np.array(board_tmp, dtype=int)
             my_color_cnt = np.count_nonzero(board_np == self.my_color)
             opp_color_cnt = np.count_nonzero(board_np == self.opponent_color)
             cnt = my_color_cnt - opp_color_cnt
