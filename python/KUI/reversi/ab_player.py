@@ -62,9 +62,6 @@ def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
     return best_action
 
 
-game_state = GameState(to_move=EMPTY_MARK, utility=0, board=[], moves=[])
-
-
 class MyPlayer(player.MyPlayer):
     def __init__(self, my_color, opponent_color, board_size=8):
         super().__init__(my_color, opponent_color, board_size)
@@ -78,7 +75,6 @@ class MyPlayer(player.MyPlayer):
     # the only function with access to board
     def move(self, board):
         moves = self.get_all_valid_moves(board)
-        global game_state
         game_state = GameState(to_move=self.my_color, utility=0, board=board, moves=moves)
         # move = alpha_beta_cutoff_search(game_state, self, d=1)
         move = max_utility(game_state, self)
