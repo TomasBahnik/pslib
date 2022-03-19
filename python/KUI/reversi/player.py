@@ -69,7 +69,7 @@ def change_stones_in_direction(board, move, dx, dy, player_color):
         posy += dy
 
 
-class MyPlayer():
+class MyPlayer:
     def __init__(self, my_color, opponent_color, board_size=8):
         self.name = 'Bahnik'
         self.my_color = my_color
