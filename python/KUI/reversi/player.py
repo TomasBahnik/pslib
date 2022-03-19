@@ -10,6 +10,7 @@ GameState = namedtuple('GameState', 'to_move, utility, board, moves')
 
 
 def max_utility(state, game):
+    # TODO player is not changed during the computation of utility function
     player = game.to_move(state)
     return max(game.actions(state), key=lambda a: game.utility(state, player))
 
@@ -153,14 +154,17 @@ class MyPlayer:
                             return True
         return False
 
+    # TODO when changing player add player argument
     def __is_correct_move(self, move, board):
         dx = [-1, -1, -1, 0, 1, 1, 1, 0]
         dy = [-1, 0, 1, 1, 1, 0, -1, -1]
         for i in range(len(dx)):
-            if self.__confirm_direction(move, dx[i], dy[i], board)[0]:
+            if self.confirm_direction(board, move, dx[i], dy[i], self.my_color):
                 return True
         return False
 
+    # original function for my_color only. returns tuple and have different order of args
+    # not used TODO remove
     def __confirm_direction(self, move, dx, dy, board):
         posx = move[0] + dx
         posy = move[1] + dy
