@@ -75,6 +75,14 @@ def change_stones_in_direction(board, move, dx, dy, player_color):
 
 
 class MyPlayer:
+    """
+    Player for reversi game based on model used in AIMA book http://aima.cs.berkeley.edu/
+    3 players
+    * random player : returns randomly one of available moves
+    * max utility : returns move with max utility where utility of move = my_color_count - opponent_color_count
+      after that move
+    * alpha_beta_cutoff_search - TODO WIP
+    """
     def __init__(self, my_color, opponent_color, board_size=8):
         self.name = 'Bahnik'
         self.my_color = my_color
