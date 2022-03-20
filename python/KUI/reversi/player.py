@@ -1,4 +1,5 @@
 import copy
+import random
 from collections import namedtuple
 
 import numpy as np
@@ -9,10 +10,13 @@ infinity = np.inf
 GameState = namedtuple('GameState', 'to_move, utility, board, moves')
 
 
+def random_player(state, game):
+    moves = game.actions(state)
+    return random.choice(moves) if len(moves) > 0 else None
+
+
 def max_utility(state, game):
-    # TODO player is not changed during the computation of utility function
-    player = game.to_move(state)
-    return max(game.actions(state), key=lambda a: game.utility(state, player))
+    return max(game.actions(state), key=lambda move: game.result(state, move).utility)
 
 
 def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
@@ -83,10 +87,10 @@ class MyPlayer:
 
     # the only function with access to board
     def move(self, board):
-        moves = self.get_all_valid_moves(board, self.my_color)
-        game_state = GameState(to_move=self.my_color, utility=0, board=board, moves=moves)
-        move = alpha_beta_cutoff_search(game_state, self, d=3)
-        # move = max_utility(game_state, self)
+        game_state = GameState(to_move=self.my_color, utility=0, board=board, moves=[])
+        # move = alpha_beta_cutoff_search(game_state, self, d=3)
+        # move = random_player(game_state, self)
+        move = max_utility(game_state, self)
         return move
 
     def actions(self, state):
@@ -94,8 +98,6 @@ class MyPlayer:
         return ret_val
 
     def result(self, state, move):
-        # if move not in state.moves:
-        #     return state  # Illegal move has no effect
         board = state.board
         board_tmp = copy.deepcopy(board)
         self.play_move(board_tmp, move, state.to_move)
@@ -120,13 +122,11 @@ class MyPlayer:
         return ret_val
 
     def compute_utility(self, board_tmp, move, player_color):
-        # if self.__is_correct_move(move, board_tmp, player_color):
         board_np = np.array(board_tmp, dtype=int)
         my_color_cnt = np.count_nonzero(board_np == self.my_color)
         opp_color_cnt = np.count_nonzero(board_np == self.opponent_color)
         cnt = my_color_cnt - opp_color_cnt
         return cnt if player_color == self.my_color else -cnt
-        # return 0
 
     def play_move(self, board, move, player_color):
         board[move[0]][move[1]] = player_color
@@ -162,28 +162,6 @@ class MyPlayer:
             if self.confirm_direction(board, move, dx[i], dy[i], player):
                 return True
         return False
-
-    # original function for my_color only. returns tuple and have different order of args
-    # not used TODO remove
-    def __confirm_direction(self, move, dx, dy, board):
-        posx = move[0] + dx
-        posy = move[1] + dy
-        opp_stones_inverted = 0
-        if (posx >= 0) and (posx < self.board_size) and (posy >= 0) and (posy < self.board_size):
-            if board[posx][posy] == self.opponent_color:
-                opp_stones_inverted += 1
-                while (posx >= 0) and (posx <= (self.board_size - 1)) and (posy >= 0) and (
-                        posy <= (self.board_size - 1)):
-                    posx += dx
-                    posy += dy
-                    if (posx >= 0) and (posx < self.board_size) and (posy >= 0) and (posy < self.board_size):
-                        if board[posx][posy] == -1:
-                            return False, 0
-                        if board[posx][posy] == self.my_color:
-                            return True, opp_stones_inverted
-                    opp_stones_inverted += 1
-
-        return False, 0
 
     def get_all_valid_moves(self, board, player):
         valid_moves = []
