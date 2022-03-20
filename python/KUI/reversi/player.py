@@ -83,14 +83,14 @@ class MyPlayer:
 
     # the only function with access to board
     def move(self, board):
-        moves = self.get_all_valid_moves(board)
+        moves = self.get_all_valid_moves(board, self.my_color)
         game_state = GameState(to_move=self.my_color, utility=0, board=board, moves=moves)
         # move = alpha_beta_cutoff_search(game_state, self, d=1)
         move = max_utility(game_state, self)
         return move
 
     def actions(self, state):
-        ret_val = self.get_all_valid_moves(state.board)
+        ret_val = self.get_all_valid_moves(state.board, state.to_move)
         return ret_val
 
     def result(self, state, move):
@@ -117,7 +117,7 @@ class MyPlayer:
         return ret_val
 
     def compute_utility(self, board, move, player_color):
-        if self.__is_correct_move(move, board):
+        if self.__is_correct_move(move, board, player_color):
             board_tmp = copy.deepcopy(board)
             self.play_move(board_tmp, move, player_color)
             board_np = np.array(board_tmp, dtype=int)
@@ -155,11 +155,11 @@ class MyPlayer:
         return False
 
     # TODO when changing player add player argument
-    def __is_correct_move(self, move, board):
+    def __is_correct_move(self, move, board, player):
         dx = [-1, -1, -1, 0, 1, 1, 1, 0]
         dy = [-1, 0, 1, 1, 1, 0, -1, -1]
         for i in range(len(dx)):
-            if self.confirm_direction(board, move, dx[i], dy[i], self.my_color):
+            if self.confirm_direction(board, move, dx[i], dy[i], player):
                 return True
         return False
 
@@ -185,11 +185,11 @@ class MyPlayer:
 
         return False, 0
 
-    def get_all_valid_moves(self, board):
+    def get_all_valid_moves(self, board, player):
         valid_moves = []
         for x in range(self.board_size):
             for y in range(self.board_size):
-                if (board[x][y] == -1) and self.__is_correct_move([x, y], board):
+                if (board[x][y] == -1) and self.__is_correct_move([x, y], board, player):
                     valid_moves.append((x, y))
 
         if len(valid_moves) <= 0:
