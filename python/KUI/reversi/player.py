@@ -75,6 +75,8 @@ def change_stones_in_direction(board, move, dx, dy, player_color):
 
 
 class MyPlayer:
+    """Player for reversi game based on model used in AIMA book"""
+
     def __init__(self, my_color, opponent_color, board_size=8):
         self.name = 'Bahnik'
         self.my_color = my_color
