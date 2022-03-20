@@ -85,8 +85,8 @@ class MyPlayer:
     def move(self, board):
         moves = self.get_all_valid_moves(board, self.my_color)
         game_state = GameState(to_move=self.my_color, utility=0, board=board, moves=moves)
-        # move = alpha_beta_cutoff_search(game_state, self, d=1)
-        move = max_utility(game_state, self)
+        move = alpha_beta_cutoff_search(game_state, self, d=3)
+        # move = max_utility(game_state, self)
         return move
 
     def actions(self, state):
@@ -94,15 +94,18 @@ class MyPlayer:
         return ret_val
 
     def result(self, state, move):
-        if move not in state.moves:
-            return state  # Illegal move has no effect
+        # if move not in state.moves:
+        #     return state  # Illegal move has no effect
         board = state.board
-        moves = self.get_all_valid_moves(board)
-        utility = self.compute_utility(board, move, state.to_move)
-        # TODO when to change player for alpha beta
-        # to_move = self.opponent_color if state.to_move == self.my_color else self.my_color
-        to_move = state.to_move
-        return GameState(to_move=to_move, utility=utility, board=board, moves=moves)
+        board_tmp = copy.deepcopy(board)
+        self.play_move(board_tmp, move, state.to_move)
+        # utility for current player
+        utility = self.compute_utility(board_tmp, move, state.to_move)
+        # exchange players
+        to_move = self.opponent_color if state.to_move == self.my_color else self.my_color
+        # moves of the changed player
+        moves = self.get_all_valid_moves(board_tmp, to_move)
+        return GameState(to_move=to_move, utility=utility, board=board_tmp, moves=moves)
 
     def utility(self, state, player_color):
         return state.utility if player_color == self.my_color else -state.utility
@@ -116,16 +119,14 @@ class MyPlayer:
         ret_val = len(actions) == 0
         return ret_val
 
-    def compute_utility(self, board, move, player_color):
-        if self.__is_correct_move(move, board, player_color):
-            board_tmp = copy.deepcopy(board)
-            self.play_move(board_tmp, move, player_color)
-            board_np = np.array(board_tmp, dtype=int)
-            my_color_cnt = np.count_nonzero(board_np == self.my_color)
-            opp_color_cnt = np.count_nonzero(board_np == self.opponent_color)
-            cnt = my_color_cnt - opp_color_cnt
-            return cnt if player_color == self.my_color else -cnt
-        return 0
+    def compute_utility(self, board_tmp, move, player_color):
+        # if self.__is_correct_move(move, board_tmp, player_color):
+        board_np = np.array(board_tmp, dtype=int)
+        my_color_cnt = np.count_nonzero(board_np == self.my_color)
+        opp_color_cnt = np.count_nonzero(board_np == self.opponent_color)
+        cnt = my_color_cnt - opp_color_cnt
+        return cnt if player_color == self.my_color else -cnt
+        # return 0
 
     def play_move(self, board, move, player_color):
         board[move[0]][move[1]] = player_color
@@ -154,7 +155,6 @@ class MyPlayer:
                             return True
         return False
 
-    # TODO when changing player add player argument
     def __is_correct_move(self, move, board, player):
         dx = [-1, -1, -1, 0, 1, 1, 1, 0]
         dy = [-1, 0, 1, 1, 1, 0, -1, -1]
