@@ -25,8 +25,6 @@ def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
     This version cuts off search and uses an evaluation function.
     """
 
-    player = game.to_move(state)
-
     # Functions used by alpha_beta
     def max_value(state, alpha, beta, depth):
         if cutoff_test(state, depth):
@@ -78,7 +76,7 @@ class MyPlayer:
     """Player for reversi game based on model used in AIMA book"""
 
     def __init__(self, my_color, opponent_color, board_size=8):
-        self.name = 'Bahnik'
+        self.name = 'bahnitom'
         self.my_color = my_color
         self.opponent_color = opponent_color
         self.board_size = board_size
