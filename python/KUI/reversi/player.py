@@ -53,7 +53,7 @@ def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
     # Body of alpha_beta_cutoff_search starts here:
     # The default test cuts off at depth d or at a terminal state
     cutoff_test = (cutoff_test or (lambda state, depth: depth > d or game.terminal_test(state)))
-    eval_fn = eval_fn or (lambda state: game.utility(state, player))
+    eval_fn = eval_fn or (lambda state: game.utility(state))
     best_score = -np.inf
     beta = np.inf
     best_action = None
@@ -111,8 +111,8 @@ class MyPlayer:
         moves = self.get_all_valid_moves(board_tmp, to_move)
         return GameState(to_move=to_move, utility=utility, board=board_tmp, moves=moves)
 
-    def utility(self, state, player_color):
-        return state.utility if player_color == self.my_color else -state.utility
+    def utility(self, state):
+        return state.utility
 
     def terminal_test(self, state):
         """
