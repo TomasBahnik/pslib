@@ -89,10 +89,10 @@ class MyPlayer:
 
     # the only function with access to board
     def move(self, board):
-        game_state = GameState(to_move=self.my_color, utility=0, board=board, moves=[])
-        # move = alpha_beta_cutoff_search(game_state, self, d=3)
+        game_state = GameState(to_move=self.my_color, utility=-infinity, board=board, moves=[])
+        move = alpha_beta_cutoff_search(game_state, self, d=3)
         # move = random_player(game_state, self)
-        move = max_utility(game_state, self)
+        # move = max_utility(game_state, self)
         return move
 
     def actions(self, state):
@@ -103,8 +103,8 @@ class MyPlayer:
         board = state.board
         board_tmp = copy.deepcopy(board)
         self.play_move(board_tmp, move, state.to_move)
-        # utility for current player
-        utility = self.compute_utility(board_tmp, move, state.to_move)
+        # utility for ME
+        utility = self.compute_utility(board_tmp)
         # exchange players
         to_move = self.opponent_color if state.to_move == self.my_color else self.my_color
         # moves of the changed player
@@ -123,12 +123,13 @@ class MyPlayer:
         ret_val = len(actions) == 0
         return ret_val
 
-    def compute_utility(self, board_tmp, move, player_color):
+    def compute_utility(self, board_tmp):
         board_np = np.array(board_tmp, dtype=int)
         my_color_cnt = np.count_nonzero(board_np == self.my_color)
         opp_color_cnt = np.count_nonzero(board_np == self.opponent_color)
+        # utility from MY POV
         cnt = my_color_cnt - opp_color_cnt
-        return cnt if player_color == self.my_color else -cnt
+        return cnt
 
     def play_move(self, board, move, player_color):
         board[move[0]][move[1]] = player_color
