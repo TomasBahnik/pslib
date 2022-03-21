@@ -29,7 +29,9 @@ printf "$FORMAT" "exit_code" "status" "std error"
 printf "%s\n" "-------------------------------"
 
 timing "Test start"
+million=1000000
 start_time="$(date '+%N')"
+start_time_ms=$((start_time / million))
 for test_input in "${TEST_FILES[@]}"; do
   test_output_file=${test_input//in/out}
   test_output=$(cat "$test_output_file")
@@ -58,8 +60,9 @@ for test_input in "${TEST_FILES[@]}"; do
   fi
 done
 end_time="$(date '+%N')"
-elapsed=$((end_time - start_time))
-elapsed_ms=$((elapsed / 1000000))
+end_time_ms=$((end_time / million))
+#elapsed=$((end_time - start_time))
+elapsed_ms=$((end_time_ms - start_time_ms))
 if ((elapsed_ms < 0)); then
   elapsed_ms=$((1000 + elapsed_ms))
 fi
