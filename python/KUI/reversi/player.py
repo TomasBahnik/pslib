@@ -53,7 +53,7 @@ def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
     # Body of alpha_beta_cutoff_search starts here:
     # The default test cuts off at depth d or at a terminal state
     cutoff_test = (cutoff_test or (lambda state, depth: depth > d or game.terminal_test(state)))
-    eval_fn = eval_fn or (lambda state: game.utility(state, player))
+    eval_fn = eval_fn or (lambda state: game.utility(state))
     best_score = -np.inf
     beta = np.inf
     best_action = None
@@ -75,14 +75,8 @@ def change_stones_in_direction(board, move, dx, dy, player_color):
 
 
 class MyPlayer:
-    """
-    Player for reversi game based on model used in AIMA book http://aima.cs.berkeley.edu/
-    3 players
-    * random player : returns randomly one of available moves
-    * max utility : returns move with max utility where utility of move = my_color_count - opponent_color_count
-      after that move
-    * alpha_beta_cutoff_search - TODO WIP
-    """
+    """Player for reversi game based on model used in AIMA book"""
+
     def __init__(self, my_color, opponent_color, board_size=8):
         self.name = 'Bahnik'
         self.my_color = my_color
@@ -95,10 +89,10 @@ class MyPlayer:
 
     # the only function with access to board
     def move(self, board):
-        game_state = GameState(to_move=self.my_color, utility=0, board=board, moves=[])
-        # move = alpha_beta_cutoff_search(game_state, self, d=3)
+        game_state = GameState(to_move=self.my_color, utility=-infinity, board=board, moves=[])
+        move = alpha_beta_cutoff_search(game_state, self, d=3)
         # move = random_player(game_state, self)
-        move = max_utility(game_state, self)
+        # move = max_utility(game_state, self)
         return move
 
     def actions(self, state):
@@ -109,16 +103,16 @@ class MyPlayer:
         board = state.board
         board_tmp = copy.deepcopy(board)
         self.play_move(board_tmp, move, state.to_move)
-        # utility for current player
-        utility = self.compute_utility(board_tmp, move, state.to_move)
+        # utility for ME
+        utility = self.compute_utility(board_tmp)
         # exchange players
         to_move = self.opponent_color if state.to_move == self.my_color else self.my_color
         # moves of the changed player
         moves = self.get_all_valid_moves(board_tmp, to_move)
         return GameState(to_move=to_move, utility=utility, board=board_tmp, moves=moves)
 
-    def utility(self, state, player_color):
-        return state.utility if player_color == self.my_color else -state.utility
+    def utility(self, state):
+        return state.utility
 
     def terminal_test(self, state):
         """
@@ -129,12 +123,13 @@ class MyPlayer:
         ret_val = len(actions) == 0
         return ret_val
 
-    def compute_utility(self, board_tmp, move, player_color):
+    def compute_utility(self, board_tmp):
         board_np = np.array(board_tmp, dtype=int)
         my_color_cnt = np.count_nonzero(board_np == self.my_color)
         opp_color_cnt = np.count_nonzero(board_np == self.opponent_color)
+        # utility from MY POV
         cnt = my_color_cnt - opp_color_cnt
-        return cnt if player_color == self.my_color else -cnt
+        return cnt
 
     def play_move(self, board, move, player_color):
         board[move[0]][move[1]] = player_color
