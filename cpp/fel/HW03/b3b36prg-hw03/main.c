@@ -37,6 +37,8 @@ int main(int argc, char *argv[])
         compare(str, str_enc, str_enc_len); // start comparing
     }
     print_error(ret);
+    free(str);
+    free(str_enc);
     return ret;
 }
 
