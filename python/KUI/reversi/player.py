@@ -76,7 +76,7 @@ def ucb(n, C=1.4):
     return np.inf if n.N == 0 else n.U / n.N + C * np.sqrt(np.log(n.parent.N) / n.N)
 
 
-def monte_carlo_tree_search(state, game, N=1000):
+def monte_carlo_tree_search(state, game, N=10, d=4, cutoff_test=None, eval_fn=None):
     def select(n):
         """select a leaf node in the tree"""
         if n.children:
@@ -91,13 +91,14 @@ def monte_carlo_tree_search(state, game, N=1000):
                           for action in game.actions(n.state)}
         return select(n)
 
-    def simulate(game, state):
+    def simulate(game, state, depth):
         """simulate the utility of current state by random picking a step"""
         player = game.to_move(state)
-        while not game.terminal_test(state):
+        while not cutoff_test(state, depth):
             action = random.choice(list(game.actions(state)))
             state = game.result(state, action)
-        v = game.utility(state, player)
+            depth += 1
+        v = eval_fn(state)
         return -v
 
     def backprop(n, utility):
@@ -111,11 +112,13 @@ def monte_carlo_tree_search(state, game, N=1000):
             backprop(n.parent, -utility)
 
     root = MCT_Node(state=state)
+    cutoff_test = (cutoff_test or (lambda state, depth: depth > d or game.terminal_test(state)))
+    eval_fn = eval_fn or (lambda state: game.utility(state))
 
     for _ in range(N):
         leaf = select(root)
         child = expand(leaf)
-        result = simulate(game, child.state)
+        result = simulate(game, child.state, 1)
         backprop(child, result)
 
     max_state = max(root.children, key=lambda p: p.N)
@@ -148,7 +151,7 @@ class MyPlayer:
     # the only function with access to board
     def move(self, board):
         game_state = GameState(to_move=self.my_color, utility=-infinity, board=board, moves=[])
-        move = monte_carlo_tree_search(game_state, self)
+        move = monte_carlo_tree_search(game_state, self, 200, 10)
         # move = alpha_beta_cutoff_search(game_state, self, d=3)
         # move = random_player(game_state, self)
         # move = max_utility(game_state, self)
