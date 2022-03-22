@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
         compare(str, str_enc, str_enc_len); // start comparing
     }
     print_error(ret);
-    free(str);
     free(str_enc);
+    free(str);
     return ret;
 }
 
@@ -105,14 +105,16 @@ void compare(char str[], char str_enc[], int str_enc_len)
 
     int counter = 0;
     int match = 0; // number of matches with input array
-    char *best_match = malloc(str_enc_len * sizeof(char));
-    char *str_tmp = malloc(str_enc_len * sizeof(char));
-    for (int i = 0; i < str_enc_len; ++i) {
-        str_tmp[i] = str_enc[i];
-    }
+    char *best_match = malloc((str_enc_len + 1) * sizeof(char));
+    char *str_tmp = malloc((str_enc_len + 1) * sizeof(char));
     if ((str_tmp == NULL) || (best_match == NULL)) {
         fprintf(stderr, "ERROR MALLOC\n");
         exit(-1);
+    }
+    best_match[str_enc_len] = 0;
+    str_tmp[str_enc_len] = 0;
+    for (int i = 0; i < str_enc_len; ++i) {
+        str_tmp[i] = str_enc[i];
     }
     for (int i = 0; i < 57; ++i) {
         for (int j = 0; j < str_enc_len; ++j) {
@@ -136,8 +138,6 @@ void compare(char str[], char str_enc[], int str_enc_len)
     printf("%s\n", best_match);
     free(str_tmp);
     free(best_match);
-    str_tmp = NULL;
-    best_match = NULL;
 }
 
 void print_error(int error)
