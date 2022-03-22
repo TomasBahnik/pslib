@@ -3,8 +3,8 @@
 #include <stdlib.h>
 
 #define ERROR_INPUT 100
-#define milion 1000000      // milion is 10 ** 6
-#define primes_in_mil 78498 // count of prime numbers in milion
+#define MILION 1000000      // milion is 10 ** 6
+#define PRIMES_IN_MIL 78498 // count of prime numbers in milion
 
 long int read_number(void);
 int decompose(long int n, int primes[]);
@@ -24,7 +24,7 @@ int print_output(int counter, int i, long int actual_num, long int n,
 
 int main(int argc, char *argv[])
 {
-    int primes[primes_in_mil];
+    int primes[PRIMES_IN_MIL];
     int ret = EXIT_SUCCESS;
     long int n;
     prime_numbers(primes);
@@ -50,11 +50,11 @@ long int read_number(void)
 
 void prime_numbers(int primes[])
 {
-    int empty[milion] = {0};
+    int empty[MILION] = {0};
     int counter = 0;
-    for (int i = 2; i < milion; ++i) {
+    for (int i = 2; i < MILION; ++i) {
         if (empty[i] == 0) {
-            for (int j = i; j < milion; j += i) {
+            for (int j = i; j < MILION; j += i) {
                 empty[j] = 1;
             }
             primes[counter] = i;
@@ -67,7 +67,7 @@ int decompose(long int n, int primes[])
 {
     int counter = 0; // counting exponent
     long int actual_num = n;
-    for (int i = 0; i < primes_in_mil; ++i) {
+    for (int i = 0; i < PRIMES_IN_MIL; ++i) {
         counter = 0;
         // while cyclus for every i that is integer divisor for our
         // number
