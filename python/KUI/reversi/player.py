@@ -80,6 +80,22 @@ class MyPlayer:
         self.my_color = my_color
         self.opponent_color = opponent_color
         self.board_size = board_size
+        b_1 = board_size - 1
+        b_2 = board_size - 2
+        b_3 = board_size - 3
+        self.board_util_1 = [(1, 1), (1, b_2), (b_2, 1), (b_2, b_2)]
+        self.board_util_2 = [(0, 1), (1, 0), (0, b_2), (b_2, 0), (1, b_1), (b_1, 1), (b_2, b_1), (b_1, b_2)]
+        first_row = [x for x in range(3, b_3)]
+        second_row = [x for x in range(2, b_2)]
+        b_u_3_0 = [(x, y) for x in [0] for y in first_row]
+        b_u_3_1 = [(x, y) for x in [1] for y in second_row]
+        b_u_3_2 = [(x, y) for x in [b_2] for y in second_row]
+        b_u_3_3 = [(x, y) for x in [b_1] for y in first_row]
+        b_u_3_4 = [(x, y) for x in first_row for y in [0]]
+        b_u_3_5 = [(x, y) for x in second_row for y in [1]]
+        b_u_3_6 = [(x, y) for x in second_row for y in [b_2]]
+        b_u_3_7 = [(x, y) for x in first_row for y in [b_1]]
+        self.board_util_3 = b_u_3_0 + b_u_3_1 + b_u_3_2 + b_u_3_3 + b_u_3_4 + b_u_3_5 + b_u_3_6 + b_u_3_7
 
     def to_move(self, state):
         """Return the player whose move it is in this state."""
@@ -125,7 +141,20 @@ class MyPlayer:
         board_np = np.array(board_tmp, dtype=int)
         my_color_cnt = np.count_nonzero(board_np == self.my_color)
         opp_color_cnt = np.count_nonzero(board_np == self.opponent_color)
+        my_marks = np.nonzero(board_np == self.my_color)
+        my_marks_coord = list(zip(my_marks[0], my_marks[1]))
+        opp_marks = np.nonzero(board_np == self.opponent_color)
+        opp_marks_coord = list(zip(opp_marks[0], opp_marks[1]))
+        my_u_1 = len(set(my_marks_coord).intersection(self.board_util_1)) * 4
+        my_u_2 = len(set(my_marks_coord).intersection(self.board_util_2)) * 3
+        my_u_3 = len(set(my_marks_coord).intersection(self.board_util_3)) * 2
+        my_u = my_u_1 + my_u_2 + my_u_3
+        opp_u_1 = len(set(opp_marks_coord).intersection(self.board_util_1)) * 4
+        opp_u_2 = len(set(opp_marks_coord).intersection(self.board_util_2)) * 3
+        opp_u_3 = len(set(opp_marks_coord).intersection(self.board_util_3)) * 2
+        opp_u = opp_u_1 + opp_u_2 + opp_u_3
         # utility from MY POV
+        u = my_u - opp_u
         cnt = my_color_cnt - opp_color_cnt
         return cnt
 
