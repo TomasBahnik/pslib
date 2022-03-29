@@ -28,24 +28,23 @@ void free_line(str_line *my_line);
 int read_line(str_line *my_line, FILE *f);
 void open_file(FILE **f, char *name_file);
 void close_file(FILE **f);
-int find_str(str_line *my_line, char *pattern);
+int find_str(str_line my_line, char *pattern);
 int len_str(char *my_str);
 
 int main(int argc, char *argv[])
 {
     str_line line;
     FILE *f;
-    open_file(&f, "in.txt");
+    open_file(&f, argv[2]);
     int finish_read = NO_END_OF_LINE;
     while (finish_read != END_OF_FILE) {
         init_line(&line);
         finish_read = read_line(&line, f);
-        printf("%s\n", line.line);
+        if (find_str(line, argv[1]))
+            printf("%s\n", line.line);
         free_line(&line);
     }
     close_file(&f);
-    // only test
-    printf("%d\n", len_str("ahoj"));
     return 0;
 }
 
@@ -73,7 +72,6 @@ void free_line(str_line *my_line) // free line
 int read_line(str_line *my_line, FILE *f)
 {
     int last_line = NO_END_OF_LINE;
-
     while (!last_line) {
         char x = fgetc(f);
         if (my_line->size + 2 >= my_line->capacity) {
@@ -108,12 +106,23 @@ void close_file(FILE **f)
         exit(1);
 }
 
-int find_str(str_line *my_line, char *pattern)
+int find_str(str_line my_line, char *pattern)
 {
     int len = len_str(pattern);
     if (len == 0)
         return FIND;
-    // TODO !!!
+    int i = 0;
+    while (my_line.line[i]) {
+        if (my_line.line[i] == pattern[0]) {
+            int j = 1;
+            while (j < len && i + j < my_line.size &&
+                   my_line.line[i + j] == pattern[j])
+                j++;
+            if (j == len)
+                return FIND;
+        }
+    }
+    i++;
     return NO_FIND;
 }
 
