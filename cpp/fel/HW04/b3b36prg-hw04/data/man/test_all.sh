@@ -12,7 +12,7 @@ function timing() {
 HW=04
 TEST_FILES=(pub*.in)
 OUTPUT_FILE="b3b36prg-hw$HW"
-COMPILE_FILES="../main.c"
+COMPILE_FILES="../../grep.c"
 message "remove file '$OUTPUT_FILE'"
 rm -f $OUTPUT_FILE
 message "compiling with 'clang -pedantic -Wall -Werror -std=c99 -O3 -lm $COMPILE_FILES -o $OUTPUT_FILE'"
@@ -34,13 +34,17 @@ start_time="$(date '+%N')"
 start_time_ms=$((start_time / million))
 for test_input in "${TEST_FILES[@]}"; do
   test_output_file=${test_input//in/out}
+  test_pattern_file=${test_input//in/in.pat}
   test_output=$(cat "$test_output_file")
   test_error=${test_input//in/err}
   test_err_content=$(cat "$test_error")
-  #  test_data=$(<"./$test_input")
-  error="$(./$OUTPUT_FILE <"$test_input" 2>&1 >/dev/null)"
+  test_pattern_content=$(cat "$test_pattern_file")
+  # call the executable
+#  echo "Running ./$OUTPUT_FILE $test_pattern_content $test_input"
+  error="$(./$OUTPUT_FILE "$test_pattern_content" "$test_input" 2>&1 >/dev/null)"
   exit_code=$?
   if ((exit_code > 0)); then
+    echo "exit code = $exit_code"
     if [[ "$error" == "$test_err_content" ]]; then
       res="PASS"
     else
@@ -49,7 +53,9 @@ for test_input in "${TEST_FILES[@]}"; do
     # shellcheck disable=SC2059
     printf "$FORMAT" "$exit_code" "$res" "$error"
   else
-    output="$(./$OUTPUT_FILE <"$test_input")"
+    echo "exit code = $exit_code"
+    echo "Running ./$OUTPUT_FILE $test_pattern_content $test_input"
+    output="$(./$OUTPUT_FILE "$test_pattern_content" "$test_input")"
     if [[ "$output" == "$test_output" ]]; then
       res="PASS"
     else
