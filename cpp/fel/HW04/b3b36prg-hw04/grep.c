@@ -20,8 +20,6 @@ typedef struct {
     int capacity;
 } str_line;
 
-// enum { NO_END_OF_LINE = 0, END_OF_LINE = 1, END_OF_FILE = 2 };
-
 void init_line(str_line *my_line);
 void realloc_line(str_line *my_line);
 void free_line(str_line *my_line);
@@ -81,7 +79,9 @@ int read_line(str_line *my_line, FILE *f)
         case '\n':
             last_line = END_OF_LINE;
             break;
+        // never happened
         case EOF:
+            // printf("%s", "EOF");
             last_line = END_OF_FILE;
             break;
         default:
@@ -121,8 +121,8 @@ int find_str(str_line my_line, char *pattern)
             if (j == len)
                 return FIND;
         }
+        i++;
     }
-    i++;
     return NO_FIND;
 }
 
