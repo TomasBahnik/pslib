@@ -20,7 +20,7 @@ clang -pedantic -Wall -Werror -std=c99 -O3 -lm $COMPILE_FILES -o $OUTPUT_FILE
 num_of_tests=${#TEST_FILES[@]}
 message "running $num_of_tests tests"
 
-FORMAT="%-10s %-5s %s\n"
+FORMAT="%-10s %-5s %s\n\n"
 FORMAT_OUT="%-10s %-5s\n"
 
 printf "%s\n" "-------------------------------"
@@ -40,10 +40,10 @@ for test_input in "${TEST_FILES[@]}"; do
   test_err_content=$(cat "$test_error")
   test_pattern_content=$(cat "$test_pattern_file")
   # call the executable
-#  echo "Running ./$OUTPUT_FILE $test_pattern_content $test_input"
   error="$(./$OUTPUT_FILE "$test_pattern_content" "$test_input" 2>&1 >/dev/null)"
   exit_code=$?
   if ((exit_code > 0)); then
+    echo "./$OUTPUT_FILE $test_pattern_content $test_input"
     echo "exit code = $exit_code"
     if [[ "$error" == "$test_err_content" ]]; then
       res="PASS"
@@ -53,8 +53,8 @@ for test_input in "${TEST_FILES[@]}"; do
     # shellcheck disable=SC2059
     printf "$FORMAT" "$exit_code" "$res" "$error"
   else
+    echo "./$OUTPUT_FILE $test_pattern_content $test_input"
     echo "exit code = $exit_code"
-    echo "Running ./$OUTPUT_FILE $test_pattern_content $test_input"
     output="$(./$OUTPUT_FILE "$test_pattern_content" "$test_input")"
     if [[ "$output" == "$test_output" ]]; then
       res="PASS"
