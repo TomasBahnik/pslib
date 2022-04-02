@@ -188,10 +188,11 @@ class GridMDP(MDP):
 A 4x3 grid environment that presents the agent with a sequential decision problem.
 """
 
-sequential_decision_environment = GridMDP([[-0.04, -0.04, -0.04, +1],
-                                           [-0.04, None, -0.04, -1],
-                                           [-0.04, -0.04, -0.04, -0.04]],
-                                          terminals=[(3, 2), (3, 1)])
+grid = [[-0.04, -0.04, -0.04, +1],
+        [-0.04, None, -0.04, -1],
+        [-0.04, -0.04, -0.04, -0.04]]
+terminals = [(3, 2), (3, 1)]
+sequential_decision_environment = GridMDP(grid, terminals=terminals, gamma=1)
 
 
 # ______________________________________________________________________________
@@ -278,3 +279,9 @@ def policy_evaluation(pi, U, mdp, k=20):
         for s in mdp.states:
             U[s] = R(s) + gamma * sum(p * U[s1] for (p, s1) in T(s, pi[s]))
     return U
+
+
+if __name__ == "__main__":
+    env = sequential_decision_environment
+    utility = value_iteration(env)
+    print(utility)
