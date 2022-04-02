@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
-
+import copy
 import os
 import random
 
 import sys
-import time
 
 import kuimaze
 
 MAP = 'maps/easy/easy1.bmp'
 MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), MAP)
-PROBS = [0.4, 0.3, 0.3, 0]
+PROBS = [0.8, 0.1, 0.1, 0]
 GRAD = (0, 0)
 SKIP = False
 SAVE_EPS = False
@@ -95,11 +94,11 @@ def init_policy(problem):
 
 
 def init_utils(problem):
-    '''
+    """
     Initialize all state utilities to zero except the goal states
     :param problem: problem - object, for us it will be kuimaze.Maze object
     :return: dictionary of utilities, indexed by state coordinates
-    '''
+    """
     utils = dict()
     x_dims = problem.observation_space.spaces[0].n
     y_dims = problem.observation_space.spaces[1].n
@@ -118,27 +117,63 @@ def find_policy_via_policy_iteration(problem, discount_factor):
     return (policy)
 
 
+# Namedtuple to hold state position with reward. Interchangeable with L{state}
+# weighted_state = collections.namedtuple('State', ['x', 'y', 'reward'])
+# Namedtuple to hold state position. Mostly interchangeable with L{weighted_state}
+# state = collections.namedtuple('State', ['x', 'y'])
+
+def q_value(MDPMaze, state, a, U, gamma):
+    if not a:
+        return state.reward
+    res = 0
+    for s_prime, p in MDPMaze.get_next_states_and_probs(state, a):  # returns state
+        s_prime = kuimaze.maze.weighted_state(x=s_prime.x, y=s_prime.y, reward=MDPMaze.get_state_reward(s_prime))
+        res += p * (state.reward + gamma * U[s_prime])
+    return res
+
+
+def value_iteration(MDPMaze, epsilon=0.001, gamma=0.9):
+    """Solving an MDP by value iteration"""
+
+    # U1 = init_utils(MDPMaze)
+    U1 = {s: 0 for s in MDPMaze.get_all_states()}  # returns weighted_state
+    while True:
+        U = copy.deepcopy(U1)
+        delta = 0
+        for s in MDPMaze.get_all_states():
+            actions = [None] if MDPMaze.is_terminal_state(s) else MDPMaze.get_actions(s)
+            U1[s] = max(q_value(MDPMaze, s, a, U, gamma) for a in actions)
+            delta = max(delta, abs(U1[s] - U[s]))
+        accuracy = epsilon * (1 - gamma) / gamma
+        if delta <= accuracy:
+            return U
+
+
 if __name__ == "__main__":
     # Initialize the maze environment
     env = kuimaze.MDPMaze(map_image=GRID_WORLD3, probs=PROBS, grad=GRAD, node_rewards=GRID_WORLD3_REWARDS)
     # env = kuimaze.MDPMaze(map_image=GRID_WORLD3, probs=PROBS, grad=GRAD, node_rewards=None)
     # env = kuimaze.MDPMaze(map_image=MAP, probs=PROBS, grad=GRAD, node_rewards=None)
     env.reset()
+    utility_values = value_iteration(env, epsilon=0.001, gamma=1)
+    print(utility_values)
+    sys.exit(0)
 
-    print('====================')
-    print('works only in terminal! NOT in IDE!')
-    print('press n - next')
-    print('press s - skip to end')
-    print('====================')
-
-    print(env.get_all_states())
-    # policy1 = find_policy_via_value_iteration(env)
-    policy = find_policy_via_policy_iteration(env, 0.9999)
-    env.visualise(get_visualisation_values(policy))
-    env.render()
-    wait_n_or_s()
-    print('Policy:', policy)
-    utils = init_utils(env)
-    env.visualise(get_visualisation_values(utils))
-    env.render()
-    time.sleep(5)
+    # print('====================')
+    # print('works only in terminal! NOT in IDE!')
+    # print('press n - next')
+    # print('press s - skip to end')
+    # print('====================')
+    #
+    # print(env.get_all_states())
+    # # policy1 = find_policy_via_value_iteration(env)
+    # policy = find_policy_via_policy_iteration(env, 0.9999)
+    # env.visualise(get_visualisation_values(policy))
+    # env.render()
+    # wait_n_or_s()
+    # print('Policy:', policy)
+    # utils = init_utils(env)
+    # env.visualise(get_visualisation_values(utils))
+    # env.render()
+    # time.sleep(5)
+    # sys.exit(0)
