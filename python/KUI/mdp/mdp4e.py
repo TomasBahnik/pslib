@@ -285,3 +285,6 @@ if __name__ == "__main__":
     env = sequential_decision_environment
     utility = value_iteration(env)
     print(utility)
+    # policy = best_policy(env, utility)
+    policy = policy_iteration(env)
+    print(policy)
