@@ -82,15 +82,15 @@ def get_visualisation_values(dictvalues):
     return ret
 
 
-# the init functions are provided for your convenience, modify, use ...
 def init_policy(problem):
     policy = dict()
     for state in problem.get_all_states():
+        key = (state.x, state.y)
         if problem.is_goal_state(state):
-            policy[state] = None
+            policy[key] = None
             continue
         actions = [action for action in problem.get_actions(state)]
-        policy[state] = random.choice(actions)
+        policy[key] = random.choice(actions)
     return policy
 
 
@@ -117,35 +117,32 @@ def actions_except_terminal_states(problem, s):
     return [None] if problem.is_terminal_state(s) else problem.get_actions(s)
 
 
-# Namedtuple to hold state position with reward. Interchangeable with L{state}
-# weighted_state = collections.namedtuple('State', ['x', 'y', 'reward'])
-# Namedtuple to hold state position. Mostly interchangeable with L{weighted_state}
-# state = collections.namedtuple('State', ['x', 'y'])
-
 def q_value(problem, state, a, U, discount_factor):
     if not a:
         return state.reward
     res = 0
-    # get_next_states_and_probs returns state might be replaced by iteration over get_next_weighted_states_and_probs
+    # get_next_states_and_probs returns state not kuimaze.maze.weighted_state
     for s_prime, p in problem.get_next_states_and_probs(state, a):
-        s_prime = get_weighted_state(problem, s_prime)
-        res += p * (state.reward + discount_factor * U[s_prime])
+        # s_prime = get_weighted_state(problem, s_prime)
+        key = (s_prime.x, s_prime.y)
+        res += p * (state.reward + discount_factor * U[key])
     return res
 
 
 def value_iteration(problem, epsilon=0.001, discount_factor=0.9):
     """Solving an MDP by value iteration"""
 
-    # U1 = init_utils(MDPMaze)
-    U1 = {s: 0 for s in problem.get_all_states()}  # returns weighted_state
+    U1 = init_utils(problem)
+    # U1 = {s: 0 for s in problem.get_all_states()}  # returns weighted_state
     while True:
         U = copy.deepcopy(U1)
         delta = 0
         for s in problem.get_all_states():
+            key = (s.x, s.y)
             # get_actions(s) does not take care of terminal states
             actions = actions_except_terminal_states(problem, s)
-            U1[s] = max(q_value(problem, s, a, U, discount_factor) for a in actions)
-            delta = max(delta, abs(U1[s] - U[s]))
+            U1[key] = max(q_value(problem, s, a, U, discount_factor) for a in actions)
+            delta = max(delta, abs(U1[key] - U[key]))
         accuracy = epsilon * (1 - discount_factor) / discount_factor
         if delta <= accuracy:
             return U
@@ -164,44 +161,35 @@ def best_policy(problem, U, discount_factor):
     return pi
 
 
-def get_weighted_state(problem, s):
-    return kuimaze.maze.weighted_state(x=s.x, y=s.y, reward=problem.get_state_reward(s))
-
-
-def get_next_weighted_states_and_probs(problem, s, a):
-    """Weighted state is used as key for utility and policy vector"""
-    # TODO replace weighted state key by juste state
-    transition_all_states = [(get_weighted_state(problem, s), p) for (s, p) in problem.get_next_states_and_probs(s, a)]
-    return transition_all_states
-
-
 def policy_evaluation(pi, U, problem, discount_factor, k=20):
     """Return an updated utility mapping U from each state in the MDP to its
     utility, using an approximation (modified policy iteration)."""
 
     for i in range(k):
         for s in problem.get_all_states():  # returns weighted state with reward
-            # U[s] has key as weighted state
-            r = problem.get_state_reward(s)
+            key = (s.x, s.y)
+            r = s.reward
             if problem.is_terminal_state(s):
-                U[s] = r
+                U[key] = r
             else:
-                U[s] = r + discount_factor * sum(p * U[s1] for (s1, p) in get_next_weighted_states_and_probs(problem, s, pi[s]))
+                U[key] = r + discount_factor * sum(
+                    p * U[(s1.x, s1.y)] for (s1, p) in problem.get_next_states_and_probs(s, pi[key]))
     return U
 
 
 def find_policy_via_policy_iteration(problem, discount_factor=0.99):
-    U = {s: 0 for s in problem.get_all_states()}
+    U = init_utils(problem)
     pi = init_policy(problem)
     while True:
         U = policy_evaluation(pi, U, problem, discount_factor)
         unchanged = True
         for s in problem.get_all_states():
+            key = (s.x, s.y)
             a_star = max(actions_except_terminal_states(problem, s),
                          key=lambda a: q_value(problem, s, a, U, discount_factor))
             # a = max(mdp.actions(s), key=lambda a: expected_utility(a, s, U, mdp))
-            if q_value(problem, s, a_star, U, discount_factor) > q_value(problem, s, pi[s], U, discount_factor):
-                pi[s] = a_star
+            if q_value(problem, s, a_star, U, discount_factor) > q_value(problem, s, pi[key], U, discount_factor):
+                pi[key] = a_star
                 unchanged = False
         if unchanged:
             return pi
@@ -216,8 +204,8 @@ if __name__ == "__main__":
     gamma = 1
     utility_values = value_iteration(env, epsilon=0.001, discount_factor=gamma)
     print(utility_values)
-    policy = best_policy(env, utility_values, discount_factor=gamma)
-    # policy = find_policy_via_policy_iteration(env, discount_factor=gamma)
+    # policy = best_policy(env, utility_values, discount_factor=gamma)
+    policy = find_policy_via_policy_iteration(env, discount_factor=gamma)
     env.visualise(get_visualisation_values(policy))
     env.render()
     time.sleep(5)
