@@ -8,9 +8,6 @@ import time
 
 import kuimaze
 
-MAP = 'maps/easy/easy1.bmp'
-MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), MAP)
-PROBS = [0.8, 0.1, 0.1, 0]
 GRAD = (0, 0)
 SKIP = False
 SAVE_EPS = False
@@ -25,7 +22,15 @@ GRID_WORLD3 = [[[255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 0, 0]],
                [[255, 255, 255], [0, 0, 0], [255, 255, 255], [255, 0, 0]],
                [[0, 0, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255]]]
 
-REWARD_NORMAL_STATE = -0.04
+PROBS = [0.8, 0.1, 0.1, 0]
+R0 = -0.04
+# R(s) < –1.6284
+R1 = -1.8
+# – 0.4278 < R(s) < – 0.0850
+R2 = -0.3
+# – 0.0221 < R(s) < 0
+R3 = -0.015
+REWARD_NORMAL_STATE = R0
 REWARD_GOAL_STATE = 1
 REWARD_DANGEROUS_STATE = -1
 
@@ -33,7 +38,8 @@ GRID_WORLD3_REWARDS = [[REWARD_NORMAL_STATE, REWARD_NORMAL_STATE, REWARD_NORMAL_
                        [REWARD_NORMAL_STATE, 0, REWARD_NORMAL_STATE, REWARD_DANGEROUS_STATE],
                        [REWARD_NORMAL_STATE, REWARD_NORMAL_STATE, REWARD_NORMAL_STATE, REWARD_NORMAL_STATE]]
 
-DEFAULT_DISCOUNT_FACTOR = 0.99
+DEFAULT_DISCOUNT_FACTOR = 0.9999
+DEFAULT_EPSILON = 0.03
 
 
 def wait_n_or_s():
@@ -125,17 +131,16 @@ def q_value(problem, state, a, U, discount_factor):
     res = 0
     # get_next_states_and_probs returns state not kuimaze.maze.weighted_state
     for s_prime, p in problem.get_next_states_and_probs(state, a):
-        # s_prime = get_weighted_state(problem, s_prime)
         key = (s_prime.x, s_prime.y)
         res += p * (state.reward + discount_factor * U[key])
     return res
 
 
-def value_iteration(problem, epsilon=0.001, discount_factor=DEFAULT_DISCOUNT_FACTOR):
+def value_iteration(problem, discount_factor=DEFAULT_DISCOUNT_FACTOR, epsilon=DEFAULT_EPSILON):
     """Solving an MDP by value iteration"""
 
     U1 = init_utils(problem)
-    # U1 = {s: 0 for s in problem.get_all_states()}  # returns weighted_state
+    # U1 = {(s.x, s.y): 0 for s in problem.get_all_states()}
     while True:
         U = copy.deepcopy(U1)
         delta = 0
@@ -150,10 +155,10 @@ def value_iteration(problem, epsilon=0.001, discount_factor=DEFAULT_DISCOUNT_FAC
             return U
 
 
-def best_policy(problem, U, discount_factor=DEFAULT_DISCOUNT_FACTOR):
+def find_policy_via_value_iteration(problem, discount_factor=DEFAULT_DISCOUNT_FACTOR, epsilon=DEFAULT_EPSILON):
     """Given an MDP and a utility function U, determine the best policy,
     as a mapping from state to action."""
-
+    U = value_iteration(problem, discount_factor, epsilon)
     pi = init_policy(problem)
     for s in problem.get_all_states():
         if problem.is_terminal_state(s):
@@ -163,7 +168,7 @@ def best_policy(problem, U, discount_factor=DEFAULT_DISCOUNT_FACTOR):
     return pi
 
 
-def policy_evaluation(pi, U, problem, discount_factor, k=20):
+def policy_evaluation(pi, U, problem, discount_factor, k=10):
     """Return an updated utility mapping U from each state in the MDP to its
     utility, using an approximation (modified policy iteration)."""
 
@@ -187,9 +192,10 @@ def find_policy_via_policy_iteration(problem, discount_factor=DEFAULT_DISCOUNT_F
         unchanged = True
         for s in problem.get_all_states():
             key = (s.x, s.y)
+            # TODO use problem.get_actions(s)
             a_star = max(actions_except_terminal_states(problem, s),
                          key=lambda a: q_value(problem, s, a, U, discount_factor))
-            # a = max(mdp.actions(s), key=lambda a: expected_utility(a, s, U, mdp))
+            # TODO a = max(mdp.actions(s), key=lambda a: expected_utility(a, s, U, mdp))
             if q_value(problem, s, a_star, U, discount_factor) > q_value(problem, s, pi[key], U, discount_factor):
                 pi[key] = a_star
                 unchanged = False
@@ -198,19 +204,27 @@ def find_policy_via_policy_iteration(problem, discount_factor=DEFAULT_DISCOUNT_F
 
 
 if __name__ == "__main__":
+    # MAP = 'maps_difficult/maze50x50.png'
+    # MAP = 'maps/easy/easy1.bmp'
+    MAP = 'maps/normal/normal12.bmp'
+    MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), MAP)
     # Initialize the maze environment
-    env = kuimaze.MDPMaze(map_image=GRID_WORLD3, probs=PROBS, grad=GRAD, node_rewards=GRID_WORLD3_REWARDS)
+    # PROBS = [0.8, 0.1, 0.1, 0]
+    # env = kuimaze.MDPMaze(map_image=GRID_WORLD3, probs=PROBS, grad=GRAD, node_rewards=GRID_WORLD3_REWARDS)
     # env = kuimaze.MDPMaze(map_image=GRID_WORLD3, probs=PROBS, grad=GRAD, node_rewards=None)
-    # env = kuimaze.MDPMaze(map_image=MAP, probs=PROBS, grad=GRAD, node_rewards=None)
+    env = kuimaze.MDPMaze(map_image=MAP, probs=PROBS, grad=GRAD, node_rewards=None)
     env.reset()
-    gamma = 1
-    utility_values = value_iteration(env, epsilon=0.001, discount_factor=gamma)
-    print(utility_values)
-    # policy = best_policy(env, utility_values, discount_factor=gamma)
+    gamma = DEFAULT_DISCOUNT_FACTOR
+    eps = 0.001
+    t0 = time.perf_counter()
+    # policy = find_policy_via_value_iteration(env, discount_factor=gamma, epsilon=epsilon)
     policy = find_policy_via_policy_iteration(env, discount_factor=gamma)
+    delta = time.perf_counter() - t0
+    print("g={}, e={}, {} sec".format(gamma, eps, delta))
     env.visualise(get_visualisation_values(policy))
     env.render()
-    time.sleep(5)
+    # wait_n_or_s()
+    time.sleep(10)
     sys.exit(0)
 
     # print('====================')
