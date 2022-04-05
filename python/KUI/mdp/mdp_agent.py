@@ -33,6 +33,8 @@ GRID_WORLD3_REWARDS = [[REWARD_NORMAL_STATE, REWARD_NORMAL_STATE, REWARD_NORMAL_
                        [REWARD_NORMAL_STATE, 0, REWARD_NORMAL_STATE, REWARD_DANGEROUS_STATE],
                        [REWARD_NORMAL_STATE, REWARD_NORMAL_STATE, REWARD_NORMAL_STATE, REWARD_NORMAL_STATE]]
 
+DEFAULT_DISCOUNT_FACTOR = 0.99
+
 
 def wait_n_or_s():
     def wait_key():
@@ -129,7 +131,7 @@ def q_value(problem, state, a, U, discount_factor):
     return res
 
 
-def value_iteration(problem, epsilon=0.001, discount_factor=0.9):
+def value_iteration(problem, epsilon=0.001, discount_factor=DEFAULT_DISCOUNT_FACTOR):
     """Solving an MDP by value iteration"""
 
     U1 = init_utils(problem)
@@ -148,7 +150,7 @@ def value_iteration(problem, epsilon=0.001, discount_factor=0.9):
             return U
 
 
-def best_policy(problem, U, discount_factor):
+def best_policy(problem, U, discount_factor=DEFAULT_DISCOUNT_FACTOR):
     """Given an MDP and a utility function U, determine the best policy,
     as a mapping from state to action."""
 
@@ -177,7 +179,7 @@ def policy_evaluation(pi, U, problem, discount_factor, k=20):
     return U
 
 
-def find_policy_via_policy_iteration(problem, discount_factor=0.99):
+def find_policy_via_policy_iteration(problem, discount_factor=DEFAULT_DISCOUNT_FACTOR):
     U = init_utils(problem)
     pi = init_policy(problem)
     while True:
