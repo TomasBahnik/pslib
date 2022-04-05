@@ -113,8 +113,8 @@ def init_utils(problem):
     return utils
 
 
-def actions_except_terminal_states(MDPMaze, s):
-    return [None] if MDPMaze.is_terminal_state(s) else MDPMaze.get_actions(s)
+def actions_except_terminal_states(problem, s):
+    return [None] if problem.is_terminal_state(s) else problem.get_actions(s)
 
 
 # Namedtuple to hold state position with reward. Interchangeable with L{state}
@@ -122,95 +122,89 @@ def actions_except_terminal_states(MDPMaze, s):
 # Namedtuple to hold state position. Mostly interchangeable with L{weighted_state}
 # state = collections.namedtuple('State', ['x', 'y'])
 
-def q_value(MDPMaze, state, a, U, gamma):
+def q_value(problem, state, a, U, discount_factor):
     if not a:
         return state.reward
     res = 0
     # get_next_states_and_probs returns state might be replaced by iteration over get_next_weighted_states_and_probs
-    for s_prime, p in MDPMaze.get_next_states_and_probs(state, a):
-        s_prime = get_weighted_state(MDPMaze, s_prime)
-        res += p * (state.reward + gamma * U[s_prime])
+    for s_prime, p in problem.get_next_states_and_probs(state, a):
+        s_prime = get_weighted_state(problem, s_prime)
+        res += p * (state.reward + discount_factor * U[s_prime])
     return res
 
 
-def value_iteration(MDPMaze, epsilon=0.001, gamma=0.9):
+def value_iteration(problem, epsilon=0.001, discount_factor=0.9):
     """Solving an MDP by value iteration"""
 
     # U1 = init_utils(MDPMaze)
-    U1 = {s: 0 for s in MDPMaze.get_all_states()}  # returns weighted_state
+    U1 = {s: 0 for s in problem.get_all_states()}  # returns weighted_state
     while True:
         U = copy.deepcopy(U1)
         delta = 0
-        for s in MDPMaze.get_all_states():
+        for s in problem.get_all_states():
             # get_actions(s) does not take care of terminal states
-            actions = actions_except_terminal_states(MDPMaze, s)
-            U1[s] = max(q_value(MDPMaze, s, a, U, gamma) for a in actions)
+            actions = actions_except_terminal_states(problem, s)
+            U1[s] = max(q_value(problem, s, a, U, discount_factor) for a in actions)
             delta = max(delta, abs(U1[s] - U[s]))
-        accuracy = epsilon * (1 - gamma) / gamma
+        accuracy = epsilon * (1 - discount_factor) / discount_factor
         if delta <= accuracy:
             return U
 
 
-def best_policy(MDPMaze, U, gamma):
+def best_policy(problem, U, discount_factor):
     """Given an MDP and a utility function U, determine the best policy,
     as a mapping from state to action."""
 
-    pi = init_policy(MDPMaze)
-    for s in MDPMaze.get_all_states():
-        if MDPMaze.is_terminal_state(s):
+    pi = init_policy(problem)
+    for s in problem.get_all_states():
+        if problem.is_terminal_state(s):
             pi[s] = None
         else:
-            pi[s] = max(MDPMaze.get_actions(s), key=lambda a: q_value(MDPMaze, s, a, U, gamma))
+            pi[s] = max(problem.get_actions(s), key=lambda a: q_value(problem, s, a, U, discount_factor))
     return pi
 
 
-def get_weighted_state(MDPMaze, s):
-    return kuimaze.maze.weighted_state(x=s.x, y=s.y, reward=MDPMaze.get_state_reward(s))
+def get_weighted_state(problem, s):
+    return kuimaze.maze.weighted_state(x=s.x, y=s.y, reward=problem.get_state_reward(s))
 
 
-def get_next_weighted_states_and_probs(MDPMaze, s, a):
+def get_next_weighted_states_and_probs(problem, s, a):
     """Weighted state is used as key for utility and policy vector"""
     # TODO replace weighted state key by juste state
-    transition_all_states = [(get_weighted_state(MDPMaze, s), p) for (s, p) in MDPMaze.get_next_states_and_probs(s, a)]
+    transition_all_states = [(get_weighted_state(problem, s), p) for (s, p) in problem.get_next_states_and_probs(s, a)]
     return transition_all_states
 
 
-def policy_evaluation(pi, U, MDPMaze, gamma, k=20):
+def policy_evaluation(pi, U, problem, discount_factor, k=20):
     """Return an updated utility mapping U from each state in the MDP to its
     utility, using an approximation (modified policy iteration)."""
 
     for i in range(k):
-        for s in MDPMaze.get_all_states():  # returns weighted state with reward
+        for s in problem.get_all_states():  # returns weighted state with reward
             # U[s] has key as weighted state
-            r = MDPMaze.get_state_reward(s)
-            if MDPMaze.is_terminal_state(s):
+            r = problem.get_state_reward(s)
+            if problem.is_terminal_state(s):
                 U[s] = r
             else:
-                U[s] = r + gamma * sum(p * U[s1] for (s1, p) in get_next_weighted_states_and_probs(MDPMaze, s, pi[s]))
+                U[s] = r + discount_factor * sum(p * U[s1] for (s1, p) in get_next_weighted_states_and_probs(problem, s, pi[s]))
     return U
 
 
-def policy_iteration(MDPMaze, gamma):
-    """Solve an MDP by policy iteration [Figure 17.7]"""
-
-    U = {s: 0 for s in MDPMaze.get_all_states()}
-    pi = init_policy(MDPMaze)
+def find_policy_via_policy_iteration(problem, discount_factor=0.99):
+    U = {s: 0 for s in problem.get_all_states()}
+    pi = init_policy(problem)
     while True:
-        U = policy_evaluation(pi, U, MDPMaze, gamma)
+        U = policy_evaluation(pi, U, problem, discount_factor)
         unchanged = True
-        for s in MDPMaze.get_all_states():
-            a_star = max(actions_except_terminal_states(MDPMaze, s),
-                         key=lambda a: q_value(MDPMaze, s, a, U, gamma))
+        for s in problem.get_all_states():
+            a_star = max(actions_except_terminal_states(problem, s),
+                         key=lambda a: q_value(problem, s, a, U, discount_factor))
             # a = max(mdp.actions(s), key=lambda a: expected_utility(a, s, U, mdp))
-            if q_value(MDPMaze, s, a_star, U, gamma) > q_value(MDPMaze, s, pi[s], U, gamma):
+            if q_value(problem, s, a_star, U, discount_factor) > q_value(problem, s, pi[s], U, discount_factor):
                 pi[s] = a_star
                 unchanged = False
         if unchanged:
             return pi
-
-
-def find_policy_via_policy_iteration(problem, discount_factor=0.99):
-    return policy_iteration(problem, discount_factor)
 
 
 if __name__ == "__main__":
@@ -219,11 +213,11 @@ if __name__ == "__main__":
     # env = kuimaze.MDPMaze(map_image=GRID_WORLD3, probs=PROBS, grad=GRAD, node_rewards=None)
     # env = kuimaze.MDPMaze(map_image=MAP, probs=PROBS, grad=GRAD, node_rewards=None)
     env.reset()
-    gamma = 0.995
-    utility_values = value_iteration(env, epsilon=0.001, gamma=gamma)
+    gamma = 1
+    utility_values = value_iteration(env, epsilon=0.001, discount_factor=gamma)
     print(utility_values)
-    policy = best_policy(env, utility_values, gamma=gamma)
-    # policy = find_policy_via_policy_iteration(env, gamma)
+    policy = best_policy(env, utility_values, discount_factor=gamma)
+    # policy = find_policy_via_policy_iteration(env, discount_factor=gamma)
     env.visualise(get_visualisation_values(policy))
     env.render()
     time.sleep(5)
