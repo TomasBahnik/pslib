@@ -113,14 +113,6 @@ def init_utils(problem):
     return utils
 
 
-def get_non_terminal_states(MDPMaze):
-    return [s for s in MDPMaze.get_all_states() if not MDPMaze.is_terminal_state(s)]
-
-
-def get_non_goal_states(MDPMaze):
-    return [s for s in MDPMaze.get_all_states() if not MDPMaze.is_goal_state(s)]
-
-
 def actions_except_terminal_states(MDPMaze, s):
     return [None] if MDPMaze.is_terminal_state(s) else MDPMaze.get_actions(s)
 
@@ -134,8 +126,9 @@ def q_value(MDPMaze, state, a, U, gamma):
     if not a:
         return state.reward
     res = 0
-    for s_prime, p in MDPMaze.get_next_states_and_probs(state, a):  # returns state
-        s_prime = kuimaze.maze.weighted_state(x=s_prime.x, y=s_prime.y, reward=MDPMaze.get_state_reward(s_prime))
+    # get_next_states_and_probs returns state might be replaced by iteration over get_next_weighted_states_and_probs
+    for s_prime, p in MDPMaze.get_next_states_and_probs(state, a):
+        s_prime = get_weighted_state(MDPMaze, s_prime)
         res += p * (state.reward + gamma * U[s_prime])
     return res
 
@@ -163,8 +156,11 @@ def best_policy(MDPMaze, U, gamma):
     as a mapping from state to action."""
 
     pi = init_policy(MDPMaze)
-    for s in get_non_terminal_states(MDPMaze):
-        pi[s] = max(MDPMaze.get_actions(s), key=lambda a: q_value(MDPMaze, s, a, U, gamma))
+    for s in MDPMaze.get_all_states():
+        if MDPMaze.is_terminal_state(s):
+            pi[s] = None
+        else:
+            pi[s] = max(MDPMaze.get_actions(s), key=lambda a: q_value(MDPMaze, s, a, U, gamma))
     return pi
 
 
@@ -172,20 +168,11 @@ def get_weighted_state(MDPMaze, s):
     return kuimaze.maze.weighted_state(x=s.x, y=s.y, reward=MDPMaze.get_state_reward(s))
 
 
-def get_next_weighted_states_and_probs(MDPMaze, s, a, all_states=True):
+def get_next_weighted_states_and_probs(MDPMaze, s, a):
+    """Weighted state is used as key for utility and policy vector"""
+    # TODO replace weighted state key by juste state
     transition_all_states = [(get_weighted_state(MDPMaze, s), p) for (s, p) in MDPMaze.get_next_states_and_probs(s, a)]
-    wo_terminal_states = [(s, p) for (s, p) in transition_all_states if not MDPMaze.is_terminal_state(s)]
-    if MDPMaze.is_terminal_state(s):
-        print(transition_all_states)
-    return transition_all_states if all_states else wo_terminal_states
-
-
-def state_from_weighted_state(s):
-    return kuimaze.maze.state(x=s.x, y=s.y)
-
-
-def get_all_states(MDPMaze):
-    return [state_from_weighted_state(s) for s in MDPMaze.get_all_states()]
+    return transition_all_states
 
 
 def policy_evaluation(pi, U, MDPMaze, gamma, k=20):
@@ -235,11 +222,11 @@ if __name__ == "__main__":
     gamma = 0.995
     utility_values = value_iteration(env, epsilon=0.001, gamma=gamma)
     print(utility_values)
-    # policy = best_policy(env, utility_values, gamma=gamma)
-    policy = find_policy_via_policy_iteration(env, gamma)
+    policy = best_policy(env, utility_values, gamma=gamma)
+    # policy = find_policy_via_policy_iteration(env, gamma)
     env.visualise(get_visualisation_values(policy))
     env.render()
-    time.sleep(10)
+    time.sleep(5)
     sys.exit(0)
 
     # print('====================')
