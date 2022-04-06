@@ -126,7 +126,7 @@ def actions_except_terminal_states(problem, s):
 
 
 def expected_utility(a, s, U, problem):
-    """The expected utility of doing a in state s, according to the MDP and U."""
+    """The expected utility of doing a in state s, according to the problem and utilities."""
     return sum(p * U[(s1.x, s1.y)] for (s1, p) in problem.get_next_states_and_probs(s, a))
 
 
@@ -208,10 +208,13 @@ def find_policy_via_policy_iteration(problem, discount_factor=DEFAULT_DISCOUNT_F
             return pi
 
 
-def compare_policies(p1, p2):
+def compare_policies(problem, p1, p2):
     if len(p1) != len(p2):
         return False
-    print("Length of policies {}".format(len(p1)))
+    x_dims = problem.observation_space.spaces[0].n
+    y_dims = problem.observation_space.spaces[1].n
+    d = x_dims * y_dims - len(p1)
+    print("Dims of problem={}, length of policies={}. diff={}".format((x_dims, y_dims), len(p1), d))
     diff_count = 0
     for p_k in policy_p_i.keys():
         if p1[p_k] != p2[p_k]:
@@ -224,10 +227,10 @@ def compare_policies(p1, p2):
 
 
 if __name__ == "__main__":
-    # MAP = 'maps_difficult/maze50x50.png'
-    # MAP = 'maps_difficult/maze50x50_22.png'
-    # MAP = 'maps/easy/easy1.bmp'
-    # MAP = 'maps/normal/normal12.bmp'
+    # map_rel = 'maps_difficult/maze50x50.png'
+    # map_rel = 'maps_difficult/maze50x50_22.png'
+    # map_rel = 'maps/easy/easy1.bmp'
+    # map_rel = 'maps/normal/normal12.bmp'
     map_rel = 'maps/normal/normal11.bmp'
     MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), map_rel)
     # Initialize the maze environment
@@ -249,7 +252,7 @@ if __name__ == "__main__":
     delta = time.perf_counter() - t0
     print("value_iteration : g={}, e={}, {} sec".format(gamma, eps, delta))
 
-    p_equals = compare_policies(policy_p_i, policy_v_i)
+    p_equals = compare_policies(env, policy_p_i, policy_v_i)
     print("policies equals : {}".format(p_equals))
 
     env.visualise(get_visualisation_values(policy_p_i))
