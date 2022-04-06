@@ -225,9 +225,11 @@ def compare_policies(p1, p2):
 
 if __name__ == "__main__":
     # MAP = 'maps_difficult/maze50x50.png'
+    # MAP = 'maps_difficult/maze50x50_22.png'
     # MAP = 'maps/easy/easy1.bmp'
-    MAP = 'maps/normal/normal12.bmp'
-    MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), MAP)
+    # MAP = 'maps/normal/normal12.bmp'
+    map_rel = 'maps/normal/normal11.bmp'
+    MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), map_rel)
     # Initialize the maze environment
     # env = kuimaze.MDPMaze(map_image=GRID_WORLD3, probs=PROBS, grad=GRAD, node_rewards=GRID_WORLD3_REWARDS)
     # env = kuimaze.MDPMaze(map_image=GRID_WORLD3, probs=PROBS, grad=GRAD, node_rewards=None)
@@ -235,15 +237,17 @@ if __name__ == "__main__":
     env.reset()
     gamma = DEFAULT_DISCOUNT_FACTOR
     eps = 0.001
-    t0 = time.perf_counter()
-    policy_v_i = find_policy_via_value_iteration(env, discount_factor=gamma, epsilon=eps)
-    delta = time.perf_counter() - t0
-    print("value_iteration : g={}, e={}, {} sec".format(gamma, eps, delta))
 
+    print("MAP {}".format(map_rel))
     t0 = time.perf_counter()
     policy_p_i = find_policy_via_policy_iteration(env, discount_factor=gamma)
     delta = time.perf_counter() - t0
     print("policy_iteration : g={}, e={}, {} sec".format(gamma, eps, delta))
+
+    t0 = time.perf_counter()
+    policy_v_i = find_policy_via_value_iteration(env, discount_factor=gamma, epsilon=eps)
+    delta = time.perf_counter() - t0
+    print("value_iteration : g={}, e={}, {} sec".format(gamma, eps, delta))
 
     p_equals = compare_policies(policy_p_i, policy_v_i)
     print("policies equals : {}".format(p_equals))
