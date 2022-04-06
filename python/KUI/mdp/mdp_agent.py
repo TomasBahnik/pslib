@@ -125,6 +125,11 @@ def actions_except_terminal_states(problem, s):
     return [None] if problem.is_terminal_state(s) else problem.get_actions(s)
 
 
+def expected_utility(a, s, U, problem):
+    """The expected utility of doing a in state s, according to the MDP and U."""
+    return sum(p * U[(s1.x, s1.y)] for (s1, p) in problem.get_next_states_and_probs(s, a))
+
+
 def q_value(problem, state, a, U, discount_factor):
     if not a:
         return state.reward
@@ -161,10 +166,11 @@ def find_policy_via_value_iteration(problem, discount_factor=DEFAULT_DISCOUNT_FA
     U = value_iteration(problem, discount_factor, epsilon)
     pi = init_policy(problem)
     for s in problem.get_all_states():
+        key = (s.x, s.y)
         if problem.is_terminal_state(s):
-            pi[s] = None
+            pi[key] = None
         else:
-            pi[s] = max(problem.get_actions(s), key=lambda a: q_value(problem, s, a, U, discount_factor))
+            pi[key] = max(problem.get_actions(s), key=lambda a: q_value(problem, s, a, U, discount_factor))
     return pi
 
 
@@ -179,8 +185,7 @@ def policy_evaluation(pi, U, problem, discount_factor, k=10):
             if problem.is_terminal_state(s):
                 U[key] = r
             else:
-                U[key] = r + discount_factor * sum(
-                    p * U[(s1.x, s1.y)] for (s1, p) in problem.get_next_states_and_probs(s, pi[key]))
+                U[key] = r + discount_factor * expected_utility(pi[key], s, U, problem)
     return U
 
 
@@ -192,15 +197,24 @@ def find_policy_via_policy_iteration(problem, discount_factor=DEFAULT_DISCOUNT_F
         unchanged = True
         for s in problem.get_all_states():
             key = (s.x, s.y)
-            # TODO use problem.get_actions(s)
+            # use problem.get_actions(s) ?
             a_star = max(actions_except_terminal_states(problem, s),
                          key=lambda a: q_value(problem, s, a, U, discount_factor))
-            # TODO a = max(mdp.actions(s), key=lambda a: expected_utility(a, s, U, mdp))
+            # use max over actions of expected_utility ?
             if q_value(problem, s, a_star, U, discount_factor) > q_value(problem, s, pi[key], U, discount_factor):
                 pi[key] = a_star
                 unchanged = False
         if unchanged:
             return pi
+
+
+def compare_policies(p1, p2):
+    if len(p1) != len(p2):
+        return False
+    for p_k in policy_p_i.keys():
+        if p1[p_k] != p2[p_k]:
+            return False
+    return True
 
 
 if __name__ == "__main__":
@@ -209,19 +223,26 @@ if __name__ == "__main__":
     MAP = 'maps/normal/normal12.bmp'
     MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), MAP)
     # Initialize the maze environment
-    # PROBS = [0.8, 0.1, 0.1, 0]
-    # env = kuimaze.MDPMaze(map_image=GRID_WORLD3, probs=PROBS, grad=GRAD, node_rewards=GRID_WORLD3_REWARDS)
+    env = kuimaze.MDPMaze(map_image=GRID_WORLD3, probs=PROBS, grad=GRAD, node_rewards=GRID_WORLD3_REWARDS)
     # env = kuimaze.MDPMaze(map_image=GRID_WORLD3, probs=PROBS, grad=GRAD, node_rewards=None)
-    env = kuimaze.MDPMaze(map_image=MAP, probs=PROBS, grad=GRAD, node_rewards=None)
+    # env = kuimaze.MDPMaze(map_image=MAP, probs=PROBS, grad=GRAD, node_rewards=None)
     env.reset()
     gamma = DEFAULT_DISCOUNT_FACTOR
     eps = 0.001
     t0 = time.perf_counter()
-    # policy = find_policy_via_value_iteration(env, discount_factor=gamma, epsilon=epsilon)
-    policy = find_policy_via_policy_iteration(env, discount_factor=gamma)
+    policy_v_i = find_policy_via_value_iteration(env, discount_factor=gamma, epsilon=eps)
     delta = time.perf_counter() - t0
-    print("g={}, e={}, {} sec".format(gamma, eps, delta))
-    env.visualise(get_visualisation_values(policy))
+    print("value_iteration : g={}, e={}, {} sec".format(gamma, eps, delta))
+
+    t0 = time.perf_counter()
+    policy_p_i = find_policy_via_policy_iteration(env, discount_factor=gamma)
+    delta = time.perf_counter() - t0
+    print("policy_iteration : g={}, e={}, {} sec".format(gamma, eps, delta))
+
+    p_equals = compare_policies(policy_p_i, policy_v_i)
+    print("policies equals : {}".format(p_equals))
+
+    env.visualise(get_visualisation_values(policy_p_i))
     env.render()
     # wait_n_or_s()
     time.sleep(10)
