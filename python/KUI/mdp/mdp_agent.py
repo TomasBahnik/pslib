@@ -211,9 +211,15 @@ def find_policy_via_policy_iteration(problem, discount_factor=DEFAULT_DISCOUNT_F
 def compare_policies(p1, p2):
     if len(p1) != len(p2):
         return False
+    print("Length of policies {}".format(len(p1)))
+    diff_count = 0
     for p_k in policy_p_i.keys():
         if p1[p_k] != p2[p_k]:
-            return False
+            diff_count += 1
+            print("key {} : p1={}, p2={}".format(p_k, p1[p_k], p2[p_k]))
+    if diff_count > 0:
+        print("diff count {}".format(diff_count))
+        return False
     return True
 
 
@@ -223,9 +229,9 @@ if __name__ == "__main__":
     MAP = 'maps/normal/normal12.bmp'
     MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), MAP)
     # Initialize the maze environment
-    env = kuimaze.MDPMaze(map_image=GRID_WORLD3, probs=PROBS, grad=GRAD, node_rewards=GRID_WORLD3_REWARDS)
+    # env = kuimaze.MDPMaze(map_image=GRID_WORLD3, probs=PROBS, grad=GRAD, node_rewards=GRID_WORLD3_REWARDS)
     # env = kuimaze.MDPMaze(map_image=GRID_WORLD3, probs=PROBS, grad=GRAD, node_rewards=None)
-    # env = kuimaze.MDPMaze(map_image=MAP, probs=PROBS, grad=GRAD, node_rewards=None)
+    env = kuimaze.MDPMaze(map_image=MAP, probs=PROBS, grad=GRAD, node_rewards=None)
     env.reset()
     gamma = DEFAULT_DISCOUNT_FACTOR
     eps = 0.001
