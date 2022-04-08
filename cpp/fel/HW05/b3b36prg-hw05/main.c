@@ -19,7 +19,6 @@ enum { ERROR_INPUT = 100 };
 int main(int argc, char *argv[])
 {
     int ret = 0;
-    int count = 0;
     // loading matrix 1
     int row1, col1;
     row1 = col1 = 1;
@@ -36,12 +35,12 @@ int main(int argc, char *argv[])
 
     if (ret == ERROR_INPUT) {
         fprintf(stderr, "Error: Chybny vstup!\n");
-        count += 1;
+        return ret;
     }
     // loading char between matrix 1 and 2
     char op[2];
-    if ((scanf("%1s", op)) != 1 ||
-        (op[0] != '+' || op[0] != '-' || op[0] != '*')) // check symbol
+    if ((scanf("%1s", op) !=
+         (op[0] != '+' || op[0] != '-' || op[0] != '*'))) // check symbol
         ret = ERROR_INPUT;
     else
         ret = EXIT_SUCCESS;
@@ -62,40 +61,44 @@ int main(int argc, char *argv[])
 
     if (ret == ERROR_INPUT) {
         fprintf(stderr, "Error: Chybny vstup!\n");
-        count += 1;
+        return ret;
     }
 
-    if (count == 0) {
-        int sign = 1;
-        int sum_res[row1][col1]; // sum resolution
-        int mul_res[row1][col2]; // multiply resolution
-        switch (op[0]) {
-        case '-': // inversion to sum function
-            sign = -1;
-        case '+': // sum function
-            if (sum(row1, col1, m1, row2, col2, m2, row1, col1, sum_res,
-                    sign) == true) // condition check rules for sum matrix
-                print_matrix(row1, col1, sum_res);
-            break;
-        case '*': // multiplication function
-            if (multi(row1, col1, m1, row2, col2, m2, mul_res, sign) ==
-                true) // condition check rules for multiply matrix
-                print_matrix(row1, col2, mul_res);
-
-        default:
+    int sign = 1;
+    int sum_res[row1][col1]; // sum resolution
+    int mul_res[row1][col2]; // multiply resolution
+    switch (op[0]) {
+    case '-': // inversion to sum function
+        sign = -1;
+    case '+': // sum function
+        if (sum(row1, col1, m1, row2, col2, m2, row1, col1, sum_res,
+                sign) == true) // condition check rules for sum matrix
+            print_matrix(row1, col1, sum_res);
+        else
             ret = ERROR_INPUT;
-            break;
-        } // end of switch
-    }
+        break;
+    case '*': // multiplication function
+        if (multi(row1, col1, m1, row2, col2, m2, mul_res, sign) ==
+            true) // condition check rules for multiply matrix
+            print_matrix(row1, col2, mul_res);
+        else
+            ret = ERROR_INPUT;
+        break;
+    default:
+        ret = ERROR_INPUT;
+        break;
+    } // end of switch
     return ret;
 }
 
 void print_matrix(int rows, int cols, int matrix[rows][cols])
 {
-    fprintf(stderr, "%d %d\n", rows, cols);
+    printf("%d %d\n", rows, cols);
     for (int r = 0; r < rows; ++r) {
         for (int c = 0; c < cols; ++c) {
-            printf("%d ", matrix[r][c]);
+            printf("%d", matrix[r][c]);
+            if (c != cols - 1) // dont print last space
+                printf(" ");
         }
         printf("\n");
     }
@@ -105,7 +108,7 @@ bool check_matrix_dim(int *r, int *c) { return scanf("%d %d", r, c) == 2; }
 
 bool read_matrix(int rows, int cols, int matrix[rows][cols])
 {
-    _Bool ret;
+    bool ret;
     for (int r = 0; r < rows; ++r) {
         for (int c = 0; c < cols; ++c) {
             if (scanf("%d", &(matrix[r][c])) == 1) {
@@ -135,7 +138,6 @@ bool sum(int r1, int c1, int m1[r1][c1], int r2, int c2, int m2[r2][c2], int r3,
 
 bool multi(int r1, int c1, int m1[r1][c1], int r2, int c2, int m2[r2][c2],
            int m3[r1][c2], int sign)
-
 {
     if (c1 == r2) {
         for (int r = 0; r < r1; ++r) {
