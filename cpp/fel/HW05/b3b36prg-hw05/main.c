@@ -39,10 +39,7 @@ int main(int argc, char *argv[])
     }
     // loading char between matrix 1 and 2
     char op[2];
-    if ((scanf("%1s", op) !=
-         (op[0] != '+' || op[0] != '-' || op[0] != '*'))) // check symbol
-        ret = ERROR_INPUT;
-    else
+    if (scanf("%1s", op) == 1) // check symbol
         ret = EXIT_SUCCESS;
 
     // loading matrix 2
