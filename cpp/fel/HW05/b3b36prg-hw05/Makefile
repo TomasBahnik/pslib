@@ -1,4 +1,4 @@
-CFLAGS+=  clang -c main.c -std=c99 -g -pedantic -Wall -Werror  -o main.o
+CFLAGS+= -std=c99 -g -pedantic -Wall -Werror 
 HW=main
 ZIP=zip
 
