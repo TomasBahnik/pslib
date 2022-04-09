@@ -1,5 +1,5 @@
-CFLAGS+=  -pedantic -Wall -std=c99 -O3
-HW=hw05-b3b36prg
+CFLAGS+=  clang -c main.c -std=c99 -g -pedantic -Wall -Werror  -o main.o
+HW=main
 ZIP=zip
 
 $(HW): main.c 
