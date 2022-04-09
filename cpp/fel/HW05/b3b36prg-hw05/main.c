@@ -108,7 +108,7 @@ bool check_matrix_dim(int *r, int *c) { return scanf("%d %d", r, c) == 2; }
 
 bool read_matrix(int rows, int cols, int matrix[rows][cols])
 {
-    bool ret;
+    bool ret = false;
     for (int r = 0; r < rows; ++r) {
         for (int c = 0; c < cols; ++c) {
             if (scanf("%d", &(matrix[r][c])) == 1) {
