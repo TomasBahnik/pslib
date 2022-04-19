@@ -1,4 +1,4 @@
-CFLAGS+= -std=c99 -g -pedantic -Wall -Werror 
+CFLAGS+= -std=c99 -O3 -g -pedantic -Wall -Werror
 HW=main
 ZIP=zip
 
