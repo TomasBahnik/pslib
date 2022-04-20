@@ -7,11 +7,11 @@
 
 /* Queue structure which holds all necessary data */
 typedef struct {
-    // TODO - Include your data structure here
     int head;
     int tail;
-    int max_size;
-    void **data;
+    int size;
+    int num_entries;
+    void **array;
 } queue_t;
 
 /* creates a new queue with a given size */
@@ -41,5 +41,9 @@ void *get_from_queue(queue_t *queue, int idx);
 
 /* gets number of stored elements */
 int get_queue_size(queue_t *queue);
+
+int is_full(queue_t *q);
+
+int is_empty(queue_t *q);
 
 #endif /* __QUEUE_H__ */
