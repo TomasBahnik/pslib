@@ -55,7 +55,7 @@ static unsigned int queue_is_empty(const queue_t *queue)
 
 bool push_to_queue(queue_t *queue, void *data)
 {
-    unsigned int result;
+    bool result;
     if (queue->is_full) {
         queue_resize(queue);
         if (queue->is_full) {

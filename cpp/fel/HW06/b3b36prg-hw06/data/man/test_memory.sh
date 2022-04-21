@@ -19,6 +19,7 @@ message "compiling with 'clang $CLANG_OPTIONS $COMPILE_FILES -o $OUTPUT_FILE'"
 clang $CLANG_OPTIONS $COMPILE_FILES -o $OUTPUT_FILE
 
 TEST_FILES=(pub*.in)
+# TODO test on all test files
 test_file=${TEST_FILES[0]}
 VALGRIND_OPTIONS="--leak-check=full --leak-resolution=med --track-origins=yes --vgdb=no"
 message "memory check 'valgrind $VALGRIND_OPTIONS ./$OUTPUT_FILE < $test_file'"
