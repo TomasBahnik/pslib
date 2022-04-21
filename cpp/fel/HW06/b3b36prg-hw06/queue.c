@@ -26,11 +26,38 @@ void delete_queue(queue_t *queue)
     }
 }
 
+static void queue_resize(queue_t *queue)
+{
+    void **temp = malloc(queue->max_size * 2 * sizeof(void *));
+    if (temp) {
+        unsigned int i = 0;
+        unsigned int h = queue->head;
+        do {
+            temp[i] = queue->data[h++];
+            if (h == queue->max_size) {
+                h = 0;
+            }
+            i++;
+        } while (h != queue->tail);
+        free(queue->data);
+        queue->data = temp;
+        queue->head = 0;
+        queue->tail = queue->max_size;
+        queue->max_size *= 2;
+        queue->is_full = 0;
+    }
+}
+
+static unsigned int queue_is_empty(const queue_t *queue)
+{
+    return (queue->head == queue->tail) && !queue->is_full;
+}
+
 bool push_to_queue(queue_t *queue, void *data)
 {
     unsigned int result;
     if (queue->is_full) {
-        cirque_resize(queue);
+        queue_resize(queue);
         if (queue->is_full) {
             result = 0;
         }
@@ -51,7 +78,7 @@ bool push_to_queue(queue_t *queue, void *data)
 void *pop_from_queue(queue_t *queue)
 {
     void *data = NULL;
-    if (!cirque_is_empty(queue)) {
+    if (!queue_is_empty(queue)) {
         data = queue->data[queue->head];
     }
     return data;
@@ -69,6 +96,18 @@ void *get_from_queue(queue_t *queue, int idx)
 
 int get_queue_size(queue_t *queue)
 {
-    printf("get queue size\n");
-    return queue->max_size;
+    unsigned int count;
+    if (queue_is_empty(queue)) {
+        count = 0;
+    } else if (queue->is_full) {
+        count = queue->max_size;
+    } else if (queue->tail > queue->head) {
+        count = queue->tail - queue->head;
+    } else {
+        count = queue->max_size - queue->head;
+        if (queue->tail > 0) {
+            count += queue->tail - 1;
+        }
+    }
+    return count;
 }
