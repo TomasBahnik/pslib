@@ -44,12 +44,11 @@ void *pop_from_queue(queue_t *queue)
 
 void *get_from_queue(queue_t *queue, int idx)
 {
-
-    if (idx >= 0) {
-
-        return queue->array[idx];
+    void *ret = NULL;
+    if (idx >= 0 && idx < queue->num_entries) {
+        ret = queue->array[(queue->head + idx) % queue->size];
     }
-    return NULL;
+    return ret;
 }
 
 int get_queue_size(queue_t *queue) { return queue->num_entries; }
