@@ -93,11 +93,10 @@ void *pop_from_queue(queue_t *queue)
 void *get_from_queue(queue_t *queue, int idx)
 {
     if (queue->head == queue->tail) {
-        printf("Queue Underflow!\n");
         return NULL;
     }
     queue->head = (queue->head + 1) % queue->max_size;
-    return queue->data[idx];
+    return queue->data[queue->head - idx];
 }
 
 int get_queue_size(queue_t *queue)

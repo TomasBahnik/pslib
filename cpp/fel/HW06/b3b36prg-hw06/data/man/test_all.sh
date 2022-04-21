@@ -19,7 +19,7 @@ message "compiling with 'clang -pedantic -Wall -Werror -std=c99 -O3 -lm $COMPILE
 clang -pedantic -Wall -Werror -std=c99 -O3 -lm $COMPILE_FILES -o $OUTPUT_FILE
 num_of_tests=${#TEST_FILES[@]}
 message "running $num_of_tests tests"
-exit 1
+#exit 1
 
 FORMAT="%-10s %-5s %s\n\n"
 FORMAT_OUT="%-10s %-5s\n"
@@ -56,19 +56,19 @@ for test_input in "${TEST_FILES[@]}"; do
     # shellcheck disable=SC2059
     printf "$FORMAT" "$exit_code" "$res" "$error"
   else
-#    output="$(./$OUTPUT_FILE <"$test_input")"
     echo "test file  = $test_input"
     output="$(./$OUTPUT_FILE <"$test_input")"
     hex_output=$(xxd -pu <<< "$output")
     output_hex=$(echo "$hex_output" | xxd -r -p)
     hex_test_output=$(xxd -pu <<< "$test_output")
-#    test_output_hex=$(echo "$hex_test_output" | xxd -r -p)
     if [[ "$output" == "$test_output" ]]; then
       res="PASS"
     else
       res="FAIL"
-      printf "hex:%s\n%s\n" "$hex_output" "$output_hex"
-      printf "exp_hex:%s\n%s\n" "$hex_test_output" "$test_output"
+      echo " ---- output ----"
+      printf "%s\n" "$output"
+      echo " ---- expected output ----"
+      printf "%s\n" "$test_output"
     fi
     # shellcheck disable=SC2059
     printf "$FORMAT_OUT" "$exit_code" "$res"
