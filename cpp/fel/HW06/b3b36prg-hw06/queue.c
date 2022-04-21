@@ -9,7 +9,7 @@ queue_t *create_queue(int capacity)
             temp->head = 0;
             temp->tail = 0;
             temp->max_size = capacity;
-            temp->is_full = 0;
+            temp->is_full = false;
         } else {
             free(temp);
             temp = NULL;
@@ -44,7 +44,7 @@ static void queue_resize(queue_t *queue)
         queue->head = 0;
         queue->tail = queue->max_size;
         queue->max_size *= 2;
-        queue->is_full = 0;
+        queue->is_full = false;
     }
 }
 
@@ -59,7 +59,7 @@ bool push_to_queue(queue_t *queue, void *data)
     if (queue->is_full) {
         queue_resize(queue);
         if (queue->is_full) {
-            result = 0;
+            result = false;
         }
     }
     if (!queue->is_full) {
@@ -68,9 +68,9 @@ bool push_to_queue(queue_t *queue, void *data)
             queue->tail = 0;
         }
         if (queue->tail == queue->head) {
-            queue->is_full = 1;
+            queue->is_full = true;
         }
-        result = 1;
+        result = true;
     }
     return result;
 }
@@ -80,7 +80,7 @@ void *pop_from_queue(queue_t *queue)
     void *data = NULL;
     if (!queue_is_empty(queue)) {
         if (queue->is_full) {
-            queue->is_full = 0;
+            queue->is_full = false;
         }
         data = queue->data[queue->head++];
         if (queue->head == queue->max_size) {
@@ -101,7 +101,7 @@ void *get_from_queue(queue_t *queue, int idx)
 
 int get_queue_size(queue_t *queue)
 {
-    unsigned int count;
+    int count;
     if (queue_is_empty(queue)) {
         count = 0;
     } else if (queue->is_full) {

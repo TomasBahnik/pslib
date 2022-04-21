@@ -7,10 +7,10 @@
 
 /* Queue structure which holds all necessary data */
 typedef struct {
-    unsigned int head;
-    unsigned int tail;
-    unsigned int is_full;
-    unsigned int max_size;
+    int head;
+    int tail;
+    bool is_full;
+    int max_size;
     void **data;
 } queue_t;
 
