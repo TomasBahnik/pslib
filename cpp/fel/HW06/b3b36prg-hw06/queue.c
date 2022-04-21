@@ -14,8 +14,8 @@ queue_t *create_queue(int capacity)
 void delete_queue(queue_t *queue)
 {
     if (queue) {
-        free(queue->array);
-        free(queue);
+        free(queue->array); // free array
+        free(queue);        // free queue
     }
 }
 
@@ -24,9 +24,9 @@ bool push_to_queue(queue_t *queue, void *data)
     if (is_full(queue)) {
         return false;
     }
-    queue->array[queue->tail] = data;
-    queue->num_entries++;
-    queue->tail = (queue->tail + 1) % queue->size;
+    queue->array[queue->tail] = data;              // add data to end of queue
+    queue->num_entries++;                          // number of elemets +1
+    queue->tail = (queue->tail + 1) % queue->size; // move tail idx +1
     return true;
 }
 
@@ -34,21 +34,30 @@ void *pop_from_queue(queue_t *queue)
 {
     void *result = NULL;
 
-    if (!is_empty(queue)) {
-        result = queue->array[queue->head];
-        queue->head = (queue->head + 1) % queue->size;
-        queue->num_entries--;
+    if (!is_empty(queue)) // if isn't full
+    {
+        result = queue->array[queue->head]; // get element from head of queue
+        queue->head = (queue->head + 1) % queue->size; // move head idx +1
+        queue->num_entries--;                          // number of elemets -1
     }
     return result;
 }
 
 void *get_from_queue(queue_t *queue, int idx)
 {
-    void *ret = NULL;
-    if (idx >= 0 && idx < queue->num_entries) {
-        ret = queue->array[(queue->head + idx) % queue->size];
+    if (idx >= 0 && idx < queue->num_entries)
+    /*
+     * if idx isn't negativ number and
+     * smaller then number of elemets
+     */
+    {
+        return queue->array[(queue->head + idx) % queue->size];
+        /*
+         * element that will be popped after
+         * idx calls of the pop_from_queue
+         */
     }
-    return ret;
+    return NULL;
 }
 
 int get_queue_size(queue_t *queue) { return queue->num_entries; }
