@@ -1,14 +1,14 @@
 #include "queue.h"
 
-queue_t *create_queue(int max_size)
+queue_t *create_queue(int capacity)
 {
     queue_t *temp = (queue_t *)malloc(sizeof(queue_t));
     if (temp) {
-        temp->data = malloc(max_size * sizeof(void *));
+        temp->data = malloc(capacity * sizeof(void *));
         if (temp->data) {
             temp->head = 0;
             temp->tail = 0;
-            temp->max_size = max_size;
+            temp->max_size = capacity;
             temp->is_full = 0;
         } else {
             free(temp);
@@ -74,12 +74,18 @@ bool push_to_queue(queue_t *queue, void *data)
     }
     return result;
 }
-
+// pop = remove, peek is not in header
 void *pop_from_queue(queue_t *queue)
 {
     void *data = NULL;
     if (!queue_is_empty(queue)) {
-        data = queue->data[queue->head];
+        if (queue->is_full) {
+            queue->is_full = 0;
+        }
+        data = queue->data[queue->head++];
+        if (queue->head == queue->max_size) {
+            queue->head = 0;
+        }
     }
     return data;
 }
