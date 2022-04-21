@@ -4,8 +4,8 @@ queue_t *create_queue(int capacity)
 {
     queue_t *queue = (queue_t *)malloc(sizeof(queue_t));
     queue->size = capacity;
-    queue->array = malloc(sizeof(void *) * queue->size);
-    queue->num_entries = 0; // empty
+    queue->array = malloc(sizeof(void *) * queue->size); // allocated array
+    queue->num_entries = 0;                              // empty queue
     queue->head = 0;
     queue->tail = 0;
     return queue;
@@ -44,49 +44,16 @@ void *pop_from_queue(queue_t *queue)
 
 void *get_from_queue(queue_t *queue, int idx)
 {
-    // TODO
-    printf("get from queue\n");
-    return 0;
+
+    if (idx >= 0) {
+
+        return queue->array[idx];
+    }
+    return NULL;
 }
 
-int get_queue_size(queue_t *queue)
-{
-    // TODO
-    printf("get queue size\n");
-    return 0;
-}
-int is_full(queue_t *queue)
-{
-    return (queue->num_entries == queue->size);
-    // if ((queue->tail + 1) % queue->size == queue->head)
-    //     return 1;
-    // return 0;
-}
-int is_empty(queue_t *queue)
-{
-    return (queue->num_entries == 0);
-    // if (queue->tail == -1 && queue->head == -1)
-    //     return 1;
-    // return 0;
-}
+int get_queue_size(queue_t *queue) { return queue->num_entries; }
 
-// int main()
-// {
-//     queue_t q1;
+int is_full(queue_t *queue) { return (queue->num_entries == queue->size); }
 
-//     // create_queue(&q1, 3); // first parametr is name of queue
-//     // second parametr is lenght of queue
-//     create_queue(3);
-
-//     push_to_queue(&q1, 58); // add 58
-//     push_to_queue(&q1, 8);  // add 8
-//     push_to_queue(&q1, 54); // add 54
-
-//     void *t;
-//     while ((t = pop_from_queue(&q1)) != QUEUE_EMPTY) {
-//         printf("t = %d\n",
-//                (int)t); // poping elements while queue isn't empty
-//     }
-
-//     delete_queue(&q1); // free queue
-// }
+int is_empty(queue_t *queue) { return (queue->num_entries == 0); }
