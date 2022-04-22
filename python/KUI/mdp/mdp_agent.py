@@ -127,7 +127,7 @@ def actions_except_terminal_states(problem, s):
 
 def expected_utility(a, s, U, problem):
     """The expected utility of doing a in state s, according to the problem and utilities."""
-    return sum(p * U[(s1.x, s1.y)] for (s1, p) in problem.get_next_states_and_probs(s, a))
+    return sum(prob_s_a * U[(s_prime.x, s_prime.y)] for (s_prime, prob_s_a) in problem.get_next_states_and_probs(s, a))
 
 
 def q_value(problem, state, a, U, discount_factor):
@@ -179,13 +179,13 @@ def policy_evaluation(pi, U, problem, discount_factor, k=10):
     utility, using an approximation (modified policy iteration)."""
 
     for i in range(k):
-        for s in problem.get_all_states():  # returns weighted state with reward
-            key = (s.x, s.y)
-            r = s.reward
-            if problem.is_terminal_state(s):
-                U[key] = r
+        for ws in problem.get_all_states():  # returns weighted state with reward
+            s = (ws.x, ws.y)
+            r_s = ws.reward
+            if problem.is_terminal_state(ws):
+                U[s] = r_s
             else:
-                U[key] = r + discount_factor * expected_utility(pi[key], s, U, problem)
+                U[s] = r_s + discount_factor * expected_utility(pi[s], ws, U, problem)
     return U
 
 
