@@ -3,11 +3,20 @@
 queue_t *create_queue(int capacity)
 {
     queue_t *queue = (queue_t *)malloc(sizeof(queue_t));
-    queue->size = capacity;
-    queue->array = malloc(sizeof(void *) * queue->size); // allocated array
-    queue->num_entries = 0;                              // empty queue
-    queue->head = 0;
-    queue->tail = 0;
+    if (queue) // for sure
+    {
+        queue->array = malloc(sizeof(void *) * capacity); // allocated array
+        if (queue->array)                                 // for sure
+        {
+            queue->size = capacity;
+            queue->num_entries = 0; // empty queue
+            queue->head = 0;
+            queue->tail = 0;
+        } else {
+            // free(queue);
+            queue = NULL;
+        }
+    }
     return queue;
 }
 
@@ -22,6 +31,24 @@ void delete_queue(queue_t *queue)
 bool push_to_queue(queue_t *queue, void *data)
 {
     if (is_full(queue)) {
+        void **array = realloc(queue->array, sizeof(void *) * 2 * queue->size);
+        // realloc array
+        if (array) // for sure
+        {
+            // int i = 0;
+            // while (i == queue->size) {
+            //     array[i] = queue->array[queue->head++ % queue->size];
+            //     i++;
+            // }
+            // resize
+            queue->array = array;
+            queue->size *= 2;
+            queue->tail = queue->num_entries;
+            queue->head = 0;
+        }
+    }
+    if (is_full(queue)) // for sure
+    {
         return false;
     }
     queue->array[queue->tail] = data;              // add data to end of queue
