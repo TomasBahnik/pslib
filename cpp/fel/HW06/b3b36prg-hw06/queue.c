@@ -35,11 +35,6 @@ bool push_to_queue(queue_t *queue, void *data)
         // realloc array
         if (array) // for sure
         {
-            // int i = 0;
-            // while (i == queue->size) {
-            //     array[i] = queue->array[queue->head++ % queue->size];
-            //     i++;
-            // }
             // resize
             queue->array = array;
             queue->size *= 2;
