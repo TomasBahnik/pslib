@@ -47,21 +47,24 @@ bool push_to_queue(queue_t *queue, void *data)
             queue->head = 0;
         }
     }
-    if (queue->num_entries < (queue->size / 3)) {
-        void **array = realloc(queue->array, sizeof(void *) * queue->size / 3);
-        // realloc array
-        if (array) // for sure
-        {
-            int i = 0;
-            while (i == queue->size) {
-                array[i] = queue->array[queue->head-- % queue->size];
-                i++;
+    if (queue->size > 3) {
+        if (queue->num_entries < (queue->size / 3)) {
+            void **array =
+                realloc(queue->array, sizeof(void *) * queue->size / 3);
+            // realloc array
+            if (array) // for sure
+            {
+                int i = 0;
+                while (i == queue->size) {
+                    array[i] = queue->array[queue->head-- % queue->size];
+                    i++;
+                }
+                // resize
+                queue->array = array;
+                queue->size = queue->size / 3;
+                queue->tail = queue->num_entries;
+                queue->head = 0;
             }
-            // resize
-            queue->array = array;
-            queue->size = queue->size / 3;
-            queue->tail = queue->num_entries;
-            queue->head = 0;
         }
     }
     if (is_full(queue)) // for sure
