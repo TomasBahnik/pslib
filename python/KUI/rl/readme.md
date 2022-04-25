@@ -1,4 +1,4 @@
-Implementujte funkci learn_policy(env) v souboru rl_agent.py který nahrajte do Brute.
+Implementujte funkci `learn_policy(env)` v souboru rl_agent.py který nahrajte do Brute.
 env je tentokrát typu HardMaze. Očekávaným výstupem je policy, slovník klíčovaný stavy, 
 hodnoty mohou být z [0,1,2,3], což odpovídá up, right, down, left (N,E,S,W).
 
