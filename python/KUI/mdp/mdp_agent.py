@@ -170,6 +170,7 @@ def find_policy_via_value_iteration(problem, discount_factor=DEFAULT_DISCOUNT_FA
         if problem.is_terminal_state(s):
             pi[key] = None
         else:
+            # argmax over actions for action-value (q) function
             pi[key] = max(problem.get_actions(s), key=lambda a: q_value(problem, s, a, U, discount_factor))
     return pi
 
