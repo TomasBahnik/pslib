@@ -43,3 +43,34 @@ while not is_done:
     total_reward += reward
     state = next_state
 ```
+
+
+SARSA control on-policy
+```text
+Algorithm parameters: step size alpha (0, 1], small eps > 0
+Initialize Q(s, a), for all s in S+, a in A(s), arbitrarily except that Q(terminal, ·) = 0
+Loop for each episode:
+    Initialize S
+    Choose A from S using policy derived from Q (e.g., e-greedy)
+    Loop for each step of episode:
+        Take action A, observe R, S'
+        Choose A' from S' using policy derived from Q (e.g., e-greedy)
+        Q(S, A) = Q(S, A) + alpha*[R + gamma*Q(S', A')  - Q(S, A)]
+        S = S'; A=A';
+    until S is terminal
+```
+
+Q-learning: off-policy TD Control
+```text
+Algorithm parameters: step size alpha (0, 1], small eps > 0
+Initialize Q(s, a), for all s in S+, a in A(s), arbitrarily except that Q(terminal, ·) = 0
+Loop for each episode:
+    Initialize S
+    Choose A from S using policy derived from Q (e.g., e-greedy)
+    Loop for each step of episode:
+        Take action A, observe R, S'
+        Choose A from S using policy derived from Q (e.g., e-greedy)
+        Q(S, A) = Q(S, A) + alpha*[R + gamma*max_aQ(S, a)  - Q(S, A)]
+        S = S'; A=A';
+    until S is terminal
+```
