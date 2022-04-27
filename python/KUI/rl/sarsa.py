@@ -37,16 +37,22 @@ def sarsa(env, num_episodes, eps0=0.5, alpha=0.5):
     assert type(env.action_space) == gym.spaces.Discrete
     assert type(env.observation_space) == gym.spaces.tuple.Tuple
 
-    # Number of available actions and maximal state ravel index
+    # Env size
+    x_dims = env.observation_space.spaces[0].n
+    y_dims = env.observation_space.spaces[1].n
+    maze_size = tuple((x_dims, y_dims))
+
+    # Number of discrete actions
     n_action = env.action_space.n
-    n_state_ridx = len(env.get_all_states())
-    # n_state_ridx = np.ravel_multi_index(env.observation_space.nvec - 1, env.observation_space.nvec) + 1
+    size_x = maze_size[0]
+    size_y = maze_size[1]
+    # Initialize action-value function - Q-table
+    q = np.zeros([size_x, size_y, n_action], dtype=np.float)
 
-    # Initialization of action value function
-    q = np.zeros([n_state_ridx, n_action], dtype=np.float)
-
+    # check the sum of probabilities
+    ones = np.ones([size_x, size_y], dtype=np.float)
     # Initialize policy to equal-probable random
-    policy = np.ones([n_state_ridx, n_action], dtype=np.float) / n_action
+    policy = np.ones([size_x, size_y, n_action], dtype=np.float) / n_action
 
     # Dictionary for states from tuples to int
     states_indexes = states_dict(env)
@@ -55,28 +61,33 @@ def sarsa(env, num_episodes, eps0=0.5, alpha=0.5):
     for episode in range(num_episodes):
         # Reset the environment
         state = env.reset()
-        state_ridx = states_indexes[state[0:2]]
-        # state_ridx = np.ravel_multi_index(state, env.observation_space.nvec)
-        # action = env.action_space.sample()
-        action = np.random.choice(n_action, p=policy[state_ridx])
+        state_ridx = state[0:2]
+        idx_x = state_ridx[0]
+        idx_y = state_ridx[1]
+        action = np.random.choice(n_action, p=policy[idx_x, idx_y])
 
         done = False
         while not done:
+            idx_x = state_ridx[0]
+            idx_y = state_ridx[1]
             # Step the environment forward and check for termination
             next_state, reward, done, info = env.step(action)
-            next_state_ridx = states_indexes[next_state[0:2]]
+            next_state_ridx = next_state[0:2]
             # return self.np_random.randint(self.n)
             # next_action = env.action_space.sample()
-            next_action = np.random.choice(n_action, p=policy[next_state_ridx])
+            next_state_idx_x = next_state_ridx[0]
+            next_state_idx_y = next_state_ridx[1]
+            next_action = np.random.choice(n_action, p=policy[next_state_idx_x, next_state_idx_y])
 
             # Update q values
-            q[state_ridx, action] += alpha * (reward + q[next_state_ridx, next_action] - q[state_ridx, action])
+            q[idx_x, idx_y, action] += alpha * (reward + q[next_state_idx_x, next_state_idx_y, next_action]
+                                                - q[idx_x, idx_y, action])
 
             # Extract eps-greedy policy from the updated q values
             eps = eps0 / (episode + 1)
-            policy[state_ridx, :] = eps / n_action
-            policy[state_ridx, np.argmax(q[state_ridx])] = 1 - eps + eps / n_action
-            assert np.allclose(np.sum(policy, axis=1), 1)
+            policy[idx_x, idx_y, :] = eps / n_action
+            policy[idx_x, idx_y, np.argmax(q[state_ridx])] = 1 - eps + eps / n_action
+            assert np.allclose(np.sum(policy, axis=2), ones)
 
             # Prepare the next q update
             state_ridx = next_state_ridx
