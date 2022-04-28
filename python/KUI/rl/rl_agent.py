@@ -9,6 +9,7 @@ A sandbox for playing with the HardMaze
 
 import os
 import sys
+import time
 from time import sleep
 
 import numpy as np
@@ -146,7 +147,13 @@ if __name__ == "__main__":
     MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), map_rel)
     # Initialize the maze environment
     env = kuimaze.HardMaze(map_image=MAP, probs=PROBS, grad=GRAD)
-    q_table, policy, history = sarsa.sarsa(env, num_episodes=900)
+    # TODO replace num of episodes by time limit
+    num_episodes = 1000
+    eps0 = 0.5  # 0.5 default
+    t0 = time.perf_counter()
+    q_table, policy, history = sarsa.sarsa(env, num_episodes=num_episodes, eps0=eps0)
+    delta = time.perf_counter() - t0
+    print("sarsa : episodes{}, eps0={}, {} sec".format(num_episodes, eps0, delta))
 
     if VERBOSITY > 0:
         # env.visualise(get_visualisation(q_table))
