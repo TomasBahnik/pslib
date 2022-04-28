@@ -20,7 +20,7 @@ import kuimaze
 PROBS = [1, 0, 0, 0]
 GRAD = (0, 0)
 SKIP = False
-VERBOSITY = 2
+VERBOSITY = 0
 
 GRID_WORLD3 = [[[255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 0, 0]],
                [[255, 255, 255], [0, 0, 0], [255, 255, 255], [0, 255, 0]],
@@ -162,29 +162,32 @@ def sarsa(problem, time_limit_sec=20, eps0=0.5, alpha=0.5, max_trials=1000):
 
 def learn_policy(problem):
     eps0 = 0.5  # 0.5 default
-    time_limit_sec = 14
+    alpha = 0.5  # 0.5 default
+    time_limit_sec = 15
     t0 = time.perf_counter()
-    q_table, eps_greedy_policy, episodes = sarsa(problem, time_limit_sec=time_limit_sec, eps0=eps0)
-    delta = time.perf_counter() - t0
-    print("sarsa : episodes{}, eps0={}, {} sec".format(episodes, eps0, delta))
+    q_table, eps_greedy_policy, episodes = sarsa(problem, time_limit_sec=time_limit_sec, eps0=eps0, alpha=alpha)
+    duration = time.perf_counter() - t0
+    print("sarsa : episodes={}, eps0={}, alpha={}, duration={} sec".format(episodes, eps0, alpha, duration))
     return get_greedy_policy(q_table)
 
 
-def main_sample(problem):
-    pi = learn_policy(problem)  # limit 20 sekund
+# some badly learned policies might go into loop. Use max steps
+def main_sample(problem, max_steps=1000):
+    pi = learn_policy(problem)  # limit 20 sec
     obv = env.reset()
     state = obv[0:2]
     is_done = False
     total_reward = 0
-
-    while not is_done:
+    step = 0
+    while not is_done and step < max_steps:
+        step += 1
         action = int(pi[state])
         obv, reward, is_done, _ = env.step(action)
         next_state = obv[0:2]
         total_reward += reward
         state = next_state
 
-    print("total reward = {}".format(total_reward))
+    print("total reward = {} in {} steps".format(total_reward, step))
     return pi
 
 
@@ -192,13 +195,16 @@ if __name__ == "__main__":
     # map_rel = 'maps_difficult/maze50x50.png'
     # map_rel = 'maps_difficult/maze50x50_22.png'
     # map_rel = 'maps/easy/easy2.bmp'
-    # map_rel = 'maps/normal/normal12.bmp'
-    map_rel = 'maps/normal/normal11.bmp'
+    # map_rel = 'maps/normal/normal6.bmp'
+    # map_rel = 'maps/normal/normal7.bmp'
     # map_rel = 'maps/normal/normal10.bmp'
+    # map_rel = 'maps/normal/normal11.bmp'
+    map_rel = 'maps/normal/normal12.bmp'
     MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), map_rel)
     # Initialize the maze environment
     env = kuimaze.HardMaze(map_image=MAP, probs=PROBS, grad=GRAD)
     greedy_policy = main_sample(env)
+    print("map={}".format(map_rel))
     if VERBOSITY > 0:
         # env.visualise(get_visualisation(q_table))
         env.visualise(get_visualisation_values(greedy_policy))
