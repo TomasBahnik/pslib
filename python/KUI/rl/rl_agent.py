@@ -88,27 +88,27 @@ def get_visualisation_values(dictvalues):
 
 def get_greedy_policy(q_table):
     pi = dict()
-    # TODO handle terminal and obstacle states as in MDP
+    # HardMaze does not have is_goal_state function policy on goal state is not None
     for y in range(len(q_table[0])):  # grid y
         for x in range(len(q_table)):  # grid x
             key = (x, y)
             action_values = q_table[x, y]
             max_action_value = np.argmax(action_values)
             # str representation od action for visualization
-            action = kuimaze.maze.ACTION(max_action_value)
-            # action = max_action_value
+            # action = kuimaze.maze.ACTION(max_action_value)
+            action = max_action_value
             pi[key] = action
     return pi
 
 
-def sarsa(env, num_episodes, eps0=0.5, alpha=0.5, max_trials=1000):
+def sarsa(problem, num_episodes, eps0=0.5, alpha=0.5, max_trials=1000):
     """ On-policy Sarsa algorithm (with exploration rate decay) """
     # Env size
-    x_dims = env.observation_space.spaces[0].n
-    y_dims = env.observation_space.spaces[1].n
+    x_dims = problem.observation_space.spaces[0].n
+    y_dims = problem.observation_space.spaces[1].n
 
     # Number of discrete actions
-    n_action = env.action_space.n
+    n_action = problem.action_space.n
     # Initialize action-value function - Q-table
     q = np.zeros([x_dims, y_dims, n_action], dtype=float)
 
@@ -119,7 +119,7 @@ def sarsa(env, num_episodes, eps0=0.5, alpha=0.5, max_trials=1000):
 
     for episode in range(num_episodes):
         # Reset the environment
-        state = env.reset()
+        state = problem.reset()
         state_idx = state[0:2]
         action = np.random.choice(n_action, p=eps_greedy_policy[state_idx[0], state_idx[1]])
 
@@ -130,7 +130,7 @@ def sarsa(env, num_episodes, eps0=0.5, alpha=0.5, max_trials=1000):
             idx_x = state_idx[0]
             idx_y = state_idx[1]
             # Step the environment forward and check for termination
-            next_state, reward, done, _ = env.step(action)
+            next_state, reward, done, _ = problem.step(action)
             next_state_idx = next_state[0:2]
             next_state_idx_x = next_state_idx[0]
             next_state_idx_y = next_state_idx[1]
@@ -146,13 +146,42 @@ def sarsa(env, num_episodes, eps0=0.5, alpha=0.5, max_trials=1000):
             max_action_value = np.argmax(q[idx_x, idx_y])
             eps_greedy_policy[idx_x, idx_y, :] = eps / n_action
             eps_greedy_policy[idx_x, idx_y, max_action_value] = 1 - eps + eps / n_action
-            # check iif eps-greedy policy probabilities sum to ~1
+            # check if eps-greedy policy probabilities sum to ~1
             assert np.allclose(np.sum(eps_greedy_policy, axis=2), ones)
 
             # Prepare the next q update
             state_idx = next_state_idx
             action = next_action
     return q, eps_greedy_policy
+
+
+def learn_policy(problem):
+    # TODO replace num of episodes by time limit
+    num_episodes = 1000
+    eps0 = 0.5  # 0.5 default
+    t0 = time.perf_counter()
+    q_table, eps_greedy_policy = sarsa(problem, num_episodes=num_episodes, eps0=eps0)
+    delta = time.perf_counter() - t0
+    print("sarsa : episodes{}, eps0={}, {} sec".format(num_episodes, eps0, delta))
+    return get_greedy_policy(q_table)
+
+
+def main_sample(problem):
+    pi = learn_policy(problem)  # limit 20 sekund
+    obv = env.reset()
+    state = obv[0:2]
+    is_done = False
+    total_reward = 0
+
+    while not is_done:
+        action = int(pi[state])
+        obv, reward, is_done, _ = env.step(action)
+        next_state = obv[0:2]
+        total_reward += reward
+        state = next_state
+
+    print("total reward = {}".format(total_reward))
+    return pi
 
 
 if __name__ == "__main__":
@@ -165,18 +194,10 @@ if __name__ == "__main__":
     MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), map_rel)
     # Initialize the maze environment
     env = kuimaze.HardMaze(map_image=MAP, probs=PROBS, grad=GRAD)
-    # TODO replace num of episodes by time limit
-    num_episodes = 1000
-    eps0 = 0.5  # 0.5 default
-    t0 = time.perf_counter()
-    q_table, policy = sarsa(env, num_episodes=num_episodes, eps0=eps0)
-    delta = time.perf_counter() - t0
-    print("sarsa : episodes{}, eps0={}, {} sec".format(num_episodes, eps0, delta))
+    greedy_policy = main_sample(env)
     if VERBOSITY > 0:
         # env.visualise(get_visualisation(q_table))
-        greedy_policy = get_greedy_policy(q_table)
         env.visualise(get_visualisation_values(greedy_policy))
         env.render()
-        sleep(20)
+        sleep(10)
     sys.exit(0)
-
