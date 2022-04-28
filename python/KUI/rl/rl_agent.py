@@ -9,14 +9,13 @@ A sandbox for playing with the HardMaze
 
 import os
 import sys
+from time import sleep
 
 import numpy as np
 
 import kuimaze
+import sarsa
 
-# MAP = 'maps/normal/normal3.bmp'
-MAP = 'maps/easy/easy2.bmp'
-MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), MAP)
 # PROBS = [0.8, 0.1, 0.1, 0]
 PROBS = [1, 0, 0, 0]
 GRAD = (0, 0)
@@ -78,6 +77,30 @@ def get_visualisation(table):
     return ret
 
 
+def get_visualisation_values(dictvalues):
+    if dictvalues is None:
+        return None
+    ret = []
+    for key, value in dictvalues.items():
+        ret.append({'x': key[0], 'y': key[1], 'value': value})
+    return ret
+
+
+def get_greedy_policy(q_table):
+    pi = dict()
+    # TODO handle terminal and obstacle states as in MDP
+    for y in range(len(q_table[0])):  # grid y
+        for x in range(len(q_table)):  # grid x
+            key = (x, y)
+            action_values = q_table[x, y]
+            max_action_value = np.argmax(action_values)
+            # str representation od action for visualization
+            action = kuimaze.maze.ACTION(max_action_value)
+            # action = max_action_value
+            pi[key] = action
+    return pi
+
+
 def walk_randomly(used_env):
     # used_env.action_space.np_random.seed(123) if you want to fix the randomness between experiments
     used_env.action_space.np_random.seed()
@@ -115,38 +138,30 @@ def walk_randomly(used_env):
 
 
 if __name__ == "__main__":
+    # map_rel = 'maps_difficult/maze50x50.png'
+    # map_rel = 'maps_difficult/maze50x50_22.png'
+    # map_rel = 'maps/easy/easy1.bmp'
+    # map_rel = 'maps/normal/normal12.bmp'
+    map_rel = 'maps/normal/normal11.bmp'
+    MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), map_rel)
     # Initialize the maze environment
     env = kuimaze.HardMaze(map_image=MAP, probs=PROBS, grad=GRAD)
+    q_table, policy, history = sarsa.sarsa(env, num_episodes=900)
 
     if VERBOSITY > 0:
-        print('====================')
-        print('works only in terminal! NOT in IDE!')
-        print('press n - next')
-        print('press s - skip to end')
-        print('====================')
-
-    '''
-    Define constants:
-    '''
-    # Maze size
-    x_dims = env.observation_space.spaces[0].n
-    y_dims = env.observation_space.spaces[1].n
-    maze_size = tuple((x_dims, y_dims))
-
-    # Number of discrete actions
-    num_actions = env.action_space.n
-    # Q-table:
-    q_table = np.zeros([maze_size[0], maze_size[1], num_actions], dtype=float)
-    if VERBOSITY > 0:
-        env.visualise(get_visualisation(q_table))
+        # env.visualise(get_visualisation(q_table))
+        greedy_policy = get_greedy_policy(q_table)
+        # print("policy {}".format(greedy_policy))
+        env.visualise(get_visualisation_values(greedy_policy))
         env.render()
-    walk_randomly(env)
-
-    if VERBOSITY > 0:
-        SKIP = False
-        env.visualise(get_visualisation(q_table))
-        env.render()
-        wait_n_or_s()
-
-        env.save_path()
-        env.save_eps()
+        sleep(20)
+    # walk_randomly(env)
+    sys.exit(0)
+    # if VERBOSITY > 0:
+    #     SKIP = False
+    #     env.visualise(get_visualisation(q_table))
+    #     env.render()
+    #     wait_n_or_s()
+    #
+    #     env.save_path()
+    #     env.save_eps()
