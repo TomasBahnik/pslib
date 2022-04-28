@@ -7,9 +7,6 @@ def run_episode(env, policy=None, render=True):
     assert type(env.action_space) == gym.spaces.Discrete
     assert type(env.observation_space) == gym.spaces.tuple.Tuple
 
-    # env.reset() returns observation
-    # observation, reward, done, _ = env.step(action)
-    # state = observation[0:2]
     state = env.reset()
     if render:
         env.render()
@@ -17,9 +14,9 @@ def run_episode(env, policy=None, render=True):
     done = False
     rewards = []
     while not done:
-        state_ridx = state[0:2]
-        action = np.argmax(policy[state_ridx])
-        state, reward, done, info = env.step(action)
+        state_idx = state[0:2]
+        action = np.argmax(policy[state_idx[0], state_idx[1]])
+        state, reward, done, _ = env.step(action)
         rewards += [reward]
 
         if render:
