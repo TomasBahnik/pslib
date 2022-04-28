@@ -101,8 +101,9 @@ def get_greedy_policy(q_table):
     return pi
 
 
-def sarsa(problem, num_episodes, eps0=0.5, alpha=0.5, max_trials=1000):
+def sarsa(problem, time_limit_sec=20, eps0=0.5, alpha=0.5, max_trials=1000):
     """ On-policy Sarsa algorithm (with exploration rate decay) """
+    t0 = time.perf_counter()
     # Env size
     x_dims = problem.observation_space.spaces[0].n
     y_dims = problem.observation_space.spaces[1].n
@@ -117,7 +118,10 @@ def sarsa(problem, num_episodes, eps0=0.5, alpha=0.5, max_trials=1000):
     # Initialize policy to equal-probable random
     eps_greedy_policy = np.ones([x_dims, y_dims, n_action], dtype=float) / n_action
 
-    for episode in range(num_episodes):
+    delta = time.perf_counter() - t0
+    episode = 0  # needed for decay
+    while delta < time_limit_sec:
+        episode += 1
         # Reset the environment
         state = problem.reset()
         state_idx = state[0:2]
@@ -152,17 +156,17 @@ def sarsa(problem, num_episodes, eps0=0.5, alpha=0.5, max_trials=1000):
             # Prepare the next q update
             state_idx = next_state_idx
             action = next_action
-    return q, eps_greedy_policy
+        delta = time.perf_counter() - t0
+    return q, eps_greedy_policy, episode
 
 
 def learn_policy(problem):
-    # TODO replace num of episodes by time limit
-    num_episodes = 1000
     eps0 = 0.5  # 0.5 default
+    time_limit_sec = 14
     t0 = time.perf_counter()
-    q_table, eps_greedy_policy = sarsa(problem, num_episodes=num_episodes, eps0=eps0)
+    q_table, eps_greedy_policy, episodes = sarsa(problem, time_limit_sec=time_limit_sec, eps0=eps0)
     delta = time.perf_counter() - t0
-    print("sarsa : episodes{}, eps0={}, {} sec".format(num_episodes, eps0, delta))
+    print("sarsa : episodes{}, eps0={}, {} sec".format(episodes, eps0, delta))
     return get_greedy_policy(q_table)
 
 
