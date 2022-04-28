@@ -15,7 +15,6 @@ from time import sleep
 import numpy as np
 
 import kuimaze
-import sarsa
 
 # PROBS = [0.8, 0.1, 0.1, 0]
 PROBS = [1, 0, 0, 0]
@@ -102,40 +101,57 @@ def get_greedy_policy(q_table):
     return pi
 
 
-def walk_randomly(used_env):
-    # used_env.action_space.np_random.seed(123) if you want to fix the randomness between experiments
-    used_env.action_space.np_random.seed()
-    obv = used_env.reset()
-    state = obv[0:2]
-    total_reward = 0
-    is_done = False
-    MAX_T = 1000  # max trials (for one episode)
-    t = 0
-    while not is_done and t < MAX_T:
-        t += 1
-        action = used_env.action_space.sample()
+def sarsa(env, num_episodes, eps0=0.5, alpha=0.5, max_trials=1000):
+    """ On-policy Sarsa algorithm (with exploration rate decay) """
 
-        obv, reward, is_done, _ = used_env.step(action)
-        next_state = obv[0:2]
-        total_reward += reward
+    # Env size
+    x_dims = env.observation_space.spaces[0].n
+    y_dims = env.observation_space.spaces[1].n
 
-        # this is perhaps not correct, just to show something
-        q_table[state[0]][state[1]][action] = reward
-        # another silly idea
-        # q_table[state[0]][state[1]][action] = t
+    # Number of discrete actions
+    n_action = env.action_space.n
+    # Initialize action-value function - Q-table
+    q = np.zeros([x_dims, y_dims, n_action], dtype=float)
 
-        if VERBOSITY > 0:
-            print(state, action, next_state, reward)
-            used_env.visualise(get_visualisation(q_table))
-            used_env.render()
-            wait_n_or_s()
+    # check the sum of probabilities
+    ones = np.ones([x_dims, y_dims], dtype=float)
+    # Initialize policy to equal-probable random
+    policy = np.ones([x_dims, y_dims, n_action], dtype=float) / n_action
 
-        state = next_state
+    for episode in range(num_episodes):
+        # Reset the environment
+        state = env.reset()
+        state_idx = state[0:2]
+        action = np.random.choice(n_action, p=policy[state_idx[0], state_idx[1]])
 
-    if not is_done:
-        print('Timed out')
+        done = False
+        trials = 0
+        while not done and trials < max_trials:
+            trials += 1
+            idx_x = state_idx[0]
+            idx_y = state_idx[1]
+            # Step the environment forward and check for termination
+            next_state, reward, done, _ = env.step(action)
+            next_state_idx = next_state[0:2]
+            next_state_idx_x = next_state_idx[0]
+            next_state_idx_y = next_state_idx[1]
+            next_action = np.random.choice(n_action, p=policy[next_state_idx_x, next_state_idx_y])
 
-    print('total_reward:', total_reward)
+            # Update q values
+            q[idx_x, idx_y, action] += alpha * (reward + q[next_state_idx_x, next_state_idx_y, next_action]
+                                                - q[idx_x, idx_y, action])
+
+            # Extract eps-greedy policy from the updated q values
+            eps = eps0 / (episode + 1)
+            max_action_value = np.argmax(q[idx_x, idx_y])
+            policy[idx_x, idx_y, :] = eps / n_action
+            policy[idx_x, idx_y, max_action_value] = 1 - eps + eps / n_action
+            assert np.allclose(np.sum(policy, axis=2), ones)
+
+            # Prepare the next q update
+            state_idx = next_state_idx
+            action = next_action
+    return q, policy
 
 
 if __name__ == "__main__":
@@ -151,10 +167,9 @@ if __name__ == "__main__":
     num_episodes = 1000
     eps0 = 0.5  # 0.5 default
     t0 = time.perf_counter()
-    q_table, policy, history = sarsa.sarsa(env, num_episodes=num_episodes, eps0=eps0)
+    q_table, policy = sarsa(env, num_episodes=num_episodes, eps0=eps0)
     delta = time.perf_counter() - t0
     print("sarsa : episodes{}, eps0={}, {} sec".format(num_episodes, eps0, delta))
-
     if VERBOSITY > 0:
         # env.visualise(get_visualisation(q_table))
         greedy_policy = get_greedy_policy(q_table)
@@ -162,13 +177,5 @@ if __name__ == "__main__":
         env.visualise(get_visualisation_values(greedy_policy))
         env.render()
         sleep(20)
-    # walk_randomly(env)
     sys.exit(0)
-    # if VERBOSITY > 0:
-    #     SKIP = False
-    #     env.visualise(get_visualisation(q_table))
-    #     env.render()
-    #     wait_n_or_s()
-    #
-    #     env.save_path()
-    #     env.save_eps()
+
