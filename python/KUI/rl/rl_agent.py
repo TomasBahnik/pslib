@@ -199,7 +199,7 @@ def main_sample(problem, max_steps=1000, time_limit_sec=DEFAULT_TIME_LIMIT_SEC):
 
 if __name__ == "__main__":
     t_l = float(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_TIME_LIMIT_SEC
-    m_s = float(sys.argv[2]) if len(sys.argv) > 2 else 1000
+    m_s = int(sys.argv[2]) if len(sys.argv) > 2 else 1000
     # map_rel = 'maps_difficult/maze50x50.png'
     # map_rel = 'maps_difficult/maze50x50_22.png'
     # map_rel = 'maps/easy/easy2.bmp'
@@ -212,7 +212,7 @@ if __name__ == "__main__":
     # Initialize the maze environment
     env = kuimaze.HardMaze(map_image=MAP, probs=PROBS, grad=GRAD)
     print("map={}".format(map_rel))
-    print("max_steps={}, time_limit_sec={}".format(m_s, t_l))
+    print("time_limit_sec={}, max_steps={}".format(t_l, m_s))
     greedy_policy = main_sample(env, max_steps=m_s, time_limit_sec=t_l)
     if VERBOSITY > 0:
         # env.visualise(get_visualisation(q_table))
