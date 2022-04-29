@@ -1,12 +1,3 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-'''
-A sandbox for playing with the HardMaze
-@author: Tomas Svoboda
-@contact: svobodat@fel.cvut.cz
-@copyright: (c) 2017, 2018
-'''
-
 import os
 import sys
 import time
@@ -16,57 +7,10 @@ import numpy as np
 
 import kuimaze
 
-# PROBS = [0.8, 0.1, 0.1, 0]
 PROBS = [1, 0, 0, 0]
 GRAD = (0, 0)
 SKIP = False
 VERBOSITY = 0
-
-GRID_WORLD3 = [[[255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 0, 0]],
-               [[255, 255, 255], [0, 0, 0], [255, 255, 255], [0, 255, 0]],
-               [[0, 0, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255]]]
-
-
-# MAP = GRID_WORLD3
-
-
-def wait_n_or_s():
-    def wait_key():
-        """
-        returns key pressed ... works only in terminal! NOT in IDE!
-        """
-        result = None
-        if os.name == 'nt':
-            import msvcrt
-            # https://cw.felk.cvut.cz/forum/thread-3766-post-14959.html#pid14959
-            result = chr(msvcrt.getch()[0])
-        else:
-            import termios
-            fd = sys.stdin.fileno()
-
-            oldterm = termios.tcgetattr(fd)
-            newattr = termios.tcgetattr(fd)
-            newattr[3] = newattr[3] & ~termios.ICANON & ~termios.ECHO
-            termios.tcsetattr(fd, termios.TCSANOW, newattr)
-            try:
-                result = sys.stdin.read(1)
-            except IOError:
-                pass
-            finally:
-                termios.tcsetattr(fd, termios.TCSAFLUSH, oldterm)
-        return result
-
-    '''
-    press n - next, s - skip to end ... write into terminal
-    '''
-    global SKIP
-    x = SKIP
-    while not x:
-        key = wait_key()
-        x = key == 'n'
-        if key == 's':
-            SKIP = True
-            break
 
 
 def get_visualisation(table):
@@ -77,25 +21,24 @@ def get_visualisation(table):
     return ret
 
 
-def get_visualisation_values(dictvalues):
-    if dictvalues is None:
+def get_visualisation_values(dict_values):
+    if dict_values is None:
         return None
     ret = []
-    for key, value in dictvalues.items():
+    for key, value in dict_values.items():
         ret.append({'x': key[0], 'y': key[1], 'value': value})
     return ret
 
 
 def get_greedy_policy(q_table):
     pi = dict()
-    # HardMaze does not have is_goal_state function policy on goal state is not None
+    # HardMaze does not have `is_goal_state` function.
+    # policy on goal state is not None
     for y in range(len(q_table[0])):  # grid y
         for x in range(len(q_table)):  # grid x
             key = (x, y)
             action_values = q_table[x, y]
             max_action_value = np.argmax(action_values)
-            # str representation od action for visualization
-            # action = kuimaze.maze.ACTION(max_action_value)
             action = max_action_value
             pi[key] = action
     return pi
@@ -201,15 +144,7 @@ def main_sample(problem, max_steps=1000, time_limit_sec=DEFAULT_TIME_LIMIT_SEC):
 if __name__ == "__main__":
     t_l = float(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_TIME_LIMIT_SEC
     m_s = int(sys.argv[2]) if len(sys.argv) > 2 else 1000
-    # map_rel = 'maps_difficult/maze50x50.png'
-    # map_rel = 'maps_difficult/maze50x50_22.png'
-    # map_rel = 'maps/easy/easy2.bmp'
-    # map_rel = 'maps/normal/normal6.bmp'
-    # map_rel = 'maps/normal/normal7.bmp'
-    map_rel = 'maps/normal/normal9.bmp'
-    # map_rel = 'maps/normal/normal10.bmp'
-    # map_rel = 'maps/normal/normal11.bmp'
-    # map_rel = 'maps/normal/normal12.bmp'
+    map_rel = 'maps/normal/normal11.bmp'
     MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), map_rel)
     # Initialize the maze environment
     env = kuimaze.HardMaze(map_image=MAP, probs=PROBS, grad=GRAD)
