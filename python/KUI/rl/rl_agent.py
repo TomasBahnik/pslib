@@ -105,7 +105,7 @@ DEFAULT_TIME_LIMIT_SEC = 18
 
 
 def sarsa(problem, time_limit_sec=DEFAULT_TIME_LIMIT_SEC, eps0=0.5, alpha=0.5, max_trials=1000):
-    """ On-policy Sarsa algorithm with exploration rate decay """
+    """ On-policy Sarsa algorithm with eps greedy policy and exploration rate decay """
     t0 = time.perf_counter()
     # Env size
     x_dims = problem.observation_space.spaces[0].n
@@ -167,10 +167,11 @@ def sarsa(problem, time_limit_sec=DEFAULT_TIME_LIMIT_SEC, eps0=0.5, alpha=0.5, m
 def learn_policy(problem, time_limit_sec=DEFAULT_TIME_LIMIT_SEC):
     eps0 = 0.5  # 0.5 default
     alpha = 0.5  # 0.5 default
-    # t0 = time.perf_counter()
+    t0 = time.perf_counter()
     q_table, eps_greedy_policy, episodes = sarsa(problem, time_limit_sec=time_limit_sec, eps0=eps0, alpha=alpha)
-    # duration = time.perf_counter() - t0
-    # print("sarsa : episodes={}, eps0={}, alpha={}, duration={} sec".format(episodes, eps0, alpha, duration))
+    duration = time.perf_counter() - t0
+    if VERBOSITY > 0:
+        print("sarsa : episodes={}, eps0={}, alpha={}, duration={} sec".format(episodes, eps0, alpha, duration))
     return get_greedy_policy(q_table)
 
 
@@ -179,7 +180,7 @@ def main_sample(problem, max_steps=1000, time_limit_sec=DEFAULT_TIME_LIMIT_SEC):
     t0 = time.perf_counter()
     pi = learn_policy(problem, time_limit_sec=time_limit_sec)  # limit 20 sec
     duration = time.perf_counter() - t0
-    print("sarsa : duration={} sec".format(duration))
+    print("learn_policy : duration={} sec".format(duration))
     obv = env.reset()
     state = obv[0:2]
     is_done = False
@@ -205,8 +206,9 @@ if __name__ == "__main__":
     # map_rel = 'maps/easy/easy2.bmp'
     # map_rel = 'maps/normal/normal6.bmp'
     # map_rel = 'maps/normal/normal7.bmp'
+    map_rel = 'maps/normal/normal9.bmp'
     # map_rel = 'maps/normal/normal10.bmp'
-    map_rel = 'maps/normal/normal11.bmp'
+    # map_rel = 'maps/normal/normal11.bmp'
     # map_rel = 'maps/normal/normal12.bmp'
     MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), map_rel)
     # Initialize the maze environment
@@ -214,7 +216,7 @@ if __name__ == "__main__":
     print("map={}".format(map_rel))
     print("time_limit_sec={}, max_steps={}".format(t_l, m_s))
     greedy_policy = main_sample(env, max_steps=m_s, time_limit_sec=t_l)
-    if VERBOSITY > 0:
+    if VERBOSITY > 1:
         # env.visualise(get_visualisation(q_table))
         env.visualise(get_visualisation_values(greedy_policy))
         env.render()
