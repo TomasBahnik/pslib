@@ -1,4 +1,8 @@
 import argparse
+import sys
+
+import numpy as np
+from PIL import Image
 
 
 def setup_arg_parser():
@@ -14,6 +18,20 @@ def setup_arg_parser():
                         default='classification.dsv',
                         help="path (including the filename) of the output .dsv file with the results")
     return parser
+
+
+#  Uvedením dtype=np.uint16 vyhradíme pro výsledky více bitů, takže se
+#  kvadráty do datového typu vejdou.
+def image_distance(path_img_1, path_img_2):
+    image_1 = Image.open(path_img_1)
+    image_2 = Image.open(path_img_2)
+    im1 = np.array(image_1).flatten()
+    im2 = np.array(image_2).flatten()
+
+    diff = im1 - im2
+    d1 = np.sqrt(np.sum(np.square(diff, dtype=np.uint16)))
+    d2 = np.linalg.norm(diff)
+    return d1, d2
 
 
 def main():
@@ -32,4 +50,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    i1 = 'train_1000_10/img_1112.png'
+    i2 = 'train_1000_10/img_1112.png'
+    image_distance(i1, i2)
+    sys.exit(0)
