@@ -101,8 +101,11 @@ def get_greedy_policy(q_table):
     return pi
 
 
-def sarsa(problem, time_limit_sec=20, eps0=0.5, alpha=0.5, max_trials=1000):
-    """ On-policy Sarsa algorithm (with exploration rate decay) """
+DEFAULT_TIME_LIMIT_SEC = 18
+
+
+def sarsa(problem, time_limit_sec=DEFAULT_TIME_LIMIT_SEC, eps0=0.5, alpha=0.5, max_trials=1000):
+    """ On-policy Sarsa algorithm with exploration rate decay """
     t0 = time.perf_counter()
     # Env size
     x_dims = problem.observation_space.spaces[0].n
@@ -161,7 +164,7 @@ def sarsa(problem, time_limit_sec=20, eps0=0.5, alpha=0.5, max_trials=1000):
 
 
 # time_limit_sec : default = 20 is max by assigment but not always optimal
-def learn_policy(problem, time_limit_sec=15):
+def learn_policy(problem, time_limit_sec=DEFAULT_TIME_LIMIT_SEC):
     eps0 = 0.5  # 0.5 default
     alpha = 0.5  # 0.5 default
     # t0 = time.perf_counter()
@@ -172,7 +175,7 @@ def learn_policy(problem, time_limit_sec=15):
 
 
 # some badly learned policies might go into loop. Use max steps
-def main_sample(problem, max_steps=1000, time_limit_sec=18):
+def main_sample(problem, max_steps=1000, time_limit_sec=DEFAULT_TIME_LIMIT_SEC):
     t0 = time.perf_counter()
     pi = learn_policy(problem, time_limit_sec=time_limit_sec)  # limit 20 sec
     duration = time.perf_counter() - t0
@@ -195,7 +198,7 @@ def main_sample(problem, max_steps=1000, time_limit_sec=18):
 
 
 if __name__ == "__main__":
-    t_l = float(sys.argv[1]) if len(sys.argv) > 1 else 15
+    t_l = float(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_TIME_LIMIT_SEC
     m_s = float(sys.argv[2]) if len(sys.argv) > 2 else 1000
     # map_rel = 'maps_difficult/maze50x50.png'
     # map_rel = 'maps_difficult/maze50x50_22.png'
