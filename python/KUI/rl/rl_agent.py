@@ -172,9 +172,9 @@ def learn_policy(problem, time_limit_sec=15):
 
 
 # some badly learned policies might go into loop. Use max steps
-def main_sample(problem, max_steps=1000):
+def main_sample(problem, max_steps=1000, time_limit_sec=18):
     t0 = time.perf_counter()
-    pi = learn_policy(problem, time_limit_sec=300)  # limit 20 sec
+    pi = learn_policy(problem, time_limit_sec=time_limit_sec)  # limit 20 sec
     duration = time.perf_counter() - t0
     print("sarsa : duration={} sec".format(duration))
     obv = env.reset()
@@ -195,19 +195,22 @@ def main_sample(problem, max_steps=1000):
 
 
 if __name__ == "__main__":
-    map_rel = 'maps_difficult/maze50x50.png'
+    t_l = float(sys.argv[1]) if len(sys.argv) > 1 else 15
+    m_s = float(sys.argv[2]) if len(sys.argv) > 2 else 1000
+    # map_rel = 'maps_difficult/maze50x50.png'
     # map_rel = 'maps_difficult/maze50x50_22.png'
     # map_rel = 'maps/easy/easy2.bmp'
     # map_rel = 'maps/normal/normal6.bmp'
     # map_rel = 'maps/normal/normal7.bmp'
     # map_rel = 'maps/normal/normal10.bmp'
-    # map_rel = 'maps/normal/normal11.bmp'
+    map_rel = 'maps/normal/normal11.bmp'
     # map_rel = 'maps/normal/normal12.bmp'
     MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), map_rel)
     # Initialize the maze environment
     env = kuimaze.HardMaze(map_image=MAP, probs=PROBS, grad=GRAD)
-    greedy_policy = main_sample(env, max_steps=10000)
     print("map={}".format(map_rel))
+    print("max_steps={}, time_limit_sec={}".format(m_s, t_l))
+    greedy_policy = main_sample(env, max_steps=m_s, time_limit_sec=t_l)
     if VERBOSITY > 0:
         # env.visualise(get_visualisation(q_table))
         env.visualise(get_visualisation_values(greedy_policy))
