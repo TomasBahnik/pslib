@@ -160,20 +160,23 @@ def sarsa(problem, time_limit_sec=20, eps0=0.5, alpha=0.5, max_trials=1000):
     return q, eps_greedy_policy, episode
 
 
-def learn_policy(problem):
+# time_limit_sec : default = 20 is max by assigment but not always optimal
+def learn_policy(problem, time_limit_sec=15):
     eps0 = 0.5  # 0.5 default
     alpha = 0.5  # 0.5 default
-    time_limit_sec = 15
-    t0 = time.perf_counter()
+    # t0 = time.perf_counter()
     q_table, eps_greedy_policy, episodes = sarsa(problem, time_limit_sec=time_limit_sec, eps0=eps0, alpha=alpha)
-    duration = time.perf_counter() - t0
-    print("sarsa : episodes={}, eps0={}, alpha={}, duration={} sec".format(episodes, eps0, alpha, duration))
+    # duration = time.perf_counter() - t0
+    # print("sarsa : episodes={}, eps0={}, alpha={}, duration={} sec".format(episodes, eps0, alpha, duration))
     return get_greedy_policy(q_table)
 
 
 # some badly learned policies might go into loop. Use max steps
 def main_sample(problem, max_steps=1000):
-    pi = learn_policy(problem)  # limit 20 sec
+    t0 = time.perf_counter()
+    pi = learn_policy(problem, time_limit_sec=300)  # limit 20 sec
+    duration = time.perf_counter() - t0
+    print("sarsa : duration={} sec".format(duration))
     obv = env.reset()
     state = obv[0:2]
     is_done = False
@@ -192,18 +195,18 @@ def main_sample(problem, max_steps=1000):
 
 
 if __name__ == "__main__":
-    # map_rel = 'maps_difficult/maze50x50.png'
+    map_rel = 'maps_difficult/maze50x50.png'
     # map_rel = 'maps_difficult/maze50x50_22.png'
     # map_rel = 'maps/easy/easy2.bmp'
     # map_rel = 'maps/normal/normal6.bmp'
     # map_rel = 'maps/normal/normal7.bmp'
     # map_rel = 'maps/normal/normal10.bmp'
     # map_rel = 'maps/normal/normal11.bmp'
-    map_rel = 'maps/normal/normal12.bmp'
+    # map_rel = 'maps/normal/normal12.bmp'
     MAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), map_rel)
     # Initialize the maze environment
     env = kuimaze.HardMaze(map_image=MAP, probs=PROBS, grad=GRAD)
-    greedy_policy = main_sample(env)
+    greedy_policy = main_sample(env, max_steps=10000)
     print("map={}".format(map_rel))
     if VERBOSITY > 0:
         # env.visualise(get_visualisation(q_table))
