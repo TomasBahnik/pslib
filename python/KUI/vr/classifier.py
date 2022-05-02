@@ -1,8 +1,10 @@
 import argparse
 import sys
+from pathlib import Path
 
 import numpy as np
 from PIL import Image
+from sklearn.naive_bayes import MultinomialNB
 
 
 def setup_arg_parser():
@@ -34,6 +36,33 @@ def image_distance(path_img_1, path_img_2):
     return d1, d2
 
 
+def read_truth_dsv(dsv_dir, dsv_file):
+    d_f = Path(dsv_dir, dsv_file)
+    ret = []
+    with open(d_f, 'r') as d_f:
+        for line in d_f.readlines():
+            stripped = line.strip()
+            ret.append(stripped.split(":"))
+    return ret
+
+
+def read_samples(truth_data):
+    # train_data = random 1/2 of indexes
+    path = Path("train_data")
+    for fpath in path.iterdir():
+        print(fpath)
+
+
+def n_b():
+    rng = np.random.RandomState(1)
+    X = rng.randint(5, size=(6, 100))
+    y = np.array([1, 2, 3, 4, 5, 6])
+    clf = MultinomialNB()
+    clf.fit(X, y)
+    MultinomialNB()
+    print(clf.predict(X[2:3]))
+
+
 def main():
     parser = setup_arg_parser()
     args = parser.parse_args()
@@ -53,5 +82,8 @@ if __name__ == "__main__":
     # main()
     i1 = 'train_1000_10/img_1112.png'
     i2 = 'train_1000_10/img_1112.png'
+    samples = read_truth_dsv('train_1000_10', 'truth.dsv')
+    # TODO split randomly samples half/half to train and test data
+    n_b()
     image_distance(i1, i2)
     sys.exit(0)
