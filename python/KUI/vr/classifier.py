@@ -53,7 +53,27 @@ def read_samples(truth_data):
         print(fpath)
 
 
-def n_b():
+ASCII_CHARS_COUNT = 128
+GREY_COUNT = 256
+
+
+def likelihoods(labeled_data: list, folder: str, img_size: int, grey_bits: int):
+    # Initialize likelihoods
+    l_h = np.zeros([ASCII_CHARS_COUNT, img_size, 2 ** grey_bits], dtype=int)
+    label_count = np.zeros([ASCII_CHARS_COUNT], dtype=int)
+    for l_d in labeled_data:
+        img_file = folder + '/' + l_d[0]
+        img_label_ascii = ord(l_d[1])
+        label_count[img_label_ascii] += 1
+        image = Image.open(img_file)
+        np_img = np.array(image).flatten()
+        for pixel in range(len(np_img)):
+            grey = np_img[pixel]
+            l_h[img_label_ascii][pixel][grey] += 1
+    return label_count, l_h
+
+
+def n_b_sample():
     rng = np.random.RandomState(1)
     X = rng.randint(5, size=(6, 100))
     y = np.array([1, 2, 3, 4, 5, 6])
@@ -80,10 +100,21 @@ def main():
 
 if __name__ == "__main__":
     # main()
-    i1 = 'train_1000_10/img_1112.png'
-    i2 = 'train_1000_10/img_1112.png'
-    samples = read_truth_dsv('train_1000_10', 'truth.dsv')
-    # TODO split randomly samples half/half to train and test data
-    n_b()
-    image_distance(i1, i2)
+    i1 = 'train_700_28/img_0000.png'
+    i2 = 'train_700_28/img_0001.png'
+    # image_distance(i1, i2)
+    # sys.exit(1)
+    # img_dir = 'train_1000_10'  # 10x10 8 bit
+    # labeled = read_truth_dsv(img_dir, 'truth.dsv')
+    # label_cnt, grey_cnt = likelihoods(labeled, img_dir, 10*10, 8)
+
+    # shape (28,28,4)
+    img_dir = 'train_700_28'  # 28x28 = 784 32 bit
+    labeled = read_truth_dsv(img_dir, 'truth.dsv')
+    label_cnt, grey_cnt = likelihoods(labeled, img_dir, 28*28*4, 8)
+    for lbl in label_cnt.nonzero()[0]:
+        print("{}: count={}".format(chr(lbl), label_cnt[lbl]))
+        # nonzero [pixel,grey]
+        n_z_lbl_pix = grey_cnt[lbl].nonzero()
+        nz_greys = n_z_lbl_pix[0].nonzero()
     sys.exit(0)
