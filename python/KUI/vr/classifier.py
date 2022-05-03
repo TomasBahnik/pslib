@@ -2,8 +2,11 @@ import argparse
 import sys
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 
 
@@ -93,14 +96,22 @@ def likelihoods(labeled_data: list, folder: str, img_size: int, grey_bits: int):
     return label_count, l_h
 
 
-def n_b_sample():
-    rng = np.random.RandomState(1)
-    X = rng.randint(5, size=(6, 100))
-    y = np.array([1, 2, 3, 4, 5, 6])
+# TODO return
+# Výsledkem klasifikátoru je soubor classification.dsv stejného formátu jako truth.dsv,
+# který je umístěný v adresáři s testovacími obrázky.
+def n_b(img_dir, img_size):
+    # img_dir = 'train_1000_10'  # 10x10 8 bit
+    labeled = read_truth_dsv(img_dir, 'truth.dsv')
+    X, y = samples(labeled, img_dir, img_size)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
     clf = MultinomialNB()
-    clf.fit(X, y)
-    # MultinomialNB()
-    print(clf.predict(X[2:4]))
+    clf.fit(X_train, y_train)
+    predictions = clf.predict(X_test)
+    cm = confusion_matrix(y_test, predictions, labels=clf.classes_)
+    disp_labels = [chr(x) for x in clf.classes_]
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=disp_labels)
+    disp.plot()
+    plt.show()
 
 
 def main():
@@ -131,18 +142,8 @@ def test_1():
 
 
 if __name__ == "__main__":
-    # main()
-    # i1 = 'train_700_28/img_0000.png'
-    # i2 = 'train_700_28/img_0001.png'
-    # image_distance(i1, i2)
-    # sys.exit(1)
-    img_dir = 'train_1000_10'  # 10x10 8 bit
-    labeled = read_truth_dsv(img_dir, 'truth.dsv')
-    X_1, y_1 = samples(labeled, img_dir, 10 * 10)
-    clf = MultinomialNB()
-    clf.fit(X_1, y_1)
-    # MultinomialNB()
-    predict = clf.predict(X_1[998:999])[0]
-    print(chr(predict))
     # label_cnt, grey_cnt = likelihoods(labeled, img_dir, 10*10, 8)
+    # n_b('train_1000_10', 10 * 10)  # 10x10 8 bit
+    # n_b('train_1000_28', 28 * 28)  # 28x28 8 bit
+    n_b('train_700_28', 28 * 28 * 4)  # 28x28 32 bit
     sys.exit(0)
