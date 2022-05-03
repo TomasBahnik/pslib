@@ -57,6 +57,26 @@ ASCII_CHARS_COUNT = 128
 GREY_COUNT = 256
 
 
+def samples(labeled_data: list, folder: str, img_size: int):
+    n_samples = len(labeled_data)
+    n_features = img_size
+    # sample values
+    X = np.empty((n_samples, n_features), dtype=int)
+    # target values = classes
+    y = np.empty(n_samples, dtype=int)
+    s = 0
+    for l_d in labeled_data:
+        img_file = folder + '/' + l_d[0]
+        img_label_ascii = ord(l_d[1])
+        image = Image.open(img_file)
+        np_img = np.array(image).flatten()
+        X[s] = np_img
+        y[s] = img_label_ascii
+        s += 1
+    return X, y
+
+
+# Multinomial NB estimates likelihoods
 def likelihoods(labeled_data: list, folder: str, img_size: int, grey_bits: int):
     # Initialize likelihoods
     l_h = np.zeros([ASCII_CHARS_COUNT, img_size, 2 ** grey_bits], dtype=int)
@@ -79,8 +99,8 @@ def n_b_sample():
     y = np.array([1, 2, 3, 4, 5, 6])
     clf = MultinomialNB()
     clf.fit(X, y)
-    MultinomialNB()
-    print(clf.predict(X[2:3]))
+    # MultinomialNB()
+    print(clf.predict(X[2:4]))
 
 
 def main():
@@ -98,23 +118,31 @@ def main():
         # TODO Train and test the Naive Bayes classifier
 
 
-if __name__ == "__main__":
-    # main()
-    i1 = 'train_700_28/img_0000.png'
-    i2 = 'train_700_28/img_0001.png'
-    # image_distance(i1, i2)
-    # sys.exit(1)
-    # img_dir = 'train_1000_10'  # 10x10 8 bit
-    # labeled = read_truth_dsv(img_dir, 'truth.dsv')
-    # label_cnt, grey_cnt = likelihoods(labeled, img_dir, 10*10, 8)
-
+def test_1():
     # shape (28,28,4)
     img_dir = 'train_700_28'  # 28x28 = 784 32 bit
     labeled = read_truth_dsv(img_dir, 'truth.dsv')
-    label_cnt, grey_cnt = likelihoods(labeled, img_dir, 28*28*4, 8)
+    label_cnt, grey_cnt = likelihoods(labeled, img_dir, 28 * 28 * 4, 8)
     for lbl in label_cnt.nonzero()[0]:
         print("{}: count={}".format(chr(lbl), label_cnt[lbl]))
         # nonzero [pixel,grey]
         n_z_lbl_pix = grey_cnt[lbl].nonzero()
         nz_greys = n_z_lbl_pix[0].nonzero()
+
+
+if __name__ == "__main__":
+    # main()
+    # i1 = 'train_700_28/img_0000.png'
+    # i2 = 'train_700_28/img_0001.png'
+    # image_distance(i1, i2)
+    # sys.exit(1)
+    img_dir = 'train_1000_10'  # 10x10 8 bit
+    labeled = read_truth_dsv(img_dir, 'truth.dsv')
+    X_1, y_1 = samples(labeled, img_dir, 10 * 10)
+    clf = MultinomialNB()
+    clf.fit(X_1, y_1)
+    # MultinomialNB()
+    predict = clf.predict(X_1[998:999])[0]
+    print(chr(predict))
+    # label_cnt, grey_cnt = likelihoods(labeled, img_dir, 10*10, 8)
     sys.exit(0)
