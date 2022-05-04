@@ -109,6 +109,12 @@ def n_b(img_dir, img_size):
     # files_train, files_test, targets_train, targets_test = train_test_split(files, targets)
     X, y = samples(labeled, img_dir, img_size)
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+    Y = one_hot_enc(y_train)
+    # multinomial_n_b(X_test, X_train, y_test, y_train)
+    print(Y.shape)
+
+
+def multinomial_n_b(X_test, X_train, y_test, y_train):
     clf = MultinomialNB()
     clf.fit(X_train, y_train)
     predictions = clf.predict(X_test)
