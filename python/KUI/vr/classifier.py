@@ -5,6 +5,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
+from scipy.sparse._sparsetools import csr_todense
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
@@ -100,10 +101,15 @@ def likelihoods(labeled_data: list, folder: str, img_size: int, grey_bits: int):
 # Výsledkem klasifikátoru je soubor classification.dsv stejného formátu jako truth.dsv,
 # který je umístěný v adresáři s testovacími obrázky.
 def n_b(img_dir, img_size):
-    # img_dir = 'train_1000_10'  # 10x10 8 bit
+    # TODO what about splitting to train and test labeled
+    # so classification.dsv can be created from tests
     labeled = read_truth_dsv(img_dir, 'truth.dsv')
+    # files = [x[0] for x in labeled]
+    # targets = [x[1] for x in labeled]
+    # files_train, files_test, targets_train, targets_test = train_test_split(files, targets)
     X, y = samples(labeled, img_dir, img_size)
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+    one_hot_y = n_b_fit(X_train,y_train)
     clf = MultinomialNB()
     clf.fit(X_train, y_train)
     predictions = clf.predict(X_test)
@@ -112,6 +118,37 @@ def n_b(img_dir, img_size):
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=disp_labels)
     disp.plot()
     plt.show()
+
+
+def unique_labels(y):
+    ys = set(x for x in y)
+    return np.array(sorted(ys))
+
+
+def one_hot_enc(y):
+    classes = unique_labels(y)
+    n_classes = len(classes)
+    n_samples = len(y)
+    classes = np.asarray(classes)
+    y_in_classes = np.in1d(y, classes)
+    y_seen = y[y_in_classes]
+    sorted_class = np.sort(classes)
+    indices = np.searchsorted(sorted_class, y_seen)
+    indptr = np.hstack((0, np.cumsum(y_in_classes)))
+
+    data = np.empty_like(indices)
+    data.fill(1)
+    # Y = sp.csr_matrix((data, indices, indptr), shape=(n_samples, n_classes))
+    out = np.zeros((n_samples, n_classes), dtype=np.int64, order='c')
+    ret = out.T
+    csr_todense(n_samples, n_classes, indptr, indices, data, ret)
+    return out
+
+
+def n_b_fit(X, y):
+    _, n_features = X.shape
+    Y = one_hot_enc(y)
+    return Y
 
 
 def main():
