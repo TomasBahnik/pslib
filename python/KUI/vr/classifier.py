@@ -4,8 +4,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy.sparse as sp
 from PIL import Image
-from scipy.sparse._sparsetools import csr_todense
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
@@ -109,7 +109,6 @@ def n_b(img_dir, img_size):
     # files_train, files_test, targets_train, targets_test = train_test_split(files, targets)
     X, y = samples(labeled, img_dir, img_size)
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
-    one_hot_y = n_b_fit(X_train,y_train)
     clf = MultinomialNB()
     clf.fit(X_train, y_train)
     predictions = clf.predict(X_test)
@@ -127,8 +126,8 @@ def unique_labels(y):
 
 def one_hot_enc(y):
     classes = unique_labels(y)
-    n_classes = len(classes)
     n_samples = len(y)
+    n_classes = len(classes)
     classes = np.asarray(classes)
     y_in_classes = np.in1d(y, classes)
     y_seen = y[y_in_classes]
@@ -138,11 +137,8 @@ def one_hot_enc(y):
 
     data = np.empty_like(indices)
     data.fill(1)
-    # Y = sp.csr_matrix((data, indices, indptr), shape=(n_samples, n_classes))
-    out = np.zeros((n_samples, n_classes), dtype=np.int64, order='c')
-    ret = out.T
-    csr_todense(n_samples, n_classes, indptr, indices, data, ret)
-    return out
+    Y = sp.csr_matrix((data, indices, indptr), shape=(n_samples, n_classes))
+    return Y.toarray()
 
 
 def n_b_fit(X, y):
