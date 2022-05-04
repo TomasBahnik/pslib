@@ -109,25 +109,8 @@ def n_b(img_dir, img_size):
     # files_train, files_test, targets_train, targets_test = train_test_split(files, targets)
     X, y = samples(labeled, img_dir, img_size)
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
-    Y = one_hot_enc(y_train)
-    # multinomial_n_b(X_test, X_train, y_test, y_train)
-    print(Y.shape)
-
-
-def multinomial_n_b(X_test, X_train, y_test, y_train):
-    clf = MultinomialNB()
-    clf.fit(X_train, y_train)
-    predictions = clf.predict(X_test)
-    cm = confusion_matrix(y_test, predictions, labels=clf.classes_)
-    disp_labels = [chr(x) for x in clf.classes_]
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=disp_labels)
-    disp.plot()
-    plt.show()
-
-
-def unique_labels(y):
-    ys = set(x for x in y)
-    return np.array(sorted(ys))
+    multinomial_n_b(X_test, X_train, y_test, y_train)
+    manual_n_b(X_test, X_train, y_test, y_train)
 
 
 def one_hot_enc(y):
@@ -144,7 +127,56 @@ def one_hot_enc(y):
     data = np.empty_like(indices)
     data.fill(1)
     Y = sp.csr_matrix((data, indices, indptr), shape=(n_samples, n_classes))
-    return Y.toarray()
+    Y = Y.toarray()
+    # Y = Y.astype(int, copy=False)
+    return Y, classes
+
+
+def manual_n_b(X_test, X_train, y_test, y_train, alpha=1.0):
+    print("Using manual nb")
+    Y, classes_ = one_hot_enc(y_train)
+    n_classes = Y.shape[1]
+    _, n_features = X_train.shape
+    feature_count_ = np.zeros((n_classes, n_features), dtype=int)
+    class_count_ = np.zeros(n_classes, dtype=int)
+    # ret = np.dot(a, b) or ret = a @ b np.matmul(a,b)
+    feature_count_ += np.dot(Y.T, X_train)
+    class_count_ += Y.sum(axis=0)
+
+    smoothed_fc = feature_count_ + alpha
+    smoothed_cc = smoothed_fc.sum(axis=1)
+    feature_log_prob_ = np.log(smoothed_fc) - np.log(smoothed_cc.reshape(-1, 1))
+    # uniform
+    # class_log_prior_ = np.full(n_classes, -np.log(n_classes))
+    # empirical prior
+    log_class_count = np.log(class_count_)
+    class_log_prior_ = log_class_count - np.log(class_count_.sum())
+    """Calculate the posterior log probability of the samples X"""
+    jll = np.dot(X_test, feature_log_prob_.T) + class_log_prior_
+    predictions = classes_[np.argmax(jll, axis=1)]
+    c_m(predictions, y_test, classes_)
+
+
+def multinomial_n_b(X_test, X_train, y_test, y_train):
+    print("Using scikit nb")
+    clf = MultinomialNB()
+    clf.fit(X_train, y_train)
+    predictions = clf.predict(X_test)
+    c_m(predictions, y_test, clf.classes_, n_b_type=1)
+
+
+def c_m(predictions, y_test, classes, n_b_type=0):
+    cm = confusion_matrix(y_test, predictions, labels=classes)
+    disp_labels = [chr(x) for x in classes]
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=disp_labels)
+    color_bar = False if n_b_type == 0 else True
+    disp.plot(colorbar=color_bar)
+    plt.show()
+
+
+def unique_labels(y):
+    ys = set(x for x in y)
+    return np.array(sorted(ys))
 
 
 def n_b_fit(X, y):
@@ -183,6 +215,6 @@ def test_1():
 if __name__ == "__main__":
     # label_cnt, grey_cnt = likelihoods(labeled, img_dir, 10*10, 8)
     # n_b('train_1000_10', 10 * 10)  # 10x10 8 bit
-    # n_b('train_1000_28', 28 * 28)  # 28x28 8 bit
-    n_b('train_700_28', 28 * 28 * 4)  # 28x28 32 bit
+    n_b('train_1000_28', 28 * 28)  # 28x28 8 bit
+    # n_b('train_700_28', 28 * 28 * 4)  # 28x28 32 bit
     sys.exit(0)
