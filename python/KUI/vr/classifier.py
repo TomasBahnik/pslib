@@ -39,16 +39,6 @@ def image_distance(path_img_1, path_img_2):
     return d1, d2
 
 
-def read_truth_dsv(dsv_dir, dsv_file):
-    d_f = Path(dsv_dir, dsv_file)
-    ret = []
-    with open(d_f, 'r') as d_f:
-        for line in d_f.readlines():
-            stripped = line.strip()
-            ret.append(stripped.split(":"))
-    return ret
-
-
 def read_samples(truth_data):
     # train_data = random 1/2 of indexes
     path = Path("train_data")
@@ -70,7 +60,17 @@ class NaiveBayes:
         self.feature_log_prob = None
         self.log_class_count = None
 
-    def samples(self, labeled_data: list, folder: str):
+    def read_truth_dsv(self, dsv_dir):
+        d_f = Path(dsv_dir, 'truth.dsv')
+        ret = []
+        with open(d_f, 'r') as d_f:
+            for line in d_f.readlines():
+                stripped = line.strip()
+                ret.append(stripped.split(":"))
+        return ret
+
+    def samples(self, folder: str):
+        labeled_data = self.read_truth_dsv(folder)
         n_samples = len(labeled_data)
         img_file = folder + '/' + labeled_data[0][0]
         image = Image.open(img_file)
@@ -146,14 +146,8 @@ class NaiveBayes:
 # který je umístěný v adresáři s testovacími obrázky.
 def n_b(train_dir, test_dir, output_file='classification.dsv'):
     # multinomial_n_b(X_test, X_train, y_test, y_train)
-    manual_n_b(train_dir, test_dir, output_file='classification.dsv')
-
-
-def manual_n_b(train_dir, test_dir, output_file='classification.dsv'):
-    print("Using manual nb")
-    labeled = read_truth_dsv(train_dir, 'truth.dsv')
     clf = NaiveBayes()
-    X, y = clf.samples(labeled, train_dir)
+    X, y = clf.samples(train_dir)
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
     clf.fit(X_train, y_train)
     predictions = clf.predict(X_test)
