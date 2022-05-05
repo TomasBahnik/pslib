@@ -56,28 +56,6 @@ def read_samples(truth_data):
         print(fpath)
 
 
-def samples(labeled_data: list, folder: str):
-    n_samples = len(labeled_data)
-    img_file = folder + '/' + labeled_data[0][0]
-    image = Image.open(img_file)
-    np_img = np.array(image).flatten()
-    n_features = len(np_img)
-    # sample values
-    X = np.empty((n_samples, n_features), dtype=int)
-    # target values = classes
-    y = np.empty(n_samples, dtype=int)
-    s = 0
-    for l_d in labeled_data:
-        img_file = folder + '/' + l_d[0]
-        img_label_ascii = ord(l_d[1])
-        image = Image.open(img_file)
-        np_img = np.array(image).flatten()
-        X[s] = np_img
-        y[s] = img_label_ascii
-        s += 1
-    return X, y
-
-
 class NaiveBayes:
 
     def __init__(self, alpha=1.0, fit_prior=True):
@@ -91,6 +69,27 @@ class NaiveBayes:
         self.class_log_prior = None
         self.feature_log_prob = None
         self.log_class_count = None
+
+    def samples(self, labeled_data: list, folder: str):
+        n_samples = len(labeled_data)
+        img_file = folder + '/' + labeled_data[0][0]
+        image = Image.open(img_file)
+        np_img = np.array(image).flatten()
+        n_features = len(np_img)
+        # sample values
+        X = np.empty((n_samples, n_features), dtype=int)
+        # target values = classes
+        y = np.empty(n_samples, dtype=int)
+        s = 0
+        for l_d in labeled_data:
+            img_file = folder + '/' + l_d[0]
+            img_label_ascii = ord(l_d[1])
+            image = Image.open(img_file)
+            np_img = np.array(image).flatten()
+            X[s] = np_img
+            y[s] = img_label_ascii
+            s += 1
+        return X, y
 
     def one_hot_enc(self, y):
         classes = np.array(sorted(set(y)))
@@ -145,22 +144,17 @@ class NaiveBayes:
 # TODO return
 # Výsledkem klasifikátoru je soubor classification.dsv stejného formátu jako truth.dsv,
 # který je umístěný v adresáři s testovacími obrázky.
-def n_b(img_dir):
-    # TODO what about splitting to train and test labeled
-    # so classification.dsv can be created from tests
-    labeled = read_truth_dsv(img_dir, 'truth.dsv')
-    # files = [x[0] for x in labeled]
-    # targets = [x[1] for x in labeled]
-    # files_train, files_test, targets_train, targets_test = train_test_split(files, targets)
-    X, y = samples(labeled, img_dir)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+def n_b(train_dir, test_dir, output_file='classification.dsv'):
     # multinomial_n_b(X_test, X_train, y_test, y_train)
-    manual_n_b(X_test, X_train, y_test, y_train)
+    manual_n_b(train_dir, test_dir, output_file='classification.dsv')
 
 
-def manual_n_b(X_test, X_train, y_test, y_train):
+def manual_n_b(train_dir, test_dir, output_file='classification.dsv'):
     print("Using manual nb")
+    labeled = read_truth_dsv(train_dir, 'truth.dsv')
     clf = NaiveBayes()
+    X, y = clf.samples(labeled, train_dir)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
     clf.fit(X_train, y_train)
     predictions = clf.predict(X_test)
     c_m(predictions, y_test, clf.classes)
@@ -178,9 +172,10 @@ def main():
         # TODO Train and test the k-NN classifier
     elif args.b:
         print("Running Naive Bayes classifier")
-        n_b(args.train_path)  # 10x10 8 bit
+        n_b(args.train_path, args.test_path, output_file=args.o)
 
 
 if __name__ == "__main__":
+    # python classifier.py -b ./train_1000_28 ./test_data
     main()
     sys.exit(0)
