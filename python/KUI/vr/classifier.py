@@ -5,7 +5,6 @@ from pathlib import Path
 import numpy as np
 import scipy.sparse as sp
 from PIL import Image
-from sklearn.model_selection import train_test_split
 
 from scikit_clf import c_m
 
@@ -46,6 +45,45 @@ def read_samples(truth_data):
         print(fpath)
 
 
+def read_truth_dsv(dsv_dir):
+    d_f = Path(dsv_dir, 'truth.dsv')
+    ret = []
+    with open(d_f, 'r') as d_f:
+        for line in d_f.readlines():
+            stripped = line.strip()
+            ret.append(stripped.split(":"))
+    return ret
+
+
+def write_output_dsv(predictions, dsv_dir, output_file='classification.dsv'):
+    d_f = Path(dsv_dir, output_file)
+    with open(d_f, 'w') as d_f:
+        d_f.writelines(str(predictions))
+
+
+def samples(folder: str):
+    labeled_data = read_truth_dsv(folder)
+    n_samples = len(labeled_data)
+    img_file = folder + '/' + labeled_data[0][0]
+    image = Image.open(img_file)
+    np_img = np.array(image).flatten()
+    n_features = len(np_img)
+    # sample values
+    X = np.empty((n_samples, n_features), dtype=int)
+    # target values = classes
+    y = np.empty(n_samples, dtype=int)
+    s = 0
+    for l_d in labeled_data:
+        img_file = folder + '/' + l_d[0]
+        img_label_ascii = ord(l_d[1])
+        image = Image.open(img_file)
+        np_img = np.array(image).flatten()
+        X[s] = np_img
+        y[s] = img_label_ascii
+        s += 1
+    return X, y
+
+
 class NaiveBayes:
 
     def __init__(self, alpha=1.0, fit_prior=True):
@@ -59,37 +97,6 @@ class NaiveBayes:
         self.class_log_prior = None
         self.feature_log_prob = None
         self.log_class_count = None
-
-    def read_truth_dsv(self, dsv_dir):
-        d_f = Path(dsv_dir, 'truth.dsv')
-        ret = []
-        with open(d_f, 'r') as d_f:
-            for line in d_f.readlines():
-                stripped = line.strip()
-                ret.append(stripped.split(":"))
-        return ret
-
-    def samples(self, folder: str):
-        labeled_data = self.read_truth_dsv(folder)
-        n_samples = len(labeled_data)
-        img_file = folder + '/' + labeled_data[0][0]
-        image = Image.open(img_file)
-        np_img = np.array(image).flatten()
-        n_features = len(np_img)
-        # sample values
-        X = np.empty((n_samples, n_features), dtype=int)
-        # target values = classes
-        y = np.empty(n_samples, dtype=int)
-        s = 0
-        for l_d in labeled_data:
-            img_file = folder + '/' + l_d[0]
-            img_label_ascii = ord(l_d[1])
-            image = Image.open(img_file)
-            np_img = np.array(image).flatten()
-            X[s] = np_img
-            y[s] = img_label_ascii
-            s += 1
-        return X, y
 
     def one_hot_enc(self, y):
         classes = np.array(sorted(set(y)))
@@ -141,17 +148,20 @@ class NaiveBayes:
         return predictions
 
 
-# TODO return
 # Výsledkem klasifikátoru je soubor classification.dsv stejného formátu jako truth.dsv,
 # který je umístěný v adresáři s testovacími obrázky.
 def n_b(train_dir, test_dir, output_file='classification.dsv'):
     # multinomial_n_b(X_test, X_train, y_test, y_train)
     clf = NaiveBayes()
-    X, y = clf.samples(train_dir)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+    X_train, y_train = samples(train_dir)
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
     clf.fit(X_train, y_train)
+
+    X_test, y_test = samples(test_dir)
     predictions = clf.predict(X_test)
+    write_output_dsv(predictions, test_dir, output_file=output_file)
     c_m(predictions, y_test, clf.classes)
+
 
 
 def main():
