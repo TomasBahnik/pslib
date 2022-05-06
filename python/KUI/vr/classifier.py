@@ -1,4 +1,5 @@
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -38,47 +39,63 @@ def image_distance(path_img_1, path_img_2):
     return d1, d2
 
 
-def read_samples(truth_data):
-    # train_data = random 1/2 of indexes
-    path = Path("train_data")
-    for fpath in path.iterdir():
-        print(fpath)
+def read_test_data(folder):
+    png_files = [Path(folder, name) for name in os.listdir(folder)
+                 if os.path.isfile(Path(folder, name)) and name.endswith('png')]
+    n_samples = len(png_files)
+    image = Image.open(png_files[0])
+    np_img = np.array(image).flatten()
+    n_features = len(np_img)
+    X = np.empty((n_samples, n_features), dtype=int)
+    s = 0
+    for f in png_files:
+        i = Image.open(f)
+        X[s] = np.array(i).flatten()
+        s += 1
+    # no target
+    return X, None, png_files
 
 
-def read_truth_dsv(dsv_dir):
-    d_f = Path(dsv_dir, 'truth.dsv')
-    ret = []
-    with open(d_f, 'r') as d_f:
-        for line in d_f.readlines():
-            stripped = line.strip()
-            ret.append(stripped.split(":"))
-    return ret
+def read_truth_dsv(dsv_dir, truth_file=True):
+    if truth_file:
+        d_f = Path(dsv_dir, 'truth.dsv')
+        ret = []
+        with open(d_f, 'r') as d_f:
+            for line in d_f.readlines():
+                stripped = line.strip()
+                ret.append(stripped.split(":"))
+        return ret
+    else:
+        return read_test_data(dsv_dir)
 
 
-def write_output_dsv(predictions, file_names, result, dsv_dir, output_file=CLASSIFICATION_DSV):
+def write_output_dsv(predictions, file_names, dsv_dir, output_file=CLASSIFICATION_DSV):
     d_f = Path(dsv_dir, output_file)
     if len(predictions) == len(file_names):
-        dsv = list(zip(file_names, predictions, result))
+        dsv = list(zip(file_names, predictions))
+        # sort by file name to compare with case without truth file - might be removed or truth.dsv=False/True
+        # but in reality truth.dsv is never available for test
+        dsv.sort(key=lambda d: d[0])
     else:
         print("ERROR : unequal length of predictions and image file names: {} != {}".
               format(predictions, file_names))
         return
     with open(d_f, 'w') as d_f:
         for item in dsv:
-            file = str(item[0])
+            file_name = item[0].name if isinstance(item[0], Path) else item[0]
             pred_class = chr(item[1])
-            res = str(item[2])
-            # d_f.write(file + ":" + pred_class + ":" + res + "\n")
-            d_f.write(file + ":" + pred_class + "\n")
+            d_f.write(file_name + ":" + pred_class + "\n")
 
 
-def samples(folder: str):
+def samples(folder: str, truth_file=True):
     """
     Read features (X) and targets (y) from parsed truth.dsv
     Targets are converted to their ASCII codes
     Also img file names are loaded for expected output classification.dsv
     """
-    labeled_data = read_truth_dsv(folder)
+    labeled_data = read_truth_dsv(folder, truth_file)
+    if not truth_file:
+        return labeled_data
     n_samples = len(labeled_data)
     img_file = folder + '/' + labeled_data[0][0]
     image = Image.open(img_file)
@@ -196,12 +213,14 @@ def n_b(train_dir, test_dir, output_file=CLASSIFICATION_DSV):
     # X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
     clf.fit(X_train, y_train)
 
-    X_test, y_test, f_name_test = samples(test_dir)
+    # TODO there is no truth.dsv for test data => y_test = None
+    X_test, y_test, f_name_test = samples(test_dir, truth_file=True)
     predictions = clf.predict(X_test)
-    result = (y_test == predictions)
-    correct = np.count_nonzero(result)
-    print("Success {} %".format(100 * correct / len(result)))
-    write_output_dsv(predictions, f_name_test, result, test_dir, output_file=output_file)
+    if isinstance(y_test, np.ndarray):
+        result = (y_test == predictions)
+        correct = np.count_nonzero(result)
+        print("Success {} %".format(100 * correct / len(result)))
+    write_output_dsv(predictions, f_name_test, test_dir, output_file=output_file)
     # c_m(predictions, y_test, clf.classes)
 
 
@@ -215,6 +234,8 @@ def main():
     if args.k is not None:
         print(f"Running k-NN classifier with k={args.k}")
         # TODO Train and test the k-NN classifier
+        # temporary use NB to check availability of scipy
+        n_b(args.train_path, args.test_path, output_file=args.o)
     elif args.b:
         print("Running Naive Bayes classifier")
         n_b(args.train_path, args.test_path, output_file=args.o)
