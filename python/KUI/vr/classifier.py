@@ -6,8 +6,6 @@ import numpy as np
 import scipy.sparse as sp
 from PIL import Image
 
-from scikit_clf import c_m
-
 CLASSIFICATION_DSV = 'classification.dsv'
 
 
@@ -57,10 +55,21 @@ def read_truth_dsv(dsv_dir):
     return ret
 
 
-def write_output_dsv(predictions, dsv_dir, output_file=CLASSIFICATION_DSV):
+def write_output_dsv(predictions, file_names, result, dsv_dir, output_file=CLASSIFICATION_DSV):
     d_f = Path(dsv_dir, output_file)
+    if len(predictions) == len(file_names):
+        dsv = list(zip(file_names, predictions, result))
+    else:
+        print("ERROR : unequal length of predictions and image file names: {} != {}".
+              format(predictions, file_names))
+        return
     with open(d_f, 'w') as d_f:
-        d_f.writelines(str(predictions))
+        for item in dsv:
+            file = str(item[0])
+            pred_class = chr(item[1])
+            res = str(item[2])
+            # d_f.write(file + ":" + pred_class + ":" + res + "\n")
+            d_f.write(file + ":" + pred_class + "\n")
 
 
 def samples(folder: str):
@@ -77,18 +86,23 @@ def samples(folder: str):
     n_features = len(np_img)
     # sample values
     X = np.empty((n_samples, n_features), dtype=int)
+    file_names = []
     # target values = classes
     y = np.empty(n_samples, dtype=int)
     s = 0
     for l_d in labeled_data:
-        img_file = folder + '/' + l_d[0]
-        img_label_ascii = ord(l_d[1])
+        file_name = l_d[0]
+        file_class = l_d[1]
+        img_file = Path(folder, file_name)
+        file_names.append(file_name)
+        # unicode int code
+        class_code = ord(file_class)
         image = Image.open(img_file)
         np_img = np.array(image).flatten()
         X[s] = np_img
-        y[s] = img_label_ascii
+        y[s] = class_code
         s += 1
-    return X, y
+    return X, y, file_names
 
 
 class NaiveBayes:
@@ -136,7 +150,8 @@ class NaiveBayes:
         return Y
 
     def fit(self, X, y):
-        """Estimate the priors and likelihoods of the samples X"""
+        """Estimate the log priors of classes (y) and log likelihoods of features X given class variable y
+        in the samples X,y"""
         Y = self.one_hot_enc(y)
         n_classes = Y.shape[1]
         if self.n_classes != n_classes:
@@ -177,14 +192,17 @@ class NaiveBayes:
 def n_b(train_dir, test_dir, output_file=CLASSIFICATION_DSV):
     # multinomial_n_b(X_test, X_train, y_test, y_train)
     clf = NaiveBayes()
-    X_train, y_train = samples(train_dir)
+    X_train, y_train, f_name_train = samples(train_dir)
     # X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
     clf.fit(X_train, y_train)
 
-    X_test, y_test = samples(test_dir)
+    X_test, y_test, f_name_test = samples(test_dir)
     predictions = clf.predict(X_test)
-    write_output_dsv(predictions, test_dir, output_file=output_file)
-    c_m(predictions, y_test, clf.classes)
+    result = (y_test == predictions)
+    correct = np.count_nonzero(result)
+    print("Success {} %".format(100 * correct / len(result)))
+    write_output_dsv(predictions, f_name_test, result, test_dir, output_file=output_file)
+    # c_m(predictions, y_test, clf.classes)
 
 
 def main():
