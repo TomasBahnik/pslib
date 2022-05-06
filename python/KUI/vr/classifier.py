@@ -8,6 +8,8 @@ from PIL import Image
 
 from scikit_clf import c_m
 
+CLASSIFICATION_DSV = 'classification.dsv'
+
 
 def setup_arg_parser():
     parser = argparse.ArgumentParser(description='Learn and classify image data.')
@@ -19,7 +21,7 @@ def setup_arg_parser():
     mutex_group.add_argument("-b",
                              help="run Naive Bayes classifier", action="store_true")
     parser.add_argument("-o", metavar='filepath',
-                        default='classification.dsv',
+                        default=CLASSIFICATION_DSV,
                         help="path (including the filename) of the output .dsv file with the results")
     return parser
 
@@ -55,13 +57,18 @@ def read_truth_dsv(dsv_dir):
     return ret
 
 
-def write_output_dsv(predictions, dsv_dir, output_file='classification.dsv'):
+def write_output_dsv(predictions, dsv_dir, output_file=CLASSIFICATION_DSV):
     d_f = Path(dsv_dir, output_file)
     with open(d_f, 'w') as d_f:
         d_f.writelines(str(predictions))
 
 
 def samples(folder: str):
+    """
+    Read features (X) and targets (y) from parsed truth.dsv
+    Targets are converted to their ASCII codes
+    Also img file names are loaded for expected output classification.dsv
+    """
     labeled_data = read_truth_dsv(folder)
     n_samples = len(labeled_data)
     img_file = folder + '/' + labeled_data[0][0]
@@ -85,6 +92,14 @@ def samples(folder: str):
 
 
 class NaiveBayes:
+    """
+    Multinomial naive Bayes with likelihood p(x_i | y) estimated by
+    p_hat(x_i | y) = (N_{y i} + alpha) / (N_y + n_features * alpha)
+    where
+    N_{y i} = sum_x (x_i) for given y : (n_classes,n_features) array
+    N_y = sum_i (N_{y i}) : (n_classes,)
+    see https://scikit-learn.org/stable/modules/naive_bayes.html
+    """
 
     def __init__(self, alpha=1.0, fit_prior=True):
         # additive smoothing parameter
@@ -99,6 +114,11 @@ class NaiveBayes:
         self.log_class_count = None
 
     def one_hot_enc(self, y):
+        """one-hot or 1-of-K encoding of targets y - needed for likelihood p(x_i { y ) multinomial estimation
+        requires scipy library
+        :param y: targets
+        :return: one hot encoding of targets
+        """
         classes = np.array(sorted(set(y)))
         self.classes = classes
         self.n_samples = len(y)
@@ -116,21 +136,24 @@ class NaiveBayes:
         return Y
 
     def fit(self, X, y):
+        """Estimate the priors and likelihoods of the samples X"""
         Y = self.one_hot_enc(y)
         n_classes = Y.shape[1]
         if self.n_classes != n_classes:
             print("Wrong one hot encoding")
         n_features = X.shape[1]
-        # init count attributes
+        # init counts for features (N_{y i}) and classes (N_y)
         feature_count = np.zeros((n_classes, n_features), dtype=int)
         class_count = np.zeros(n_classes, dtype=int)
-        # ret = np.dot(a, b) or ret = a @ b np.matmul(a,b)
+        # for matrix multiplication ret = np.dot(a, b) or ret = a @ b np.matmul(a,b) might be used
+        # N_{y i} = sum_x (x_i) for given y
         feature_count += np.dot(Y.T, X)
+        # N_y = sum_i (N_{y i})
         class_count += Y.sum(axis=0)
         # smoothed counts
         smoothed_fc = feature_count + self.alpha
         smoothed_cc = smoothed_fc.sum(axis=1)
-        # fit model
+        # multinomial log likelihood estimation - stability
         feature_log_prob = np.log(smoothed_fc) - np.log(smoothed_cc.reshape(-1, 1))
         self.feature_log_prob = feature_log_prob
         # TODO if/else uniform
@@ -138,11 +161,12 @@ class NaiveBayes:
         # empirical prior
         log_class_count = np.log(class_count)
         self.log_class_count = log_class_count
+        # class log prior probabilities
         class_log_prior = log_class_count - np.log(class_count.sum())
         self.class_log_prior = class_log_prior
 
     def predict(self, X):
-        """Calculate the posterior log probability of the samples X"""
+        """Calculate the posterior log probability of the samples X from Bayes rule"""
         log_post_prob = np.dot(X, self.feature_log_prob.T) + self.class_log_prior
         predictions = self.classes[np.argmax(log_post_prob, axis=1)]
         return predictions
@@ -150,7 +174,7 @@ class NaiveBayes:
 
 # Výsledkem klasifikátoru je soubor classification.dsv stejného formátu jako truth.dsv,
 # který je umístěný v adresáři s testovacími obrázky.
-def n_b(train_dir, test_dir, output_file='classification.dsv'):
+def n_b(train_dir, test_dir, output_file=CLASSIFICATION_DSV):
     # multinomial_n_b(X_test, X_train, y_test, y_train)
     clf = NaiveBayes()
     X_train, y_train = samples(train_dir)
@@ -161,7 +185,6 @@ def n_b(train_dir, test_dir, output_file='classification.dsv'):
     predictions = clf.predict(X_test)
     write_output_dsv(predictions, test_dir, output_file=output_file)
     c_m(predictions, y_test, clf.classes)
-
 
 
 def main():
