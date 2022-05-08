@@ -39,52 +39,56 @@ def image_distance(path_img_1, path_img_2):
     return d1, d2
 
 
-def read_test_data(folder):
-    png_files = [Path(folder, name) for name in os.listdir(folder)
-                 if os.path.isfile(Path(folder, name)) and name.endswith('png')]
-    n_samples = len(png_files)
-    image = Image.open(png_files[0])
+def read_truth_dsv(dsv_dir):
+    d_f = Path(dsv_dir, 'truth.dsv')
+    file_name_label = []
+    with open(d_f, 'r') as d_f:
+        for line in d_f.readlines():
+            stripped = line.strip()
+            stripped_split = stripped.split(":")
+            p = Path(dsv_dir, stripped_split[0])
+            # unicode int code
+            target = ord(stripped_split[1])
+            file_name_label.append((p, target))
+    return file_name_label
+
+
+def init_np_arrays(img_files):
+    n_samples = len(img_files)
+    image = Image.open(img_files[0][0])
     np_img = np.array(image).flatten()
     n_features = len(np_img)
     X = np.empty((n_samples, n_features), dtype=int)
+    y = np.empty(n_samples, dtype=int)
+    return X, y
+
+
+def read_test_data(folder):
+    img_files = [Path(folder, name) for name in os.listdir(folder) if os.path.isfile(Path(folder, name))]
+    targets = [0] * len(img_files)  # no targets for test data
+    X, y = init_np_arrays(list(zip(img_files, targets)))
     s = 0
-    for f in png_files:
-        i = Image.open(f)
-        X[s] = np.array(i).flatten()
+    for f in img_files:
+        X[s] = np.array(Image.open(f)).flatten()
         s += 1
     # no target
-    return X, None, png_files
+    return X, None, img_files
 
 
-def read_truth_dsv(dsv_dir, truth_file=True):
-    if truth_file:
-        d_f = Path(dsv_dir, 'truth.dsv')
-        ret = []
-        with open(d_f, 'r') as d_f:
-            for line in d_f.readlines():
-                stripped = line.strip()
-                ret.append(stripped.split(":"))
-        return ret
-    else:
-        return read_test_data(dsv_dir)
-
-
-def write_output_dsv(predictions, file_names, dsv_dir, output_file=CLASSIFICATION_DSV):
-    d_f = Path(dsv_dir, output_file)
-    if len(predictions) == len(file_names):
-        dsv = list(zip(file_names, predictions))
-        # sort by file name to compare with case without truth file - might be removed or truth.dsv=False/True
-        # but in reality truth.dsv is never available for test
-        dsv.sort(key=lambda d: d[0])
-    else:
-        print("ERROR : unequal length of predictions and image file names: {} != {}".
-              format(predictions, file_names))
-        return
-    with open(d_f, 'w') as d_f:
-        for item in dsv:
-            file_name = item[0].name if isinstance(item[0], Path) else item[0]
-            pred_class = chr(item[1])
-            d_f.write(file_name + ":" + pred_class + "\n")
+def read_train_data(folder):
+    labeled_data = read_truth_dsv(folder)
+    X, y = init_np_arrays(labeled_data)
+    img_files = []
+    s = 0
+    for l_d in labeled_data:
+        img_path = l_d[0]
+        img_class = l_d[1]
+        img_files.append(img_path)
+        np_img = np.array(Image.open(img_path)).flatten()
+        X[s] = np_img
+        y[s] = img_class
+        s += 1
+    return X, y, img_files
 
 
 def samples(folder: str, truth_file=True):
@@ -93,33 +97,27 @@ def samples(folder: str, truth_file=True):
     Targets are converted to their ASCII codes
     Also img file names are loaded for expected output classification.dsv
     """
-    labeled_data = read_truth_dsv(folder, truth_file)
-    if not truth_file:
-        return labeled_data
-    n_samples = len(labeled_data)
-    img_file = folder + '/' + labeled_data[0][0]
-    image = Image.open(img_file)
-    np_img = np.array(image).flatten()
-    n_features = len(np_img)
-    # sample values
-    X = np.empty((n_samples, n_features), dtype=int)
-    file_names = []
-    # target values = classes
-    y = np.empty(n_samples, dtype=int)
-    s = 0
-    for l_d in labeled_data:
-        file_name = l_d[0]
-        file_class = l_d[1]
-        img_file = Path(folder, file_name)
-        file_names.append(file_name)
-        # unicode int code
-        class_code = ord(file_class)
-        image = Image.open(img_file)
-        np_img = np.array(image).flatten()
-        X[s] = np_img
-        y[s] = class_code
-        s += 1
-    return X, y, file_names
+    if truth_file:
+        return read_train_data(folder)
+
+    return read_test_data(folder)
+
+
+def write_output_dsv(predictions, file_names, dsv_dir, output_file=CLASSIFICATION_DSV):
+    output_dsv_f = Path(dsv_dir, output_file)
+    if len(predictions) == len(file_names):
+        dsv = list(zip(file_names, predictions))
+        # in case of comparison with labeled data use dict with key = filename no sort
+        dsv.sort(key=lambda d: d[0])
+    else:
+        print("ERROR : unequal length of predictions and image file names: {} != {}".
+              format(predictions, file_names))
+        return
+    with open(output_dsv_f, 'w') as output_dsv_f:
+        for item in dsv:
+            file_name = item[0].name if isinstance(item[0], Path) else item[0]
+            pred_class = chr(item[1])
+            output_dsv_f.write(file_name + ":" + pred_class + "\n")
 
 
 class NaiveBayes:
@@ -209,18 +207,18 @@ class NaiveBayes:
 def n_b(train_dir, test_dir, output_file=CLASSIFICATION_DSV):
     # multinomial_n_b(X_test, X_train, y_test, y_train)
     clf = NaiveBayes()
-    X_train, y_train, f_name_train = samples(train_dir)
+    X_train, y_train, f_name_train = samples(train_dir, truth_file=True)
     # X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
     clf.fit(X_train, y_train)
 
-    # TODO there is no truth.dsv for test data => y_test = None
-    X_test, y_test, f_name_test = samples(test_dir, truth_file=True)
+    X_test, y_test, f_name_test = samples(test_dir, truth_file=False)
     predictions = clf.predict(X_test)
     if isinstance(y_test, np.ndarray):
         result = (y_test == predictions)
         correct = np.count_nonzero(result)
         print("Success {} %".format(100 * correct / len(result)))
     write_output_dsv(predictions, f_name_test, test_dir, output_file=output_file)
+    write_output_dsv(y_train, f_name_train, test_dir, output_file='class_truth.dsv')
     # c_m(predictions, y_test, clf.classes)
 
 
