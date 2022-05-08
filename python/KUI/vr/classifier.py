@@ -7,8 +7,6 @@ import numpy as np
 import scipy.sparse as sp
 from PIL import Image
 
-CLASSIFICATION_DSV = 'classification.dsv'
-
 
 def setup_arg_parser():
     parser = argparse.ArgumentParser(description='Learn and classify image data.')
@@ -20,7 +18,7 @@ def setup_arg_parser():
     mutex_group.add_argument("-b",
                              help="run Naive Bayes classifier", action="store_true")
     parser.add_argument("-o", metavar='filepath',
-                        default=CLASSIFICATION_DSV,
+                        default='classification.dsv',
                         help="path (including the filename) of the output .dsv file with the results")
     return parser
 
@@ -104,7 +102,7 @@ def samples(folder: str, truth_file=True):
     return read_test_data(folder)
 
 
-def write_output_dsv(predictions, file_names, dsv_dir, output_file=CLASSIFICATION_DSV):
+def write_output_dsv(predictions, file_names, dsv_dir, output_file):
     output_dsv_f = Path(output_file)
     # full path to file
     if not output_dsv_f.is_absolute():
@@ -207,9 +205,7 @@ class NaiveBayes:
         return predictions
 
 
-# Výsledkem klasifikátoru je soubor classification.dsv stejného formátu jako truth.dsv,
-# který je umístěný v adresáři s testovacími obrázky.
-def n_b(train_dir, test_dir, output_file=CLASSIFICATION_DSV, test_accuracy=False):
+def n_b(train_dir, test_dir, output_file, test_accuracy=False):
     clf = NaiveBayes()
     # X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
     X_train, y_train, f_name_train = samples(train_dir, truth_file=True)
