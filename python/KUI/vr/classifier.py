@@ -39,14 +39,14 @@ def image_distance(path_img_1, path_img_2):
     return d1, d2
 
 
-def read_truth_dsv(dsv_dir):
-    d_f = Path(dsv_dir, 'truth.dsv')
+def read_truth_dsv(train_dir):
+    d_f = Path(train_dir, 'truth.dsv')
     file_name_label = []
     with open(d_f, 'r') as d_f:
         for line in d_f.readlines():
             stripped = line.strip()
             stripped_split = stripped.split(":")
-            p = Path(dsv_dir, stripped_split[0])
+            p = Path(train_dir, stripped_split[0])
             # unicode int code
             target = ord(stripped_split[1])
             file_name_label.append((p, target))
@@ -204,25 +204,29 @@ class NaiveBayes:
 
 # Výsledkem klasifikátoru je soubor classification.dsv stejného formátu jako truth.dsv,
 # který je umístěný v adresáři s testovacími obrázky.
-def n_b(train_dir, test_dir, output_file=CLASSIFICATION_DSV):
-    # multinomial_n_b(X_test, X_train, y_test, y_train)
+def n_b(train_dir, test_dir, output_file=CLASSIFICATION_DSV, test_accuracy=False):
     clf = NaiveBayes()
-    X_train, y_train, f_name_train = samples(train_dir, truth_file=True)
     # X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+    X_train, y_train, f_name_train = samples(train_dir, truth_file=True)
     clf.fit(X_train, y_train)
 
     X_test, y_test, f_name_test = samples(test_dir, truth_file=False)
     predictions = clf.predict(X_test)
+    write_output_dsv(predictions, f_name_test, test_dir, output_file=output_file)
+    if test_accuracy:
+        report_accuracy(f_name_train, predictions, test_dir, y_test, y_train)
+
+
+def report_accuracy(f_name_train, predictions, test_dir, y_test, y_train):
     if isinstance(y_test, np.ndarray):
         result = (y_test == predictions)
         correct = np.count_nonzero(result)
-        print("Success {} %".format(100 * correct / len(result)))
-    write_output_dsv(predictions, f_name_test, test_dir, output_file=output_file)
+        print("Correct={}, Errors={}, Success={} %".format(correct, len(result) - correct, 100 * correct / len(result)))
+        # c_m(predictions, y_test, clf.classes)
     write_output_dsv(y_train, f_name_train, test_dir, output_file='class_truth.dsv')
-    # c_m(predictions, y_test, clf.classes)
 
 
-def main():
+def main(test_accuracy=False):
     parser = setup_arg_parser()
     args = parser.parse_args()
 
@@ -232,11 +236,11 @@ def main():
     if args.k is not None:
         print(f"Running k-NN classifier with k={args.k}")
         # TODO Train and test the k-NN classifier
-        # temporary use NB to check availability of scipy
+        # temporary use NB to check availability of scipy and test NB only
         n_b(args.train_path, args.test_path, output_file=args.o)
     elif args.b:
         print("Running Naive Bayes classifier")
-        n_b(args.train_path, args.test_path, output_file=args.o)
+        n_b(args.train_path, args.test_path, output_file=args.o, test_accuracy=test_accuracy)
 
 
 if __name__ == "__main__":
