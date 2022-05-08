@@ -64,7 +64,8 @@ def init_np_arrays(img_files):
 
 
 def read_test_data(folder):
-    img_files = [Path(folder, name) for name in os.listdir(folder) if os.path.isfile(Path(folder, name))]
+    img_files = [Path(folder, name) for name in os.listdir(folder) if os.path.isfile(Path(folder, name))
+                 and name.endswith('png')]
     targets = [0] * len(img_files)  # no targets for test data
     X, y = init_np_arrays(list(zip(img_files, targets)))
     s = 0
@@ -104,7 +105,10 @@ def samples(folder: str, truth_file=True):
 
 
 def write_output_dsv(predictions, file_names, dsv_dir, output_file=CLASSIFICATION_DSV):
-    output_dsv_f = Path(dsv_dir, output_file)
+    output_dsv_f = Path(output_file)
+    # full path to file
+    if not output_dsv_f.is_absolute():
+        output_dsv_f = Path(dsv_dir, output_file)
     if len(predictions) == len(file_names):
         dsv = list(zip(file_names, predictions))
         # in case of comparison with labeled data use dict with key = filename no sort
