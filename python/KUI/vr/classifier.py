@@ -111,7 +111,8 @@ def write_output_dsv(predictions, file_names, dsv_dir, output_file=CLASSIFICATIO
         output_dsv_f = Path(dsv_dir, output_file)
     if len(predictions) == len(file_names):
         dsv = list(zip(file_names, predictions))
-        # in case of comparison with labeled data use dict with key = filename no sort
+        # in case of comparison with labeled data use
+        # diff -y --suppress-common-lines classification.dsv class_truth.dsv | wc -l gives success rate
         dsv.sort(key=lambda d: d[0])
     else:
         print("ERROR : unequal length of predictions and image file names: {} != {}".
