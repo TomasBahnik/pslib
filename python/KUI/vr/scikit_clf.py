@@ -4,6 +4,10 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.naive_bayes import MultinomialNB, ComplementNB
+from sklearn.neighbors import NeighborhoodComponentsAnalysis, KNeighborsClassifier
+from sklearn.pipeline import Pipeline
+
+from classifier import samples, write_output_dsv, report_accuracy
 
 
 def multinomial_n_b(X_test, X_train, y_test, y_train):
@@ -29,6 +33,20 @@ def c_m(predictions, y_test, classes, n_b_type=0):
     color_bar = False if n_b_type == 0 else True
     disp.plot(colorbar=color_bar)
     plt.show()
+
+
+def k_nn(train_dir, test_dir, n_neighbors, output_file, test_accuracy=False):
+    X_train, y_train, f_name_train = samples(train_dir, truth_file=True)
+    nca = NeighborhoodComponentsAnalysis(random_state=42)
+    knn = KNeighborsClassifier(n_neighbors=n_neighbors)
+    nca_pipe = Pipeline([('nca', nca), ('knn', knn)])
+    nca_pipe.fit(X_train, y_train)
+    X_test, y_test, f_name_test = samples(test_dir, truth_file=False)
+    predictions = nca_pipe.predict(X_test)
+    write_output_dsv(predictions, f_name_test, test_dir, output_file=output_file)
+    if test_accuracy:
+        print(nca_pipe.score(X_test, y_test))
+        report_accuracy(f_name_train, predictions, test_dir, y_test, y_train)
 
 
 def sample_data():
