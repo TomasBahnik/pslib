@@ -6,8 +6,6 @@ from pathlib import Path
 import numpy as np
 import scipy.sparse as sp
 from PIL import Image
-from sklearn.neighbors import (NeighborhoodComponentsAnalysis, KNeighborsClassifier)
-from sklearn.pipeline import Pipeline
 
 
 def setup_arg_parser():
@@ -222,20 +220,6 @@ def n_b(train_dir, test_dir, output_file, test_accuracy=False):
         report_accuracy(f_name_train, predictions, test_dir, y_test, y_train)
 
 
-def k_nn(train_dir, test_dir, n_neighbors, output_file, test_accuracy=False):
-    X_train, y_train, f_name_train = samples(train_dir, truth_file=True)
-    nca = NeighborhoodComponentsAnalysis(random_state=42)
-    knn = KNeighborsClassifier(n_neighbors=n_neighbors)
-    nca_pipe = Pipeline([('nca', nca), ('knn', knn)])
-    nca_pipe.fit(X_train, y_train)
-    X_test, y_test, f_name_test = samples(test_dir, truth_file=False)
-    predictions = nca_pipe.predict(X_test)
-    write_output_dsv(predictions, f_name_test, test_dir, output_file=output_file)
-    if test_accuracy:
-        print(nca_pipe.score(X_test, y_test))
-        report_accuracy(f_name_train, predictions, test_dir, y_test, y_train)
-
-
 def report_accuracy(f_name_train, predictions, test_dir, y_test, y_train):
     if isinstance(y_test, np.ndarray):
         result = (y_test == predictions)
@@ -257,7 +241,7 @@ def main(test_accuracy=False):
     if args.k is not None:
         k = int(args.k) if int(args.k) > 0 else 3
         print(f"Running k-NN classifier with k={k}")
-        k_nn(args.train_path, args.test_path, n_neighbors=k, output_file=args.o, test_accuracy=test_accuracy)
+        # n_b(args.train_path, args.test_path, output_file=args.o, test_accuracy=test_accuracy)
     elif args.b:
         print("Running Naive Bayes classifier")
         n_b(args.train_path, args.test_path, output_file=args.o, test_accuracy=test_accuracy)
