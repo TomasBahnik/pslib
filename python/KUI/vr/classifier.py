@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 import scipy.sparse as sp
 from PIL import Image
+from scipy.spatial.distance import cdist
 
 
 def setup_arg_parser():
@@ -205,6 +206,56 @@ class NaiveBayes:
         return predictions
 
 
+# TODO delete url
+class KNearestNeighbors:
+    """  https://nycdatascience.edu/blog/student-works/machine-learning/knn-classifier-from-scratch-numpy-only/
+    """
+    def __init__(self, n_neighbors):
+        self.n_neighbors = n_neighbors
+        self.fit_X = None
+        self.fit_y = None
+        self.n_samples_fit = None
+
+    def fit(self, X, y):
+        self.fit_X = X
+        self.fit_y = y
+        y = y.reshape((-1, 1))
+        # TODO add _y from sklearn.neighbors._base.NeighborsBase._fit
+        self.n_samples_fit = X.shape[0]
+
+    def kneighbors(self, X):
+        distances = cdist(self.fit_X, X, 'euclidean')  # n_train x n_test matrix
+        indices = np.argsort(distances, 0)
+        distances = np.sort(distances, 0)
+        neigh_ind = indices[0:self.n_neighbors, :]
+        neigh_dist = distances[0:self.n_neighbors, :]
+        return neigh_dist.T, neigh_ind.T
+
+    def predict(self, X):
+        neigh_dist, neigh_ind = self.kneighbors(X)
+        # TODO add scipy mode function from sklearn.neighbors._classification.KNeighborsClassifier.predict
+        # k = 0 self._y.shape[1]
+        # y = y.reshape((-1, 1))
+        # self.classes_ = []
+        # self._y = np.empty(y.shape, dtype=int)
+        # for k in range(self._y.shape[1]):
+        #     classes, self._y[:, k] = np.unique(y[:, k], return_inverse=True)
+        #     self.classes_.append(classes)
+        #
+        # if not self.outputs_2d_:
+        #     self.classes_ = self.classes_[0]
+        #     self._y = self._y.ravel()
+        #
+        # n_outputs = len(classes_)
+        # n_queries = _num_samples(X)
+        # mode, _ = stats.mode(_y[neigh_ind, k], axis=1)
+        # y_pred = np.empty((n_queries, n_outputs), dtype=classes_[0].dtype)
+        #     mode = np.asarray(mode.ravel(), dtype=np.intp)
+        # y_pred = y_pred.ravel()
+        # y_pred[:, k] = classes_k.take(mode)
+        return neigh_dist, neigh_ind
+
+
 def n_b(train_dir, test_dir, output_file, test_accuracy=False):
     clf = NaiveBayes()
     # f_name_train is used to write class_truth.dsv file - can be compared
@@ -217,6 +268,19 @@ def n_b(train_dir, test_dir, output_file, test_accuracy=False):
     predictions = clf.predict(X_test)
     write_output_dsv(predictions, f_name_test, test_dir, output_file=output_file)
     if test_accuracy:
+        report_accuracy(f_name_train, predictions, test_dir, y_test, y_train)
+
+
+def k_nn(train_dir, test_dir, n_neighbors, output_file, test_accuracy=False):
+    X_train, y_train, f_name_train = samples(train_dir, truth_file=True)
+    # knn = KNeighborsClassifier(algorithm='brute', n_neighbors=n_neighbors, metric='euclidean')
+    knn = KNearestNeighbors(n_neighbors=n_neighbors)
+    knn.fit(X_train, y_train)
+    X_test, y_test, f_name_test = samples(test_dir, truth_file=True)
+    predictions = knn.predict(X_test)
+    write_output_dsv(predictions, f_name_test, test_dir, output_file=output_file)
+    if test_accuracy:
+        # print(knn.score(X_test, y_test))
         report_accuracy(f_name_train, predictions, test_dir, y_test, y_train)
 
 
@@ -241,12 +305,12 @@ def main(test_accuracy=False):
     if args.k is not None:
         k = int(args.k) if int(args.k) > 0 else 3
         print(f"Running k-NN classifier with k={k}")
-        # n_b(args.train_path, args.test_path, output_file=args.o, test_accuracy=test_accuracy)
+        k_nn(args.train_path, args.test_path, k, output_file=args.o, test_accuracy=test_accuracy)
     elif args.b:
         print("Running Naive Bayes classifier")
         n_b(args.train_path, args.test_path, output_file=args.o, test_accuracy=test_accuracy)
 
 
 if __name__ == "__main__":
-    main()
+    main(True)
     sys.exit(0)
