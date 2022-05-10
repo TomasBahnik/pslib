@@ -210,7 +210,7 @@ class NaiveBayes:
 class KNearestNeighbors:
     def __init__(self, n_neighbors):
         self._y = None
-        self.classes_ = None
+        self.classes = None
         self.n_neighbors = n_neighbors
         self.fit_X = None
         self.fit_y = None
@@ -219,9 +219,10 @@ class KNearestNeighbors:
     def fit(self, X, y):
         self.fit_X = X
         self.fit_y = y
+        # _y indices of the unique array that reconstruct the input array
         self._y = np.empty(y.shape, dtype=int)
         classes, self._y = np.unique(y, return_inverse=True)
-        self.classes_ = classes
+        self.classes = classes
         self.n_samples_fit = X.shape[0]
 
     def kneighbors(self, X):
@@ -234,10 +235,11 @@ class KNearestNeighbors:
 
     def predict(self, X):
         neigh_dist, neigh_ind = self.kneighbors(X)
+        # _y from row to column
         _y = self._y.reshape((-1, 1))
-        classes_ = self.classes_
+        classes = self.classes
         mode, _ = stats.mode(_y[neigh_ind, 0], axis=1)
-        y_pred = classes_.take(mode)
+        y_pred = classes.take(mode)
         y_pred = y_pred.ravel()
         return y_pred
 
