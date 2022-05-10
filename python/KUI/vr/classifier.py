@@ -207,11 +207,7 @@ class NaiveBayes:
         return predictions
 
 
-# TODO delete url
 class KNearestNeighbors:
-    """  https://nycdatascience.edu/blog/student-works/machine-learning/knn-classifier-from-scratch-numpy-only/
-    """
-
     def __init__(self, n_neighbors):
         self._y = None
         self.classes_ = None
@@ -223,9 +219,8 @@ class KNearestNeighbors:
     def fit(self, X, y):
         self.fit_X = X
         self.fit_y = y
-        self.classes_ = []
         self._y = np.empty(y.shape, dtype=int)
-        classes, self._y[:] = np.unique(y[:], return_inverse=True)
+        classes, self._y = np.unique(y, return_inverse=True)
         self.classes_ = classes
         self.n_samples_fit = X.shape[0]
 
