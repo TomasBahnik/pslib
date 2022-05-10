@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 import scipy.sparse as sp
 from PIL import Image
+from scipy import stats
 from scipy.spatial.distance import cdist
 
 
@@ -210,7 +211,10 @@ class NaiveBayes:
 class KNearestNeighbors:
     """  https://nycdatascience.edu/blog/student-works/machine-learning/knn-classifier-from-scratch-numpy-only/
     """
+
     def __init__(self, n_neighbors):
+        self._y = None
+        self.classes_ = None
         self.n_neighbors = n_neighbors
         self.fit_X = None
         self.fit_y = None
@@ -219,8 +223,10 @@ class KNearestNeighbors:
     def fit(self, X, y):
         self.fit_X = X
         self.fit_y = y
-        y = y.reshape((-1, 1))
-        # TODO add _y from sklearn.neighbors._base.NeighborsBase._fit
+        self.classes_ = []
+        self._y = np.empty(y.shape, dtype=int)
+        classes, self._y[:] = np.unique(y[:], return_inverse=True)
+        self.classes_ = classes
         self.n_samples_fit = X.shape[0]
 
     def kneighbors(self, X):
@@ -233,27 +239,12 @@ class KNearestNeighbors:
 
     def predict(self, X):
         neigh_dist, neigh_ind = self.kneighbors(X)
-        # TODO add scipy mode function from sklearn.neighbors._classification.KNeighborsClassifier.predict
-        # k = 0 self._y.shape[1]
-        # y = y.reshape((-1, 1))
-        # self.classes_ = []
-        # self._y = np.empty(y.shape, dtype=int)
-        # for k in range(self._y.shape[1]):
-        #     classes, self._y[:, k] = np.unique(y[:, k], return_inverse=True)
-        #     self.classes_.append(classes)
-        #
-        # if not self.outputs_2d_:
-        #     self.classes_ = self.classes_[0]
-        #     self._y = self._y.ravel()
-        #
-        # n_outputs = len(classes_)
-        # n_queries = _num_samples(X)
-        # mode, _ = stats.mode(_y[neigh_ind, k], axis=1)
-        # y_pred = np.empty((n_queries, n_outputs), dtype=classes_[0].dtype)
-        #     mode = np.asarray(mode.ravel(), dtype=np.intp)
-        # y_pred = y_pred.ravel()
-        # y_pred[:, k] = classes_k.take(mode)
-        return neigh_dist, neigh_ind
+        _y = self._y.reshape((-1, 1))
+        classes_ = self.classes_
+        mode, _ = stats.mode(_y[neigh_ind, 0], axis=1)
+        y_pred = classes_.take(mode)
+        y_pred = y_pred.ravel()
+        return y_pred
 
 
 def n_b(train_dir, test_dir, output_file, test_accuracy=False):
