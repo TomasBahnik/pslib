@@ -25,20 +25,6 @@ def setup_arg_parser():
     return parser
 
 
-#  Uvedením dtype=np.uint16 vyhradíme pro výsledky více bitů, takže se
-#  kvadráty do datového typu vejdou.
-def image_distance(path_img_1, path_img_2):
-    image_1 = Image.open(path_img_1)
-    image_2 = Image.open(path_img_2)
-    im1 = np.array(image_1).flatten()
-    im2 = np.array(image_2).flatten()
-
-    diff = im1 - im2
-    d1 = np.sqrt(np.sum(np.square(diff, dtype=np.uint16)))
-    d2 = np.linalg.norm(diff)
-    return d1, d2
-
-
 def read_truth_dsv(train_dir):
     d_f = Path(train_dir, 'truth.dsv')
     file_name_label = []
@@ -209,12 +195,11 @@ class NaiveBayes:
 
 class KNearestNeighbors:
     def __init__(self, n_neighbors):
+        self.n_neighbors = n_neighbors
         self._y = None
         self.classes = None
-        self.n_neighbors = n_neighbors
         self.fit_X = None
         self.fit_y = None
-        self.n_samples_fit = None
 
     def fit(self, X, y):
         self.fit_X = X
@@ -223,7 +208,6 @@ class KNearestNeighbors:
         self._y = np.empty(y.shape, dtype=int)
         classes, self._y = np.unique(y, return_inverse=True)
         self.classes = classes
-        self.n_samples_fit = X.shape[0]
 
     def kneighbors(self, X):
         distances = cdist(self.fit_X, X, 'euclidean')  # n_train x n_test matrix
@@ -261,14 +245,12 @@ def n_b(train_dir, test_dir, output_file, test_accuracy=False):
 
 def k_nn(train_dir, test_dir, n_neighbors, output_file, test_accuracy=False):
     X_train, y_train, f_name_train = samples(train_dir, truth_file=True)
-    # knn = KNeighborsClassifier(algorithm='brute', n_neighbors=n_neighbors, metric='euclidean')
     knn = KNearestNeighbors(n_neighbors=n_neighbors)
     knn.fit(X_train, y_train)
-    X_test, y_test, f_name_test = samples(test_dir, truth_file=True)
+    X_test, y_test, f_name_test = samples(test_dir, truth_file=False)
     predictions = knn.predict(X_test)
     write_output_dsv(predictions, f_name_test, test_dir, output_file=output_file)
     if test_accuracy:
-        # print(knn.score(X_test, y_test))
         report_accuracy(f_name_train, predictions, test_dir, y_test, y_train)
 
 
@@ -300,5 +282,5 @@ def main(test_accuracy=False):
 
 
 if __name__ == "__main__":
-    main(True)
+    main()
     sys.exit(0)
