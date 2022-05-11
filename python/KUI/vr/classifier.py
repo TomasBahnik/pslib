@@ -194,6 +194,10 @@ class NaiveBayes:
 
 
 class KNearestNeighbors:
+    """k NN with euclidean distances calculated by `scipy.spatial.distance.cdist`.
+       predict function uses `numpy.take' from classes with k nearest indices based
+       on mode `scipy.stats.stats.mode`
+    """
     def __init__(self, n_neighbors):
         self.n_neighbors = n_neighbors
         self._y = None
