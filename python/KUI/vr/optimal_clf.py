@@ -55,7 +55,7 @@ def display_plots(y_true, best_clf, best_pred, roc):
         if roc:
             fpr, tpr, thresh = roc_curve(y_true, y_pred)
             auc = roc_auc_score(y_true, y_pred)
-            label = "clf=" + str(i + 1) + ",alpha=" + str(alpha) + ",auc=" + str(round(auc, 2))
+            label = "clf=" + str(i + 1) + ",alpha_ind=" + str(alpha) + ",auc=" + str(round(auc, 2))
             plt.plot(fpr, tpr, label=label)
             plt.title("Best ROC curves with AUC")
             plt.legend()
@@ -65,7 +65,7 @@ def display_plots(y_true, best_clf, best_pred, roc):
             disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=disp_labels)
             color_bar = True
             disp.plot(colorbar=color_bar)
-            label = "clf=" + str(i + 1) + ",alpha=" + str(alpha) + ",accuracy=" + str(round(acc, 2))
+            label = "clf=" + str(i + 1) + ",alpha_ind=" + str(alpha) + ",accuracy=" + str(round(acc, 2))
             disp.ax_.set_title(label)
             plt.show()
     plt.show()
