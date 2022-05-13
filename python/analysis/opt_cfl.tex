@@ -1,0 +1,62 @@
+%! Author = tomas.bahnik
+%! Date = 11/16/2021
+
+% Preamble
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage[total={7in,10in}]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\geometry{a4paper}
+
+
+% Document
+\begin{document}
+
+    \section{Optimal classifier}\label{sec:opt_class}
+
+    Confusion matrices for classifiers with $\alpha_{ha}$ parameter equal to that
+    with the highest accuracy.
+    The $accuracy$ is defined as a ratio of correctly predicted classes
+
+    \begin{equation}
+        accuracy = \frac{y_{correct}}{y_{all}}\label{eq:accuracy}
+    \end{equation}
+
+    We need to prevent unauthorized person to get access i.e.\ to minimize number of false-positive
+    when true label is $0$ (fingerprint does not match) but is recognized as $1$.
+
+    \begin{equation}
+        FPR = \frac{FP}{TN + FP}\label{eq:fpr}
+    \end{equation}
+
+    \begin{center}
+        \begin{tabular}{ c c }
+            FN(0,0) & FP(0,1) \\
+            TN(1,0) & TP(1,1) \\
+        \end{tabular}
+    \end{center}
+
+    \includegraphics[scale=0.5]{cm_1}
+    \includegraphics[scale=0.5]{cm_2}
+
+    \includegraphics[scale=0.5]{cm_3}
+    \includegraphics[scale=0.5]{cm_4}
+
+    \includegraphics[scale=0.5]{cm_5}
+
+    \newpage
+
+    ROC functions and AUC of $y_{true}$ and $y_{pred}$ for $\alpha_{ha}$
+
+    \includegraphics[scale=0.5]{roc}
+
+    calculated via
+
+    \texttt{sklearn.metrics.\_ranking.roc\_curve(y\_true, y\_pred)}
+
+    \texttt{sklearn.metrics.\_ranking.roc\_auc\_score(y\_true, y\_pred)}
+
+\end{document}
