@@ -15,48 +15,42 @@
 % Document
 \begin{document}
 
-    \section{Optimal classifier}\label{sec:opt_class}
-
-    Confusion matrices for classifiers with $\alpha_{ha}$ parameter equal to that
-    with the highest accuracy.
-    The $accuracy$ is defined as a ratio of correctly predicted classes
+    \section{Optimální binární klasifikátor}\label{sec:opt_clf}
+    Optimální hodnota parametru  $\alpha$, pro daný klasifikátor,
+    byla určena z podmínky maximalní správnosti (accuracy)
 
     \begin{equation}
-        accuracy = \frac{y_{correct}}{y_{all}}\label{eq:accuracy}
+        accuracy = \frac{y\_pred_{correct}}{y\_pred_{all}}\label{eq:accuracy}
     \end{equation}
 
-    We need to prevent unauthorized person to get access i.e.\ to minimize number of false-positive
-    when true label is $0$ (fingerprint does not match) but is recognized as $1$.
+    Volba klasifikátoru pak vychází z požadavku {\em hlavně bezpečně} t.j.\
+    minimalizovat případy neautorizovaného přístupu, kdy platí že $y_{true = 0}$ ale $y_{pred = 1}$,
+    což odpovidá minimální false positive rate
 
     \begin{equation}
-        FPR = \frac{FP}{TN + FP}\label{eq:fpr}
+        FPR = \frac{TN}{N}=\frac{FP}{TN + FP}\label{eq:fpr}
     \end{equation}
 
     \begin{center}
         \begin{tabular}{ c c }
-            FN(0,0) & FP(0,1) \\
-            TN(1,0) & TP(1,1) \\
+            TN(0,0) & FP(0,1) \\
+            FN(1,0) & TP(1,1) \\
         \end{tabular}
     \end{center}
 
-    \includegraphics[scale=0.5]{cm_1}
-    \includegraphics[scale=0.5]{cm_2}
+    Matice záměn a ROC křivky pro klasifikátory $C1..C5$ ukazují $C1$ s $\alpha_{22}$ jako
+    optimální klasifikátor
 
-    \includegraphics[scale=0.5]{cm_3}
-    \includegraphics[scale=0.5]{cm_4}
+    \includegraphics[scale=0.45]{cm_1}
+    \includegraphics[scale=0.45]{cm_2}
 
-    \includegraphics[scale=0.5]{cm_5}
+    \includegraphics[scale=0.45]{cm_3}
+    \includegraphics[scale=0.45]{cm_4}
 
-    \newpage
+    \includegraphics[scale=0.45]{cm_5}
+    \includegraphics[scale=0.45]{roc}
 
-    ROC functions and AUC of $y_{true}$ and $y_{pred}$ for $\alpha_{ha}$
-
-    \includegraphics[scale=0.5]{roc}
-
-    calculated via
-
-    \texttt{sklearn.metrics.\_ranking.roc\_curve(y\_true, y\_pred)}
-
-    \texttt{sklearn.metrics.\_ranking.roc\_auc\_score(y\_true, y\_pred)}
-
+    Použité funkce
+    \texttt{confusion\_matrix, ConfusionMatrixDisplay, roc\_curve, roc\_auc\_score)}
+    z knihovny \texttt{sklearn.metrics}
 \end{document}
