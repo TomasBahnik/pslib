@@ -17,14 +17,15 @@
 
     \section{Optimální binární klasifikátor}\label{sec:opt_clf}
     Optimální hodnota parametru  $\alpha$, pro daný klasifikátor,
-    byla určena z podmínky maximální správnosti (accuracy)
+    byla určena z podmínky maximální správnosti (accuracy) t.j. poměru počtu správně
+    klasifikovaných vzorků vs. počet všech vzorků
 
     \begin{equation}
-        accuracy = \frac{y\_pred_{correct}}{y\_pred_{all}}\label{eq:accuracy}
+        accuracy = \frac{\mathcal{N}_{correct}}{\mathcal{N}_{all}}\label{eq:accuracy}
     \end{equation}
 
     Volba klasifikátoru pak vychází z požadavku {\em hlavně bezpečně} t.j.\
-    minimalizovat případy neautorizovaného přístupu, kdy platí že $y_{true = 0}$ ale $y_{pred = 1}$,
+    minimalizovat případy neautorizovaného přístupu, kdy platí že $y_{true}=0$ ale $y_{pred}=1$,
     což odpovídá minimální false positive rate
 
     \begin{equation}
