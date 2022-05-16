@@ -16,10 +16,11 @@ def opt_clf(folder, n_samples=100, n_params=50):
     clf_results = np.empty((n_clf, n_samples, n_params,), dtype=int)
     for i in range(n_clf):
         c_f = clf_files[i]
-        np_c_f = genfromtxt(c_f, delimiter=',')
+        np_c_f = genfromtxt(c_f, delimiter=',', dtype=int)
         clf_results[i] = np_c_f
     gt_file = Path(folder, 'GT.dsv')
-    y_true = genfromtxt(gt_file, delimiter=',')
+    y_true = genfromtxt(gt_file, dtype=int)
+    # accuracy is float type
     clf_alpha_acc = np.zeros((n_clf, n_params), dtype=float)
     for clf in range(n_clf):
         for param in range(n_params):
