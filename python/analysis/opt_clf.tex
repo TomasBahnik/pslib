@@ -8,7 +8,11 @@
 \usepackage[total={7in,10in}]{geometry}
 \usepackage{amsmath}
 \usepackage{graphicx}
-\usepackage{hyperref}
+\usepackage[colorlinks = true,
+    linkcolor = blue,
+    urlcolor  = blue,
+    citecolor = blue,
+    anchorcolor = blue]{hyperref}
 \geometry{a4paper}
 
 
@@ -18,10 +22,11 @@
     \section{Optimální binární klasifikátor}\label{sec:opt_clf}
     Optimální hodnota parametru  $\alpha$, pro daný klasifikátor,
     byla určena z podmínky maximální správnosti (accuracy) t.j. poměru počtu správně
-    klasifikovaných vzorků vs. počet všech vzorků
+    klasifikovaných vzorků vs. počet všech vzorků viz.
+    \href{https://en.wikipedia.org/wiki/Receiver_operating_characteristic}{Receiver operating characteristic}
 
     \begin{equation}
-        accuracy = \frac{\mathcal{N}_{correct}}{\mathcal{N}_{all}}\label{eq:accuracy}
+        ACC = \frac{TP + TN}{P + N} = \frac{TP + TN}{TP + TN + FP + FN}\label{eq:accuracy}
     \end{equation}
 
     Volba klasifikátoru pak vychází z požadavku {\em hlavně bezpečně} t.j.\
@@ -29,7 +34,7 @@
     což odpovídá minimální false positive rate
 
     \begin{equation}
-        FPR = \frac{TN}{N}=\frac{FP}{TN + FP}\label{eq:fpr}
+        FPR = \frac{FP}{N}=\frac{FP}{TN + FP}\label{eq:fpr}
     \end{equation}
 
     \begin{center}
