@@ -36,13 +36,16 @@ def load_classifiers(folder, n_samples=100, n_params=50):
 def evaluate_classifiers(classifiers: list[Classifier] = None):
     i = 0
     for c in classifiers:
-        i += 1
         """Print metrics"""
         tpr = metrics.TruePositiveRate(c.cm)
         fpr = metrics.FalsePositiveRate(c.cm)
         acc = metrics.Accuracy(c.cm)
+        f1 = metrics.F1(c.cm).get()
+        f1 = round(f1, 2)
         a = c.alpha
-        print(f"{i}.alpha={a}. {acc}, {tpr}, {fpr}")
+        ind = (i // 50) + 1
+        print(f"C{ind}.alpha={a}. {acc}, F1={f1}, {tpr}, {fpr}")
+        i += 1
 
 
 if __name__ == "__main__":

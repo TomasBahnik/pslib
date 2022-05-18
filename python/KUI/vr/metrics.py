@@ -80,7 +80,7 @@ class Accuracy(Metric):
         negative = GroundTruthNegative(self.cm).get()
         positive = GroundTruthPositive(self.cm).get()
         try:
-            return self.cm.true_positives + self.cm.true_negatives / (positive + negative)
+            return (self.cm.true_positives + self.cm.true_negatives) / (positive + negative)
         except ZeroDivisionError:
             return 0.0
 
