@@ -75,6 +75,16 @@ class FalsePositiveRate(Metric):
             return 0.0
 
 
+class Accuracy(Metric):
+    def get(self):
+        negative = GroundTruthNegative(self.cm).get()
+        positive = GroundTruthPositive(self.cm).get()
+        try:
+            return self.cm.true_positives + self.cm.true_negatives / (positive + negative)
+        except ZeroDivisionError:
+            return 0.0
+
+
 class F1(Metric):
     def __init__(self, cm: BinaryConfusionMatrix):
         super().__init__(cm)
