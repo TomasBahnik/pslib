@@ -3,10 +3,11 @@ import sys
 from pathlib import Path
 
 import numpy as np
+from matplotlib import pyplot as plt
 from numpy import genfromtxt
 
 import metrics
-from clf import Classifier
+from clf import Classifier, ClassifierTest
 
 
 def load_classifiers(folder, n_samples=100, n_params=50):
@@ -21,31 +22,40 @@ def load_classifiers(folder, n_samples=100, n_params=50):
         clf_results[i] = np_c_f
     gt_file = Path(folder, 'GT.dsv')
     y_true = genfromtxt(gt_file, dtype=int)
-    classifiers = []
+    classifiers: list[Classifier] = []
     for clf in range(n_clf):
+        classifier = Classifier(y_true)
+        classifiers.append(classifier)
         for alpha in range(n_params):
             y_pred = clf_results[clf, :, alpha]
             cm = metrics.BinaryConfusionMatrix()
-            classifier = Classifier(cm, alpha, y_pred, y_true)
-            classifier.check_y()
-            classifier.update_cm()
-            classifiers.append(classifier)
+            classifier_test = ClassifierTest(cm, y_pred=y_pred, alpha=alpha)
+            classifier.check_y(y_pred)
+            classifier_test.update_cm(y_true=y_true)
+            classifier.update_ct(classifier_test)
     return classifiers
 
 
 def evaluate_classifiers(classifiers: list[Classifier] = None):
     i = 0
     for c in classifiers:
-        """Print metrics"""
-        tpr = metrics.TruePositiveRate(c.cm)
-        fpr = metrics.FalsePositiveRate(c.cm)
-        acc = metrics.Accuracy(c.cm)
-        f1 = metrics.F1(c.cm).get()
-        f1 = round(f1, 2)
-        a = c.alpha
-        ind = (i // 50) + 1
-        print(f"C{ind}.alpha={a}. {acc}, F1={f1}, {tpr}, {fpr}")
         i += 1
+        x = []
+        y = []
+        accuracies = np.asarray([ct.metrics()[2] for ct in c.cts])
+        max_acc = max(accuracies)
+        max_acc_ind = accuracies.argmax()
+        for ct in c.cts:
+            tpr, fpr, acc, f1 = ct.metrics()
+            x.append(fpr)
+            y.append(tpr)
+            a = ct.alpha
+            print(f"C{i} : alpha={a}, {acc}, {tpr}, {fpr}")
+        label = f"C{i}: alpha={max_acc_ind}, max_acc={max_acc}"
+        plt.plot(x, y, label=label)
+        plt.title("ROC curves for alphas")
+        plt.legend()
+    plt.show()
 
 
 if __name__ == "__main__":
