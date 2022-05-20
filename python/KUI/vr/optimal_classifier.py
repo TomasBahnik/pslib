@@ -11,9 +11,8 @@ from clf import Classifier, ClassifierTest
 
 
 def load_classifiers(folder, n_samples=100, n_params=50):
-    clf_files = [Path(folder, name) for name in os.listdir(folder) if os.path.isfile(Path(folder, name))
-                 and name.endswith('dsv') and name.startswith('C')]
-
+    clf_files = sorted([Path(folder, name) for name in os.listdir(folder) if os.path.isfile(Path(folder, name))
+                        and name.endswith('dsv') and name.startswith('C')])
     n_clf = len(clf_files)
     clf_results = np.empty((n_clf, n_samples, n_params,), dtype=int)
     for i in range(n_clf):
