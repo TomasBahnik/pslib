@@ -1,7 +1,7 @@
 import json
 from collections import namedtuple
 from datetime import timedelta, datetime
-from typing import NamedTuple, Pattern, Callable, Any, Tuple, List
+from typing import NamedTuple, Pattern, Callable, Tuple, List
 
 from cpt.common import FeTransaction, FeTransaction2Gql, LOG_TIMESTAMP_RE, SCRIPT_STARTED_RE, START_ITER, START_TRX, \
     END_TRX, END_TRX_PASSED_THINK_TIME, END_TRX_PASSED, OPERATION_NAME_START_RE
@@ -65,52 +65,36 @@ class ParseResults:
 
 class Rule(NamedTuple):
     regexp: Pattern
-    get: Callable
-    # works on LogFile instance rule.set(self, rule_result)
-    set: Callable[[ParseResults, Any], None]
+    set: Callable[[ParseResults], None]
     # groups available from regexp pattern
     groups: Tuple[int, ...]
     apply_sub_rules: bool = False
     sub_rules: List = []
 
 
-def script_start_time(lp: ParseResults) -> datetime:
-    return datetime.strptime(lp.re_groups_values[0], "%Y-%m-%d %H:%M:%S")
-
-
-def set_script_start_time(x: ParseResults, y):
+def set_script_start_time(x: ParseResults):
+    y = x.rule_result
     x.script_start_time = datetime.strptime(y[0], "%Y-%m-%d %H:%M:%S")
 
 
-def iteration_start(lp: ParseResults) -> int:
-    return int(lp.re_groups_values[0])
-
-
-def set_iteration_start(x: ParseResults, y):
+def set_iteration_start(x: ParseResults):
+    y = x.rule_result
     x.current_iteration = int(y[0])
 
 
-def transaction_start(lp: ParseResults) -> str:
-    return str(lp.re_groups_values[0])
-
-
-def set_transaction_start(x: ParseResults, y):
+def set_transaction_start(x: ParseResults):
+    y = x.rule_result
     trx = str(y[0])
     x.current_transaction = trx
     x.opened_transaction.append(trx)
 
 
-def transaction_end(lp: ParseResults) -> Tuple[List[str], bool]:
-    # rules for END_TRX_PASSED and END_TRX_PASSED_THINK_TIME are conditioned by passed END_TRX
-    conditioned = True
-    return lp.re_groups_values, conditioned
-
-
-def set_transaction_end(x: ParseResults, y):
+def set_transaction_end(x: ParseResults):
+    y = x.rule_result
     x.process_end_transaction(y)
 
 
-def set_gql_request(x: ParseResults, y):
+def set_gql_request(x: ParseResults):
     stripped = x.line.replace('\\\\', '\\')
     # when created by cmd line version
     if "\t" in stripped:
@@ -136,15 +120,15 @@ def set_transaction_times(x: ParseResults, y):
 
 conditional_rules = [
     # duration,think time,wasted time goes first
-    Rule(END_TRX_PASSED_THINK_TIME, transaction_times, set_transaction_times, (1, 2, 3)),
+    Rule(END_TRX_PASSED_THINK_TIME, set_transaction_times, (1, 2, 3)),
     # duration,wasted time
-    Rule(END_TRX_PASSED, transaction_times, set_transaction_times, (1, 2))
+    Rule(END_TRX_PASSED, set_transaction_times, (1, 2))
 ]
 all_rules = [
-    Rule(SCRIPT_STARTED_RE, script_start_time, set_script_start_time, (1,)),
-    Rule(START_ITER, iteration_start, set_iteration_start, (1,)),
-    Rule(START_TRX, transaction_start, set_transaction_start, (1,)),
+    Rule(SCRIPT_STARTED_RE, set_script_start_time, (1,)),
+    Rule(START_ITER, set_iteration_start, (1,)),
+    Rule(START_TRX, set_transaction_start, (1,)),
     # with status Pass
-    Rule(END_TRX, transaction_end, set_transaction_end, (1, 2), apply_sub_rules=True, sub_rules=conditional_rules),
-    Rule(OPERATION_NAME_START_RE, set_gql_request, set_gql_request, (1,))
+    Rule(END_TRX, set_transaction_end, (1, 2), apply_sub_rules=True, sub_rules=conditional_rules),
+    Rule(OPERATION_NAME_START_RE, set_gql_request, (1,))
 ]

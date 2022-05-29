@@ -55,7 +55,7 @@ class LogFile:
                 if (rule, rule_result) != (None, None):
                     self.pr.line = stripped
                     self.pr.rule_result = rule_result
-                    rule.set(self.pr, rule_result)
+                    rule.set(self.pr)
                 self.pr.previous_line = stripped
 
     def print_fe_transactions(self):
