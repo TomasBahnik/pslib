@@ -9,9 +9,8 @@ from cpt.parse_rules import Rule, ParseResults, STATUS_PASS
 class LineProcessor:
     """ How to extract (apply rules to) data for particular line in th log file"""
 
-    def __init__(self, rules: List[Rule], cond_rules: List[Rule]):
+    def __init__(self, rules: List[Rule]):
         self.rules = rules
-        self.cond_rules = cond_rules
         self.re_groups_values: List[str] = []
         self.line: str = ''
 
@@ -29,7 +28,7 @@ class LineProcessor:
     def process_line(self, line: str) -> Tuple[Any, Any]:
         rule, rule_result = self.process_rules(line, self.rules)
         # conditional expressed by 2nd value = True
-        if rule and rule.apply_sub_rules:
+        if rule and len(rule.sub_rules) > 0:
             trx_name, trx_status = rule_result
             if trx_status == STATUS_PASS:
                 # event_name is always transaction_times

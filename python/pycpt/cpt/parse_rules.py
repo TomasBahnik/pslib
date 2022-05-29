@@ -21,7 +21,6 @@ class ParseResults:
         # remember previous line with relative timestamp for error and end time
         self.previous_line: str = ''
         self.line: str = ''
-        self.re_groups_values: List[str] = []
         self.rule_result: List[str] = []
         self.fe_gql: List[FeTransaction2Gql] = []
 
@@ -65,10 +64,9 @@ class ParseResults:
 
 class Rule(NamedTuple):
     regexp: Pattern
-    set: Callable[[ParseResults], None]
     # groups available from regexp pattern
-    groups: Tuple[int, ...]
-    apply_sub_rules: bool = False
+    groups: Tuple[int, ...] = (1,)
+    set: Callable[[ParseResults], None] = lambda x: None
     sub_rules: List = []
 
 
@@ -118,17 +116,17 @@ def set_transaction_times(x: ParseResults, y):
     return None
 
 
-conditional_rules = [
+transaction_end_rules = [
     # duration,think time,wasted time goes first
-    Rule(END_TRX_PASSED_THINK_TIME, set_transaction_times, (1, 2, 3)),
+    Rule(END_TRX_PASSED_THINK_TIME, groups=(1, 2, 3)),
     # duration,wasted time
-    Rule(END_TRX_PASSED, set_transaction_times, (1, 2))
+    Rule(END_TRX_PASSED, groups=(1, 2))
 ]
-all_rules = [
-    Rule(SCRIPT_STARTED_RE, set_script_start_time, (1,)),
-    Rule(START_ITER, set_iteration_start, (1,)),
-    Rule(START_TRX, set_transaction_start, (1,)),
+request_response_log_rules = [
+    Rule(SCRIPT_STARTED_RE, set=set_script_start_time),
+    Rule(START_ITER, set=set_iteration_start),
+    Rule(START_TRX, set=set_transaction_start),
     # with status Pass
-    Rule(END_TRX, set_transaction_end, (1, 2), apply_sub_rules=True, sub_rules=conditional_rules),
-    Rule(OPERATION_NAME_START_RE, set_gql_request, (1,))
+    Rule(END_TRX, groups=(1, 2), set=set_transaction_end, sub_rules=transaction_end_rules),
+    Rule(OPERATION_NAME_START_RE, set=set_gql_request)
 ]
