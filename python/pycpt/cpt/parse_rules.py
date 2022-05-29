@@ -22,7 +22,7 @@ class ParseResults:
         self.previous_line: str = ''
         self.line: str = ''
         self.re_groups_values: List[str] = []
-        self.rule_result: Any
+        self.rule_result: List[str] = []
         self.fe_gql: List[FeTransaction2Gql] = []
 
     def process_gql(self, rule_result: dict):
@@ -46,7 +46,7 @@ class ParseResults:
         name = rule_result[0]
         status = rule_result[1]
         if status == STATUS_PASS:
-            t_times: TransactionTimes = rule_result[2]
+            t_times: TransactionTimes = transaction_times(self)
             # trx_time is calculated during initialization
             fet = FeTransaction(name=name, status=status,
                                 duration=t_times.duration,
@@ -70,20 +70,24 @@ class Rule(NamedTuple):
     set: Callable[[ParseResults, Any], None]
     # groups available from regexp pattern
     groups: Tuple[int, ...]
+    apply_sub_rules: bool = False
+    sub_rules: List = []
 
 
 def script_start_time(lp: ParseResults) -> datetime:
     return datetime.strptime(lp.re_groups_values[0], "%Y-%m-%d %H:%M:%S")
 
 
-def set_script_start_time(x: ParseResults, y): x.script_start_time = y
+def set_script_start_time(x: ParseResults, y):
+    x.script_start_time = datetime.strptime(y[0], "%Y-%m-%d %H:%M:%S")
 
 
 def iteration_start(lp: ParseResults) -> int:
     return int(lp.re_groups_values[0])
 
 
-def set_iteration_start(x: ParseResults, y): x.current_iteration = y
+def set_iteration_start(x: ParseResults, y):
+    x.current_iteration = int(y[0])
 
 
 def transaction_start(lp: ParseResults) -> str:
@@ -91,8 +95,9 @@ def transaction_start(lp: ParseResults) -> str:
 
 
 def set_transaction_start(x: ParseResults, y):
-    x.current_transaction = y
-    x.opened_transaction.append(y)
+    trx = str(y[0])
+    x.current_transaction = trx
+    x.opened_transaction.append(trx)
 
 
 def transaction_end(lp: ParseResults) -> Tuple[List[str], bool]:
@@ -101,18 +106,8 @@ def transaction_end(lp: ParseResults) -> Tuple[List[str], bool]:
     return lp.re_groups_values, conditioned
 
 
-def set_transaction_end(x: ParseResults, y): x.process_end_transaction(y)
-
-
-def gql_request(lp: ParseResults) -> dict:
-    pass
-    # stripped = lp.line.replace('\\\\', '\\')
-    # # when created by cmd line version
-    # if "\t" in stripped:
-    #     tab = stripped.index("\t")
-    #     stripped = stripped[0:tab]
-    # gql = json.loads(stripped)
-    # return gql
+def set_transaction_end(x: ParseResults, y):
+    x.process_end_transaction(y)
 
 
 def set_gql_request(x: ParseResults, y):
@@ -126,7 +121,7 @@ def set_gql_request(x: ParseResults, y):
 
 
 def transaction_times(lp: ParseResults):
-    ret = [float(x) for x in lp.re_groups_values]
+    ret = [float(x) for x in lp.rule_result[2]]
     if len(ret) == 2:
         # think time = 0
         return TransactionTimes(ret[0], 0, ret[1])
@@ -139,17 +134,17 @@ def set_transaction_times(x: ParseResults, y):
     return None
 
 
-all_rules = [
-    Rule(SCRIPT_STARTED_RE, script_start_time, set_script_start_time, (1,)),
-    Rule(START_ITER, iteration_start, set_iteration_start, (1,)),
-    Rule(START_TRX, transaction_start, set_transaction_start, (1,)),
-    # with status Pass
-    Rule(END_TRX, transaction_end, set_transaction_end, (1, 2)),
-    Rule(OPERATION_NAME_START_RE, gql_request, set_gql_request, (1,))
-]
 conditional_rules = [
     # duration,think time,wasted time goes first
     Rule(END_TRX_PASSED_THINK_TIME, transaction_times, set_transaction_times, (1, 2, 3)),
     # duration,wasted time
     Rule(END_TRX_PASSED, transaction_times, set_transaction_times, (1, 2))
+]
+all_rules = [
+    Rule(SCRIPT_STARTED_RE, script_start_time, set_script_start_time, (1,)),
+    Rule(START_ITER, iteration_start, set_iteration_start, (1,)),
+    Rule(START_TRX, transaction_start, set_transaction_start, (1,)),
+    # with status Pass
+    Rule(END_TRX, transaction_end, set_transaction_end, (1, 2), apply_sub_rules=True, sub_rules=conditional_rules),
+    Rule(OPERATION_NAME_START_RE, set_gql_request, set_gql_request, (1,))
 ]

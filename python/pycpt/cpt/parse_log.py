@@ -15,17 +15,13 @@ class LineProcessor:
         self.re_groups_values: List[str] = []
         self.line: str = ''
 
-    def process_rules(self, line: str, rules: List[Rule]) -> Tuple[Any, Any]:
+    @staticmethod
+    def process_rules(line: str, rules: List[Rule]) -> Tuple[Any, Any]:
         for rule in rules:
             regexp_match = rule.regexp.match(line)
             if regexp_match:
-                self.re_groups_values = [regexp_match.group(x) for x in rule.groups]
-                # for most get_val is re_groups_values, for gql it is line
-                # TODO do not use self in this get - use ParseResults or just return correct value
-                # !! only set value is enough
-                get_val = rule.get(self)
-                # only the first one regexp applies for given line
-                return rule, get_val
+                rule_result = [regexp_match.group(x) for x in rule.groups]
+                return rule, rule_result
             else:
                 continue
         return None, None
@@ -33,11 +29,11 @@ class LineProcessor:
     def process_line(self, line: str) -> Tuple[Any, Any]:
         rule, rule_result = self.process_rules(line, self.rules)
         # conditional expressed by 2nd value = True
-        if rule and isinstance(rule_result, Tuple) and rule_result[1]:
-            trx_name, trx_status = rule_result[0]
+        if rule and rule.apply_sub_rules:
+            trx_name, trx_status = rule_result
             if trx_status == STATUS_PASS:
                 # event_name is always transaction_times
-                _, trx_times = self.process_rules(line, self.cond_rules)
+                _, trx_times = self.process_rules(line, rule.sub_rules)
                 return rule, [trx_name, trx_status, trx_times]
         return rule, rule_result
 
@@ -55,10 +51,10 @@ class LogFile:
         with open(self.log_file, encoding='windows-1252') as input_file:
             for line in input_file.readlines():
                 stripped = line.strip()
-                self.pr.line = stripped
                 (rule, rule_result) = self.lp.process_line(stripped)
-                self.pr.rule_result = rule_result
                 if (rule, rule_result) != (None, None):
+                    self.pr.line = stripped
+                    self.pr.rule_result = rule_result
                     rule.set(self.pr, rule_result)
                 self.pr.previous_line = stripped
 
