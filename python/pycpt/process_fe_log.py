@@ -1,7 +1,8 @@
 import argparse
 from pathlib import Path
 
-from cpt.parse_log import LogFile, ParseResults, LineProcessor, all_rules, conditional_rules
+from cpt.parse_log import LogFile, LineProcessor, all_rules, conditional_rules
+from cpt.parse_rules import ParseResults
 
 
 def setup_arg_parser():
