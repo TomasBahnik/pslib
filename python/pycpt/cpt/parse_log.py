@@ -16,12 +16,8 @@ STATUS_PASS = 'Pass'
 TransactionTimes = namedtuple('TransactionTimes', 'duration, think, wasted')
 
 
-class LogFile:
-    """ keep content of log file in structures """
-
-    def __init__(self, log_file: Path, output_dir: Path):
-        self.log_file = log_file
-        self.output_dir = output_dir
+class ParseResults:
+    def __init__(self):
         self.script_start_time = None
         self.current_iteration: int = 0
         self.ended_fe_transaction: List[FeTransaction] = []
@@ -31,16 +27,21 @@ class LogFile:
         self.previous_line: str = ''
         self.fe_gql: List[FeTransaction2Gql] = []
 
-    def parse_all(self):
-        lp = LineProcessor(all_rules, conditional_rules)
-        with open(self.log_file, encoding='windows-1252') as input_file:
-            for line in input_file.readlines():
-                stripped = line.strip()
-                lp.line = stripped
-                (rule, rule_result) = lp.process_line(stripped)
-                if (rule, rule_result) != (None, None):
-                    rule.set(self, rule_result)
-                self.previous_line = stripped
+    def process_gql(self, rule_result: dict):
+        gql = rule_result
+        # TODO fix the logic of assigned trx
+        last_opened_fe_trx = self.opened_transaction.pop() if len(self.opened_transaction) > 0 else ''
+        trx_gql = FeTransaction2Gql(last_opened_fe_trx, gql, self.current_iteration)
+        self.fe_gql.append(trx_gql)
+
+    def fe_trx_end_time(self) -> str:
+        """ ISO time for transaction end"""
+        match = LOG_TIMESTAMP_RE.match(self.previous_line)
+        if match:
+            t = int(match.group(1))
+            end_time = self.script_start_time + timedelta(milliseconds=t)
+            return end_time.isoformat()
+        return ''
 
     def process_end_transaction(self, rule_result):
         # event_result = name , status, times (for Passed trx)
@@ -63,37 +64,12 @@ class LogFile:
                                 iteration=self.current_iteration)
             self.ended_fe_transaction.append(fet)
 
-    def process_gql(self, rule_result: dict):
-        gql = rule_result
-        # TODO fix the logic of assigned trx
-        last_opened_fe_trx = self.opened_transaction.pop() if len(self.opened_transaction) > 0 else ''
-        trx_gql = FeTransaction2Gql(last_opened_fe_trx, gql, self.current_iteration)
-        self.fe_gql.append(trx_gql)
-
-    def fe_trx_end_time(self) -> str:
-        """ ISO time for transaction end"""
-        match = LOG_TIMESTAMP_RE.match(self.previous_line)
-        if match:
-            t = int(match.group(1))
-            end_time = self.script_start_time + timedelta(milliseconds=t)
-            return end_time.isoformat()
-        return ''
-
-    def print_fe_transactions(self):
-        for t in self.ended_fe_transaction:
-            print(f'{t.iteration}: {t.trx_name},{t.status},{t.trx_time},{t.end_time},{t.error}')
-
-    def print_gqls(self):
-        print(f'{len(self.fe_gql)} gqls')
-        for t in self.fe_gql:
-            print(f'{t.iteration}: {t.trx_name},{t.gql[OPERATION_NAME]}')
-
 
 class Rule(NamedTuple):
     regexp: Pattern
     get: Callable
     # works on LogFile instance rule.set(self, rule_result)
-    set: Callable[[LogFile, Any], None]
+    set: Callable[[ParseResults, Any], None]
     # groups available from regexp pattern
     groups: Tuple[int, ...]
 
@@ -130,6 +106,36 @@ class LineProcessor:
                 return rule, [trx_name, trx_status, trx_times]
         return rule, rule_result
 
+
+class LogFile:
+    """ keep content of log file in structures """
+
+    def __init__(self, log_file: Path, output_dir: Path, pr: ParseResults, lp: LineProcessor):
+        self.log_file = log_file
+        self.output_dir = output_dir
+        self.pr = pr
+        self.lp = lp
+
+    def parse_all(self):
+        with open(self.log_file, encoding='windows-1252') as input_file:
+            for line in input_file.readlines():
+                stripped = line.strip()
+                self.lp.line = stripped
+                (rule, rule_result) = self.lp.process_line(stripped)
+                if (rule, rule_result) != (None, None):
+                    rule.set(self.pr, rule_result)
+                self.pr.previous_line = stripped
+
+    def print_fe_transactions(self):
+        for t in self.pr.ended_fe_transaction:
+            print(f'{t.iteration}: {t.trx_name},{t.status},{t.trx_time},{t.end_time},{t.error}')
+
+    def print_gqls(self):
+        print(f'{len(self.pr.fe_gql)} gqls')
+        for t in self.pr.fe_gql:
+            print(f'{t.iteration}: {t.trx_name},{t.gql[OPERATION_NAME]}')
+
+
 # rule get/set functions
 
 
@@ -137,21 +143,21 @@ def script_start_time(lp: LineProcessor) -> datetime:
     return datetime.strptime(lp.re_groups_values[0], "%Y-%m-%d %H:%M:%S")
 
 
-def set_script_start_time(x: LogFile, y): x.script_start_time = y
+def set_script_start_time(x: ParseResults, y): x.script_start_time = y
 
 
 def iteration_start(lp: LineProcessor) -> int:
     return int(lp.re_groups_values[0])
 
 
-def set_iteration_start(x: LogFile, y): x.current_iteration = y
+def set_iteration_start(x: ParseResults, y): x.current_iteration = y
 
 
 def transaction_start(lp: LineProcessor) -> str:
     return str(lp.re_groups_values[0])
 
 
-def set_transaction_start(x: LogFile, y):
+def set_transaction_start(x: ParseResults, y):
     x.current_transaction = y
     x.opened_transaction.append(y)
 
@@ -162,7 +168,7 @@ def transaction_end(lp: LineProcessor) -> Tuple[List[str], bool]:
     return lp.re_groups_values, conditioned
 
 
-def set_transaction_end(x: LogFile, y): x.process_end_transaction(y)
+def set_transaction_end(x: ParseResults, y): x.process_end_transaction(y)
 
 
 def gql_request(lp: LineProcessor) -> dict:
@@ -175,7 +181,7 @@ def gql_request(lp: LineProcessor) -> dict:
     return gql
 
 
-def set_gql_request(x: LogFile, y): x.process_gql(y)
+def set_gql_request(x: ParseResults, y): x.process_gql(y)
 
 
 def transaction_times(lp: LineProcessor):
@@ -187,7 +193,7 @@ def transaction_times(lp: LineProcessor):
         return TransactionTimes(ret[0], ret[1], ret[2])
 
 
-def set_transaction_times(x: LogFile, y):
+def set_transaction_times(x: ParseResults, y):
     # no set for transaction_times
     return None
 

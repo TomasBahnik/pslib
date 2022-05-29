@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from cpt.parse_log import LogFile
+from cpt.parse_log import LogFile, ParseResults, LineProcessor, all_rules, conditional_rules
 
 
 def setup_arg_parser():
@@ -25,7 +25,9 @@ if __name__ == '__main__':
     print(f"log file:{log_file.absolute()}")
     print(f"output dir:{output_dir.absolute()}")
 
-    lf = LogFile(log_file, output_dir)
+    pr = ParseResults()
+    lp = LineProcessor(all_rules, conditional_rules)
+    lf = LogFile(log_file, output_dir, pr=pr, lp=lp)
 
     lf.parse_all()
     if args.trx:
