@@ -18,6 +18,12 @@ def setup_arg_parser():
 
 
 if __name__ == '__main__':
+    """
+    test run : python process_fe_log.py --log_file test/output.txt --output_dir test -trx
+    options:
+        -trx : extract frontend transactions from log file 
+        -gql : extract graphql requests from log file
+    """
     parser = setup_arg_parser()
     args = parser.parse_args()
 
@@ -33,7 +39,10 @@ if __name__ == '__main__':
     lf.parse_all()
     if args.trx:
         lf.print_fe_transactions()
+        lf.save_fe_transactions()
+        lf.fe_transaction_elk()
     elif args.gql:
         lf.print_gqls()
+        lf.save_gqls()
     else:
         print(f'Unknown target')

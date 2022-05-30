@@ -5,11 +5,11 @@ from cpt.common import ELK_BASE_URL
 
 
 class ELKEvent:
-    def __init__(self, eventType, event, timestamp):
-        self.eventType = eventType
+    def __init__(self, event_type: str, event: dict, timestamp):
+        self.eventType = event_type
         self.event = event
         self.timestamp = timestamp
-        self.eventBuildInfo = {}
+        self.eventBuildInfo = None
         self.eventSourceHost = None
 
 

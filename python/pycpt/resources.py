@@ -37,7 +37,7 @@ if __name__ == '__main__':
         # does not require other args - complicates redeploy_kust.sh
         switch_loaded_config_map(km.kustomize_git_dir)
     elif args.rv:
-        # TODO subfolder  contains TEST_ENV
+        # TODO vars_yaml Path contains TEST_ENV
         vars_yaml = Path(km.kustomize_git_dir, os.environ["TEST_ENV"] + '.yaml')
         vs = load_vars(vars_yaml)
         km.load_manifest(vs)

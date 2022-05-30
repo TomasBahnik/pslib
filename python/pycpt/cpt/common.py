@@ -35,6 +35,8 @@ OPERATION_NAME_START_RE = re.compile(OPERATION_NAME_START)
 SCRIPT_STEP_OUTPUT_RE = r't=(\d+)ms:\sStep\s([\d\.]+):\s([a-zA-Z\s"]+[\w"])\s{4}'
 SCRIPT_STEP_OUTPUT_RE_COMPILED = re.compile(SCRIPT_STEP_OUTPUT_RE)
 
+LR_VUGEN_SCRIPT = os.getenv('LR_VUGEN_SCRIPT')
+
 
 class FeTransaction2Gql:
     def __init__(self, trx_name: str, gql: dict, iteration: int):

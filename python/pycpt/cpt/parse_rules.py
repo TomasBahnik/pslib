@@ -1,10 +1,16 @@
 import json
+import os
+import socket
 from collections import namedtuple
 from datetime import timedelta, datetime
 from typing import NamedTuple, Pattern, Callable, Tuple, List
 
+import requests
+
 from cpt.common import FeTransaction, FeTransaction2Gql, LOG_TIMESTAMP_RE, SCRIPT_STARTED_RE, START_ITER, START_TRX, \
-    END_TRX, END_TRX_PASSED_THINK_TIME, END_TRX_PASSED, OPERATION_NAME_START_RE
+    END_TRX, END_TRX_PASSED_THINK_TIME, END_TRX_PASSED, OPERATION_NAME_START_RE, FeTransactionGqlCount
+from cpt.elk_events import ELKEvent
+from cpt.parse_trx import FeTransactionTestResultEvent, BUILD_INFO_GQL
 
 STATUS_FAIL = 'Fail'
 STATUS_PASS = 'Pass'
@@ -22,14 +28,17 @@ class ParseResults:
         self.previous_line: str = ''
         self.line: str = ''
         self.rule_result: List[str] = []
-        self.fe_gql: List[FeTransaction2Gql] = []
+        # table [fe_trans, iteration, gql] created during parsing
+        self.fet_iter_gql: List[FeTransaction2Gql] = []
+        # table [fe_trans, iteration, n_gqls]
+        self.fet_iter_n_gqls: List[FeTransactionGqlCount] = []
+        self.fe_elk_events: List[dict] = []
 
     def process_gql(self, rule_result: dict):
         gql = rule_result
-        # TODO fix the logic of assigned trx
-        last_opened_fe_trx = self.opened_transaction.pop() if len(self.opened_transaction) > 0 else ''
+        last_opened_fe_trx = self.opened_transaction[-1] if len(self.opened_transaction) > 0 else None
         trx_gql = FeTransaction2Gql(last_opened_fe_trx, gql, self.current_iteration)
-        self.fe_gql.append(trx_gql)
+        self.fet_iter_gql.append(trx_gql)
 
     def fe_trx_end_time(self) -> str:
         """ ISO time for transaction end"""
@@ -60,6 +69,70 @@ class ParseResults:
                                 error=self.previous_line,
                                 iteration=self.current_iteration)
             self.ended_fe_transaction.append(fet)
+        self.update_opened_fe_transaction(name)
+
+    def update_opened_fe_transaction(self, ended_trans: str):
+        try:
+            self.opened_transaction.remove(ended_trans)
+        except ValueError as e:
+            pass
+
+    def get_gql_count(self, fet_name, iteration):
+        ret = [x.gql_count for x in self.fet_iter_n_gqls
+               if x.trx_name == fet_name and x.iteration == iteration]
+        return int(ret[0]) if len(ret) == 1 else None
+
+    def set_gql_counts(self):
+        # creates set
+        fe_transactions = {trx_gql.trx_name for trx_gql in self.fet_iter_gql}
+        fe_iterations = {trx_gql.iteration for trx_gql in self.fet_iter_gql}
+        for i in sorted(fe_iterations):
+            for fe_trx in fe_transactions:
+                trx_gql_count = [x for x in self.fet_iter_gql
+                                 if (x.trx_name == fe_trx and int(x.iteration) == int(i))]
+                gql_count = len(trx_gql_count)
+                item = FeTransactionGqlCount(fe_trx, gql_count, i)
+                self.fet_iter_n_gqls.append(item)
+
+    @staticmethod
+    def build_info(be_url):
+        if be_url is None:
+            return None
+        r = requests.post(be_url, auth=('admin', 'admin'), verify=False, json=BUILD_INFO_GQL)
+        if r.status_code != 200:
+            return None
+        build_info = r.json()['data']['_buildInfo']
+        if build_info:
+            return build_info
+        else:
+            return None
+
+    def map_to_elk(self, source: FeTransaction) -> FeTransactionTestResultEvent:
+        bi = self.build_info(os.getenv('APP_GQL_URL'))
+        ret = FeTransactionTestResultEvent(os.getenv('TEST_ENV'),
+                                           os.getenv('GIT_BRANCH'),
+                                           os.getenv('GIT_COMMIT'))
+        ret.scriptName = os.getenv('LR_VUGEN_SCRIPT')
+        ret.appBranch = bi['branch'] if bi else None
+        ret.appHeadCommit = bi['commitId'] if bi else None
+        ret.sqlServiceType = os.getenv('SQL_SERVICE_TYPE')
+        ret.iteration = source.iteration
+        ret.duration = source.duration
+        ret.trxName = source.trx_name
+        ret.result = source.status
+        ret.testError = source.error
+        ret.gqlCount = self.get_gql_count(source.trx_name, source.iteration)
+        return ret
+
+    def set_fe_elk_events(self):
+        """ Map self.fe_gql to FeTransactionTestResultEvent"""
+        for fet in self.ended_fe_transaction:
+            elk = self.map_to_elk(fet)
+            elk_event = ELKEvent('fe-test-results', elk.__dict__, fet.end_time)
+            # TODO duplicated
+            elk_event.eventBuildInfo = self.build_info(os.getenv('APP_GQL_URL'))
+            elk_event.eventSourceHost = socket.gethostname()
+            self.fe_elk_events.append(elk_event.__dict__)
 
 
 class Rule(NamedTuple):
