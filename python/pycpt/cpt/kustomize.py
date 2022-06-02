@@ -5,6 +5,7 @@ from pathlib import Path
 import yaml
 from flatten_dict import flatten, unflatten
 
+from cpt.common import debug_print, DEBUG_PRINT, error_print
 from cpt.sizing import Sizing, containers
 
 
@@ -26,12 +27,12 @@ class KubernetesManifest(Sizing):
             ret = image
             placeholders = re.findall(self.variable_placeholder_re, ret)
             for placeholder in placeholders:
-                print(f"{image} has placeholders {placeholders}")
+                debug_print(f"{image} has placeholders {placeholders}", DEBUG_PRINT)
                 value = vars[placeholder]
                 ret = re.sub(self.variable_placeholder_re, value, ret, 1)
-            print(f"{image}={ret}")
+            debug_print(f"{image}={ret}", DEBUG_PRINT)
         except KeyError as e:
-            print(f"No {image} in test environment")
+            error_print(e, message=f"No {image} in test environment")
             ret = None
         return ret
 
@@ -45,7 +46,7 @@ class KubernetesManifest(Sizing):
                 for i in range(0, len(docs)):
                     doc = docs[i]
                     if doc is not None and doc in cont_docs:
-                        print("Processing doc kind : {}".format(doc["kind"]))
+                        debug_print("Processing doc kind : {}".format(doc["kind"]), DEBUG_PRINT)
                         name = None
                         try:
                             doc_flat = flatten(doc)
@@ -61,18 +62,18 @@ class KubernetesManifest(Sizing):
                                     image_inter = self.interpolate_image(variables, image)
                                     c['image'] = image_inter
                             except KeyError as e:
-                                print("initContainers not present for {}, {}".format(name, e))
+                                error_print(e, f"initContainers not present for {name}")
                             doc = unflatten(doc_flat)
                             with open(Path(self.kustomize_builds_dir, name + '_inter.yaml'), 'w') as outfile:
                                 yaml.dump(doc, outfile, default_flow_style=False)
                         except KeyError as e:
-                            print("image is empty dict, KeyError {}".format(e))
+                            error_print(e, f"image is empty dict")
                     docs[i] = doc
                 with open(self.interpolated_yaml, 'w') as outfile:
-                    print(f"Writing {self.interpolated_yaml.resolve()}")
+                    debug_print(f"Writing {self.interpolated_yaml.resolve()}", DEBUG_PRINT)
                     yaml.dump_all(docs, outfile, default_flow_style=False)
-            except yaml.YAMLError as exc:
-                print(exc)
+            except yaml.YAMLError as e:
+                error_print(e)
 
 
 def load_vars(var_file):
@@ -85,10 +86,10 @@ def load_vars(var_file):
                     data_dict = doc["data"]
                     variables.update(data_dict)
                 except KeyError as e:
-                    print("{} does not contain 'data'".format(var_file))
-                    continue
-        except yaml.YAMLError as exc:
-            print(exc)
+                    error_print(e)
+                continue
+        except yaml.YAMLError as e:
+            error_print(e)
         return variables
 
 
@@ -100,15 +101,15 @@ def switch_loaded_config_map(kust_dir):
             docs = list(yaml.safe_load_all(r_stream))
             resources = docs[0]['resources'] if len(docs) == 1 else None
             env_def = os.environ["TEST_ENV"] + '.yaml'
-            print("test env : {}".format(env_def))
+            debug_print(f"test env : {env_def}", DEBUG_PRINT)
             if resources is not None:
                 resources.append(env_def)
                 new_doc = docs[0]
-        except yaml.YAMLError as y_e:
-            print(y_e)
+        except yaml.YAMLError as e:
+            error_print(e)
 
     with open(kust_yaml, 'w') as w_stream:
         try:
             yaml.dump(new_doc, w_stream)
-        except yaml.YAMLError as y_e:
-            print(y_e)
+        except yaml.YAMLError as e:
+            error_print(e)

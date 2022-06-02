@@ -1,4 +1,5 @@
 import argparse
+import os
 from pathlib import Path
 
 from cpt.parse_log import LogFile, LineProcessor
@@ -11,9 +12,6 @@ def setup_arg_parser():
                         help='location of frontend log file')
     parser.add_argument('--output_dir', type=str, required=True,
                         help='location artifacts produced by processing the frontend log')
-    mutex_group = parser.add_mutually_exclusive_group(required=True)
-    mutex_group.add_argument('-gql', help='extract individual GQLs', action='store_true')
-    mutex_group.add_argument("-trx", help="extract individual frontend transactions", action='store_true')
     return parser
 
 
@@ -32,17 +30,16 @@ if __name__ == '__main__':
     print(f"log file:{log_file.absolute()}")
     print(f"output dir:{output_dir.absolute()}")
 
+    # origin of output file - exposed by shell scripts
+    # TODO oring of parsed file passed as argument from calling shell script
+    # e.g. bin/lr_vugen_test.sh:process_vugen_log()
+    vugen_script = os.getenv('LR_VUGEN_SCRIPT')
     pr = ParseResults()
     lp = LineProcessor(request_response_log_rules)
-    lf = LogFile(log_file, output_dir, pr=pr, lp=lp)
+    lf = LogFile(log_file, output_dir, pr=pr, lp=lp, test_runs=5, vugen_script=vugen_script)
 
     lf.parse_all()
-    if args.trx:
-        lf.print_fe_transactions()
-        lf.save_fe_transactions()
-        lf.fe_transaction_elk()
-    elif args.gql:
-        lf.print_gqls()
-        lf.save_gqls()
-    else:
-        print(f'Unknown target')
+
+    lf.save_fe_transactions()
+    lf.fe_transaction_elk()
+    lf.save_gqls()

@@ -6,6 +6,7 @@ import pandas as pd
 import yaml
 from jinja2 import Template
 
+from cpt.common import debug_print, DEBUG_PRINT, ERROR_PRINT, error_print
 from cpt.constants import RESOURCE_RE, units_conversion
 
 
@@ -30,7 +31,7 @@ class Sizing:
         metrics = extract_resources(input_yaml)
         volumes = extract_volumes(input_yaml)
         metrics.update({'volumes': volumes})
-        print(f"Create sizing from {input_yaml} to {output_json}")
+        debug_print(f"Create sizing from {input_yaml} to {output_json}", DEBUG_PRINT)
         with open(output_json, "w") as json_file:
             json.dump(metrics, json_file, indent=4, sort_keys=True)
         # remove key for html/csv
@@ -55,20 +56,20 @@ def extract_volumes(file):
                 if doc is not None:
                     resources = None
                     storage = None
-                    print("Processing doc kind : {}".format(doc["kind"]))
+                    debug_print("Processing doc kind : {}".format(doc["kind"]), DEBUG_PRINT)
                     try:
                         volumes = doc["spec"]["volumeClaimTemplates"][0]["spec"]["resources"]["requests"]
                         service_name = doc["spec"]["serviceName"]
                     except KeyError as e:
-                        print("volumeClaimTemplates can't be read from doc kind : {}".format(doc["kind"]))
+                        error_print(e)
                         continue
                     try:
                         resources = volumes["storage"]
                         resources_dict[service_name] = resources
                     except KeyError as e:
-                        print("name : {}, resources : {} KeyError {}".format(storage, resources, e))
-        except yaml.YAMLError as exc:
-            print(exc)
+                        debug_print("name : {}, resources : {} KeyError {}".format(storage, resources, e), ERROR_PRINT)
+        except yaml.YAMLError as e:
+            error_print(e)
         return resources_dict
 
 
@@ -124,7 +125,7 @@ def normalize_metrics(metrics):
         l_cpu = get_resources(resources, 'limits', 'cpu')
         r_mem = get_resources(resources, 'requests', 'memory')
         r_cpu = get_resources(resources, 'requests', 'cpu')
-        print("get resource values for module {}".format(module))
+        debug_print("get resource values for module {}".format(module), DEBUG_PRINT)
         metrics[module]['limits']['memory'] = resource_value(l_mem)
         metrics[module]['limits']['cpu'] = resource_value(l_cpu)
         metrics[module]['requests']['memory'] = resource_value(r_mem)
@@ -169,39 +170,39 @@ def extract_resources(file):
                     name = None
                     image = None
                     # only doc kind = Deployment has resources etc.
-                    print("Processing doc kind : {}".format(doc["kind"]))
+                    debug_print("Processing doc kind : {}".format(doc["kind"]), DEBUG_PRINT)
                     container = doc["spec"]["template"]["spec"]["containers"][0]
                     try:
                         name = container["name"]
                     except KeyError as e:
-                        print("name : {}, resources : {} KeyError {}".format(name, resources, e))
+                        debug_print("name : {}, resources : {} KeyError {}".format(name, resources, e), ERROR_PRINT)
                     try:
                         resources = container["resources"]
                     except KeyError as e:
-                        print("name : {}, resources set to empty dict, KeyError {}".format(name, e))
+                        error_print(e, f"name : {name}, resources set to empty dict")
                         resources = {}  # empty is not None
                     try:
                         image = container["image"]
                     except KeyError as e:
-                        print("name : {}, image set to empty dict, KeyError {}".format(name, e))
+                        error_print(e, f"name : {name}, image set to empty dict")
                         resources = {}  # empty is not None
                     try:
                         replicas = doc["spec"]["replicas"]
                     except KeyError as e:
-                        print("name : {}, replicas set to None, KeyError {}".format(name, e))
+                        error_print(e, f"name : {name}, replicas set to None")
                         replicas = None
                 if name is not None and resources is not None:
                     if resources:
-                        print("Add non empty resources {} = {}".format(name, resources))
+                        debug_print("Add non empty resources {} = {}".format(name, resources), DEBUG_PRINT)
                         resources.update({'replicas': replicas})
                         resources.update({'image': image})
                         resources_dict[name] = resources
                     else:
                         # can't explicitly access keys limits and requests - leads to unclear html template
-                        print("Add empty resources for {}".format(name))
+                        debug_print("Add empty resources for {}".format(name), DEBUG_PRINT)
                         resources_dict[name] = {'limits': {}, 'requests': {}, 'replicas': {}}
-        except yaml.YAMLError as exc:
-            print(exc)
+        except yaml.YAMLError as e:
+            error_print(e)
         return resources_dict
 
 
@@ -212,8 +213,8 @@ def containers(docs):
             # test existence of the keys
             test = doc["spec"]["template"]["spec"]["containers"]
             d_c.append(doc)
-            print("containers found in : {}".format(doc["kind"]))
+            debug_print("containers found in : {}".format(doc["kind"]), DEBUG_PRINT)
         except KeyError as e:
-            # print("containers can't be read from doc kind : {}".format(doc["kind"]))
+            error_print(e)
             continue
     return d_c

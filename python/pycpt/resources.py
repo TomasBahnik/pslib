@@ -2,6 +2,7 @@ import argparse
 import os
 from pathlib import Path
 
+from cpt.common import debug_print, DEBUG_PRINT
 from cpt.kustomize import load_vars, switch_loaded_config_map, KubernetesManifest
 from cpt.sizing import Sizing
 
@@ -27,9 +28,9 @@ if __name__ == '__main__':
     builds_dir = args.kustomize_builds_dir
     subfolder = args.subfolder
     git_dir = args.kustomize_git_dir
-    print(f"kustomize builds dir:{builds_dir}")
-    print(f"kustomize builds subfolder:{subfolder}")
-    print(f"kustomize_git_dir:{git_dir}")
+    debug_print(f"kustomize builds dir:{builds_dir}", DEBUG_PRINT)
+    debug_print(f"kustomize builds subfolder:{subfolder}", DEBUG_PRINT)
+    debug_print(f"kustomize_git_dir:{git_dir}", DEBUG_PRINT)
 
     km = KubernetesManifest(builds_dir, git_dir, subfolder)
     sizing = Sizing(builds_dir, subfolder)

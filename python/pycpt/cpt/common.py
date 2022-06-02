@@ -37,11 +37,28 @@ SCRIPT_STEP_OUTPUT_RE_COMPILED = re.compile(SCRIPT_STEP_OUTPUT_RE)
 
 LR_VUGEN_SCRIPT = os.getenv('LR_VUGEN_SCRIPT')
 
+DEBUG_PRINT = False
+ERROR_PRINT = True
+
+
+def debug_print(message, print_debug):
+    if print_debug:
+        print(message)
+
+
+def error_print(error: Exception, message: str = ''):
+    """error message must be set in order to print error"""
+    error_name = error.__class__.__name__
+    # do not print key errors
+    # is_not_key_error = error_name != 'KeyError'
+    message_is_not_empty = len(message) > 1
+    debug_print(f"{error_name}:{message}", message_is_not_empty and ERROR_PRINT)
+
 
 class FeTransaction2Gql:
     def __init__(self, trx_name: str, gql: dict, iteration: int):
         self.trx_name = trx_name
-        self.gql = gql
+        self.gql: dict = gql
         self.iteration = iteration
 
 
