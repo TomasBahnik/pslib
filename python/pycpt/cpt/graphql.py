@@ -2,11 +2,6 @@ import logging
 
 import requests
 
-MMM_BUILD_INFO_GQL = {
-    "query": "query getBuildInfo {\n  _buildInfo {\n    branch\n    buildHost\n    buildUserName\n    buildVersion\n  "
-             "  commitId\n    commitIdAbbrev\n    commitTime\n    commitUserName\n    totalCommitCount\n  }\n}\n",
-    "operationName": "getBuildInfo"}
-
 logger = logging.getLogger(__name__)
 
 
@@ -18,12 +13,13 @@ class MMMDbMetrics:
 
 
 # from index.json
-GQL_ORDER = 'gqlOrder'
-GQL_HASH_MD5 = 'gqlHashMD5'
-GQL_LENGTH = 'gqlLength'
-GQL_VARIABLES_LENGTH = 'variablesLength'
-GQL_VARIABLES_HASH_MD5 = 'variablesHashMD5'
-GQL_FE_TRANSACTION = 'uiTransaction'
+# GQL_ORDER = 'gqlOrder'
+# GQL_HASH_MD5 = 'gqlHashMD5'
+# GQL_LENGTH = 'gqlLength'
+# GQL_VARIABLES_LENGTH = 'variablesLength'
+# GQL_VARIABLES_HASH_MD5 = 'variablesHashMD5'
+# GQL_FE_TRANSACTION = 'uiTransaction'
+OPERATION_NAME = 'operationName'
 
 
 # loaded from csv from ELK
@@ -74,6 +70,3 @@ def post_gql(url, user, password, data):
     returned_data = r.json()['data']['_buildInfo']
     logger.debug("Returned data %s", returned_data)
     return returned_data
-
-
-OPERATION_NAME = 'operationName'

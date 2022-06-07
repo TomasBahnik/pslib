@@ -82,13 +82,17 @@ class LogFile:
                  pr: ParseResults,
                  lp: LineProcessor,
                  test_runs: int = 4,
-                 vugen_script: str = 'fe'):
+                 log_origin: str = 'fe'):
         self.log_file = log_file
         self.output_dir = output_dir
         self.pr = pr
         self.lp = lp
         self.test_runs = test_runs
-        self.vugen_script = vugen_script
+        self.log_origin = log_origin
+        self.create_dir()
+
+    def create_dir(self):
+        os.makedirs(self.output_dir, exist_ok=True)
 
     def parse_all(self):
         with open(self.log_file, encoding='windows-1252') as input_file:
@@ -113,31 +117,23 @@ class LogFile:
     def save_fe_transactions(self):
         """ Save fe trx as json and html to output dir"""
         fe_trx_dict = [x.__dict__ for x in self.pr.ended_fe_transaction]
-        summary_file_name = Path(self.output_dir, f"{self.vugen_script}_summary")
+        summary_file_name = Path(self.output_dir, f"{self.log_origin}_summary")
         with open("{}.json".format(summary_file_name), "w") as json_file:
             json.dump(fe_trx_dict, json_file, indent=4, sort_keys=True)
         html = fe_transaction_html_template().render(trxs=fe_trx_dict)
         with open("{}.html".format(summary_file_name), "w") as html_file:
             html_file.write(html)
 
+    def save_elk_events(self):
+        file_name = Path(self.output_dir, f"{self.log_origin}_feElkEvents.json")
+        with open(file_name, "w") as json_file:
+            json.dump(self.pr.fe_elk_events, json_file, indent=4, sort_keys=True)
+
     def fe_transaction_elk(self):
-        """Prepares and sends ELK events for fe transaction
-            number of GQLs inside fe transaction - counts also unassigned GQLs
-            build info from GQL API
-            most of the fields is copied from self.pr.fe_gql
-        """
+        """Prepares and sends ELK events for fe transaction"""
         self.pr.set_gql_counts()
         self.pr.set_fe_elk_events()
         self.save_elk_events()
-        # cpt.elk_events.post_elk_event
-        # cpt.parse_trx.post_elk_events
-        # post_elk_events - respect property ELK_SENT_EVENTS=true/false
-        pass
-
-    def save_elk_events(self):
-        file_name = Path(self.output_dir, f"{self.vugen_script}_feElkEvents.json")
-        with open(file_name, "w") as json_file:
-            json.dump(self.pr.fe_elk_events, json_file, indent=4, sort_keys=True)
 
     def save_gqls(self):
         test_tag = datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S")
@@ -152,10 +148,9 @@ class LogFile:
                                gqlQuery=gql_query,
                                operationName=g.gql[OPERATION_NAME])
             gql_tests.append(gql_test)
-        # save GQL query to generated dir, use MD5 hash as subdir
-        generated_dir = Path(self.output_dir, 'generated')
+        # save GQL query to output dir, use MD5 hash as subdir
         for g_t in gql_tests:
-            gql_file_dir = Path(generated_dir, f"{g_t.gqlHashMD5}")
+            gql_file_dir = Path(self.output_dir, f"{g_t.gqlHashMD5}")
             os.makedirs(gql_file_dir, exist_ok=True)
             gql_file_name = Path(gql_file_dir, f"{g_t.operationName}.graphql")
             try:
@@ -174,6 +169,6 @@ class LogFile:
                 # remove GQL query
                 g_t_dict.pop('gqlQuery')
                 tests_multiple_runs.append(g_t_dict)
-        index_file_dir = Path(generated_dir, "index.json")
+        index_file_dir = Path(self.output_dir, "index.json")
         with open(index_file_dir, "w") as json_file:
             json.dump(tests_multiple_runs, json_file, indent=4, sort_keys=True)

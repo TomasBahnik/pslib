@@ -1,10 +1,8 @@
 import argparse
 import os
-from pathlib import Path
 
 from cpt.common import debug_print, DEBUG_PRINT
-from cpt.kustomize import load_vars, switch_loaded_config_map, KubernetesManifest
-from cpt.sizing import Sizing
+from cpt.kustomize import KubernetesManifest
 
 
 def setup_arg_parser():
@@ -32,14 +30,11 @@ if __name__ == '__main__':
     debug_print(f"kustomize builds subfolder:{subfolder}", DEBUG_PRINT)
     debug_print(f"kustomize_git_dir:{git_dir}", DEBUG_PRINT)
 
-    km = KubernetesManifest(builds_dir, git_dir, subfolder)
-    sizing = Sizing(builds_dir, subfolder)
+    km = KubernetesManifest(builds_dir, git_dir, subfolder, test_env=os.getenv("TEST_ENV"))
     if args.sc:
         # does not require other args - complicates redeploy_kust.sh
-        switch_loaded_config_map(km.kustomize_git_dir)
+        km.switch_loaded_config_map()
     elif args.rv:
-        # TODO vars_yaml Path contains TEST_ENV
-        vars_yaml = Path(km.kustomize_git_dir, os.environ["TEST_ENV"] + '.yaml')
-        vs = load_vars(vars_yaml)
-        km.load_manifest(vs)
-        sizing.save_sizing()
+        km.load_vars()
+        km.load_manifest()
+        km.save_sizing()

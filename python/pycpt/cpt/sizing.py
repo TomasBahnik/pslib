@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from typing import List
 
@@ -21,6 +22,10 @@ class Sizing:
         self.subfolder_path = Path(kustomize_builds_dir, subfolder)
         self.interpolated_yaml = Path(self.subfolder_path, interpolated_m)
         self.generic_yaml = Path(self.subfolder_path, generic_m)
+        self.create_dir()
+
+    def create_dir(self):
+        os.makedirs(self.subfolder_path, exist_ok=True)
 
     def save_sizing(self, base_file_name='sizing'):
         dir_path = self.subfolder_path

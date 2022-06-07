@@ -12,6 +12,8 @@ def setup_arg_parser():
                         help='location of frontend log file')
     parser.add_argument('--output_dir', type=str, required=True,
                         help='location artifacts produced by processing the frontend log')
+    parser.add_argument('--log_origin', type=str, required=True,
+                        help='source of the log file e.g. Vugen script name')
     return parser
 
 
@@ -27,8 +29,11 @@ if __name__ == '__main__':
 
     log_file = Path(args.log_file)
     output_dir = Path(args.output_dir)
+    log_origin = args.log_origin
+
     print(f"log file:{log_file.absolute()}")
     print(f"output dir:{output_dir.absolute()}")
+    print(f"log origin:{log_origin}")
 
     # origin of output file - exposed by shell scripts
     # TODO oring of parsed file passed as argument from calling shell script
@@ -36,7 +41,7 @@ if __name__ == '__main__':
     vugen_script = os.getenv('LR_VUGEN_SCRIPT')
     pr = ParseResults()
     lp = LineProcessor(request_response_log_rules)
-    lf = LogFile(log_file, output_dir, pr=pr, lp=lp, test_runs=5, vugen_script=vugen_script)
+    lf = LogFile(log_file, output_dir, pr=pr, lp=lp, test_runs=5, log_origin=log_origin)
 
     lf.parse_all()
 
