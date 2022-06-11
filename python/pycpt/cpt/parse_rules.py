@@ -7,8 +7,8 @@ from typing import NamedTuple, Pattern, Callable, Tuple, List
 
 import requests
 
-from cpt.common import FeTransaction, FeTransaction2Gql, LOG_TIMESTAMP_RE, SCRIPT_STARTED_RE, START_ITER, START_TRX, \
-    END_TRX, END_TRX_PASSED_THINK_TIME, END_TRX_PASSED, OPERATION_NAME_START_RE, FeTransactionGqlCount
+from cpt.common import LOG_TIMESTAMP_RE, SCRIPT_STARTED_RE, START_ITER, START_TRX, \
+    END_TRX, END_TRX_PASSED_THINK_TIME, END_TRX_PASSED, OPERATION_NAME_START_RE
 
 STATUS_FAIL = 'Fail'
 STATUS_PASS = 'Pass'
@@ -61,6 +61,42 @@ class FeTransactionTestResultEvent:
         self.sqlServiceType = None
         self.gqlCount = -1
         self.iteration = 0
+
+
+class FeTransaction2Gql:
+    def __init__(self, trx_name: str, gql: dict, iteration: int):
+        self.trx_name = trx_name
+        self.gql: dict = gql
+        self.iteration = iteration
+
+
+class FeTransaction:
+    def __init__(self, name: str, status: str,
+                 end_time: str = '', error: str = '',
+                 iteration: int = 0, duration: float = 0,
+                 wasted_time: float = 0, think_time: float = 0):
+        self.trx_name = name
+        self.status = status
+        self.duration = duration
+        self.think_time = think_time
+        self.wasted_time = wasted_time
+        self.trx_time = round((duration - wasted_time), 3)
+        self.error = error
+        self.iteration = iteration
+        self.end_time = end_time
+
+
+class FeTransactionGqlCount:
+    def __init__(self, trx_name, gql_count, iteration):
+        self.trx_name = trx_name
+        self.gql_count = gql_count
+        self.iteration = iteration
+
+    def __str__(self):
+        if self.trx_name is not None:
+            return str(self.iteration) + "." + self.trx_name + " : " + str(self.gql_count) + " GQLs"
+        else:
+            return str(self.iteration) + ".Unassigned : " + str(self.gql_count) + " GQLs"
 
 
 class ParseResults:

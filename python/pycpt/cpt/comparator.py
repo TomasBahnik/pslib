@@ -7,7 +7,22 @@ from pandas import DataFrame
 
 VAR_LENGTH_COLUMN = 'Var Length'
 GQL_HASH_COLUMN = 'GQL Hash'
-MEAN = 'Avg Duration [ms]'
+
+MEAN = "Avg Execution [ms]"
+
+G_V_O_COLS = ["GQL Hash", "Var Length", "Operation Name", "Avg Duration [ms]", "Avg Execution [ms]",
+              "Max Duration [ms]", "50th percentile of Duration [ms]", "Count", "Lower Std dev", "Upper Std dev"]
+
+G_V_F_COLS = ["GQL Hash", "Var Length", "FE Transaction", "Avg Duration [ms]",
+              "Max Duration [ms]", "50th percentile of Duration [ms]", "Count", "Lower Std dev", "Upper Std dev"]
+
+drop_cols_gvo1 = [G_V_O_COLS.index("Avg Duration [ms]"),
+                  G_V_O_COLS.index("Max Duration [ms]"),
+                  G_V_O_COLS.index("50th percentile of Duration [ms]"),
+                  G_V_O_COLS.index("Lower Std dev"),
+                  G_V_O_COLS.index("Upper Std dev")]
+
+drop_cols_gvo2 = [G_V_O_COLS.index("Operation Name")] + drop_cols_gvo1
 
 
 @dataclass
@@ -23,11 +38,9 @@ class Measurement:
 
 
 class Comparator:
-    """ Kibana raw csv"""
+    """ Comparison based on Kibana raw csv from dashboards"""
 
     def __init__(self, m1: Measurement, m2: Measurement, suffixes: Tuple[str, str], output_dir: Path):
-        drop_cols_gvo1 = [4, 5, 7, 8]
-        drop_cols_gvo2 = [2, 4, 5, 7, 8]
         self.m1 = m1
         self.m2 = m2
         self.suffixes = suffixes

@@ -2,6 +2,7 @@ import os
 import subprocess
 from pathlib import Path
 
+from cpt.configuration import Configuration
 from cpt.kustomize import KubernetesManifest
 
 
@@ -30,20 +31,26 @@ def git_checkout(git_dir: Path, file: str):
 
 
 if __name__ == '__main__':
-    GENERIC_YAML_FILE_NAME = 'all_one20.yaml'
-    INTERPLATED_YAML_FILE_NAME = 'inter_all_one20.yaml'
+    resources = Path(os.getcwd(), '..', '..', '..', 'modules', 'api-tests', 'resources').resolve()
+    TEST_ENV = "paas_ci"
+    p = Configuration(resources, TEST_ENV)
+    p.set_raw_properties()
+    p.set_properties()
+
+    GENERIC_FILE = p.properties['kustomize.generic.file']
+    INTERPOLATED_FILE = p.properties['kustomize.interpolated.file']
     KUSTOMIZATION_YAML = 'kustomization.yaml'
-    TEST_ENV = "paas_dq"
-    KUST_GIT_DIR = "C:\\Users\\tomas.bahnik\\git\\ataccama\\gitlab\\cloud\\kustomize-base\\base\\ataccama-v2"
-    KUST_BUILDS_DIR = f"{os.getcwd()}\\kustomize_builds"
+    KUST_GIT_DIR = p.properties['kustomize.git.dir']
+    # KUST_BUILDS_DIR = f"{os.getcwd()}\\kustomize_builds"
+    KUST_BUILDS_DIR = p.properties['kustomize.build.dir']
     FOLDER = f"{TEST_ENV}_latest"
 
     km = KubernetesManifest(KUST_BUILDS_DIR, KUST_GIT_DIR, FOLDER,
                             test_env=TEST_ENV,
-                            generic_m=GENERIC_YAML_FILE_NAME,
-                            interpolated_m=INTERPLATED_YAML_FILE_NAME)
+                            generic_m=GENERIC_FILE,
+                            interpolated_m=INTERPOLATED_FILE)
     km.switch_loaded_config_map()
-    kustomize_build(Path(KUST_BUILDS_DIR), Path(KUST_GIT_DIR), FOLDER, GENERIC_YAML_FILE_NAME)
+    kustomize_build(Path(KUST_BUILDS_DIR), Path(KUST_GIT_DIR), FOLDER, GENERIC_FILE)
     git_checkout(Path(KUST_GIT_DIR), KUSTOMIZATION_YAML)
     km.load_vars()
     km.load_manifest()

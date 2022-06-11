@@ -1,6 +1,7 @@
 import json
 import sys
 from pathlib import Path
+from typing import List
 
 import requests
 
@@ -43,7 +44,32 @@ def elk_events_from_file(event_file: Path):
         elk_events = json.loads(f.read())
     print(f"elk base URL = {ELK_BASE_URL}")
     print(f"elk events size = {len(elk_events)}")
-    post_elk_events(elk_events)
+    events_stats(elk_events, "e9a1aa519ec0240e17698e19f062dc3d")
+    # post_elk_events(elk_events)
+
+
+def events_stats(events: List[dict], gql_hash: str):
+    passed = [e for e in events if e['event']['result'] == 'pass']
+    passed_hash = len([e for e in passed if e['event']['args']["gqlHashMD5"] == gql_hash])
+    failed = [e for e in events if e['event']['result'] == 'fail']
+    fh = [e['event'] for e in failed if e['event']['args']["gqlHashMD5"] == gql_hash]
+    failed_hash = len(fh)
+    print(f"{gql_hash} : passed:{passed_hash} failed:{failed_hash}")
+    i = len(events)
+    j = len(passed)
+    k = len(failed)
+    assert i == j + k
+    print(f"total {i}, passed:{j} failed:{k}")
+    m = 0
+    for f_h in fh:
+        m += 1
+        print(f"{m}.{f_h['error']['message']}")
+
+
+class EventsSender:
+    def __init__(self, events):
+        self.events = events
+        self.unsent_events: List = []
 
 
 if __name__ == '__main__':

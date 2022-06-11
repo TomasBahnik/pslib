@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from pathlib import Path
 from typing import List
@@ -7,8 +8,10 @@ import pandas as pd
 import yaml
 from jinja2 import Template
 
-from cpt.common import debug_print, DEBUG_PRINT, ERROR_PRINT, error_print
+from cpt.configuration import setup_logging, fullname
 from cpt.constants import RESOURCE_RE, units_conversion
+
+logger = setup_logging(logger_name=__name__, level=logging.INFO)
 
 
 class Sizing:
@@ -22,6 +25,7 @@ class Sizing:
         self.subfolder_path = Path(kustomize_builds_dir, subfolder)
         self.interpolated_yaml = Path(self.subfolder_path, interpolated_m)
         self.generic_yaml = Path(self.subfolder_path, generic_m)
+        self.logger = setup_logging(fullname(self))
         self.create_dir()
 
     def create_dir(self):
@@ -36,7 +40,7 @@ class Sizing:
         metrics = extract_resources(input_yaml)
         volumes = extract_volumes(input_yaml)
         metrics.update({'volumes': volumes})
-        debug_print(f"Create sizing from {input_yaml} to {output_json}", DEBUG_PRINT)
+        self.logger.info(f"Create sizing from {input_yaml} to {output_json}")
         with open(output_json, "w") as json_file:
             json.dump(metrics, json_file, indent=4, sort_keys=True)
         # remove key for html/csv
@@ -61,20 +65,20 @@ def extract_volumes(file):
                 if doc is not None:
                     resources = None
                     storage = None
-                    debug_print("Processing doc kind : {}".format(doc["kind"]), DEBUG_PRINT)
+                    logger.debug("Processing doc kind : {}".format(doc["kind"]))
                     try:
                         volumes = doc["spec"]["volumeClaimTemplates"][0]["spec"]["resources"]["requests"]
                         service_name = doc["spec"]["serviceName"]
                     except KeyError as e:
-                        error_print(e)
+                        logger.debug(e)
                         continue
                     try:
                         resources = volumes["storage"]
                         resources_dict[service_name] = resources
                     except KeyError as e:
-                        debug_print("name : {}, resources : {} KeyError {}".format(storage, resources, e), ERROR_PRINT)
+                        logger.debug("name : {}, resources : {} KeyError {}".format(storage, resources, e))
         except yaml.YAMLError as e:
-            error_print(e)
+            logger.debug(e)
         return resources_dict
 
 
@@ -130,7 +134,7 @@ def normalize_metrics(metrics):
         l_cpu = get_resources(resources, 'limits', 'cpu')
         r_mem = get_resources(resources, 'requests', 'memory')
         r_cpu = get_resources(resources, 'requests', 'cpu')
-        debug_print("get resource values for module {}".format(module), DEBUG_PRINT)
+        logger.debug("get resource values for module {}".format(module))
         metrics[module]['limits']['memory'] = resource_value(l_mem)
         metrics[module]['limits']['cpu'] = resource_value(l_cpu)
         metrics[module]['requests']['memory'] = resource_value(r_mem)
@@ -175,39 +179,39 @@ def extract_resources(file):
                     name = None
                     image = None
                     # only doc kind = Deployment has resources etc.
-                    debug_print("Processing doc kind : {}".format(doc["kind"]), DEBUG_PRINT)
+                    logger.debug("Processing doc kind : {}".format(doc["kind"]))
                     container = doc["spec"]["template"]["spec"]["containers"][0]
                     try:
                         name = container["name"]
                     except KeyError as e:
-                        debug_print("name : {}, resources : {} KeyError {}".format(name, resources, e), ERROR_PRINT)
+                        logger.debug("name : {}, resources : {} KeyError {}".format(name, resources, e))
                     try:
                         resources = container["resources"]
                     except KeyError as e:
-                        error_print(e, f"name : {name}, resources set to empty dict")
+                        logger.debug(f"{e} name : {name}, resources set to empty dict")
                         resources = {}  # empty is not None
                     try:
                         image = container["image"]
                     except KeyError as e:
-                        error_print(e, f"name : {name}, image set to empty dict")
+                        logger.debug(f"{e} name : {name}, image set to empty dict")
                         resources = {}  # empty is not None
                     try:
                         replicas = doc["spec"]["replicas"]
                     except KeyError as e:
-                        error_print(e, f"name : {name}, replicas set to None")
+                        logger.debug(f"{e} name : {name}, replicas set to None")
                         replicas = None
                 if name is not None and resources is not None:
                     if resources:
-                        debug_print("Add non empty resources {} = {}".format(name, resources), DEBUG_PRINT)
+                        logger.debug("Add non empty resources {} = {}".format(name, resources))
                         resources.update({'replicas': replicas})
                         resources.update({'image': image})
                         resources_dict[name] = resources
                     else:
                         # can't explicitly access keys limits and requests - leads to unclear html template
-                        debug_print("Add empty resources for {}".format(name), DEBUG_PRINT)
+                        logger.debug("Add empty resources for {}".format(name))
                         resources_dict[name] = {'limits': {}, 'requests': {}, 'replicas': {}}
         except yaml.YAMLError as e:
-            error_print(e)
+            logger.debug(e)
         return resources_dict
 
 
@@ -218,8 +222,8 @@ def containers(docs):
             # test existence of the keys
             test = doc["spec"]["template"]["spec"]["containers"]
             d_c.append(doc)
-            debug_print("containers found in : {}".format(doc["kind"]), DEBUG_PRINT)
+            logger.debug("containers found in : {}".format(doc["kind"]))
         except KeyError as e:
-            error_print(e)
+            logger.debug(e)
             continue
     return d_c

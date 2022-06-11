@@ -49,39 +49,3 @@ def error_print(error: Exception, message: str = ''):
     # is_not_key_error = error_name != 'KeyError'
     message_is_not_empty = len(message) > 1
     debug_print(f"{error_name}:{message}", message_is_not_empty and ERROR_PRINT)
-
-
-class FeTransaction2Gql:
-    def __init__(self, trx_name: str, gql: dict, iteration: int):
-        self.trx_name = trx_name
-        self.gql: dict = gql
-        self.iteration = iteration
-
-
-class FeTransactionGqlCount:
-    def __init__(self, trx_name, gql_count, iteration):
-        self.trx_name = trx_name
-        self.gql_count = gql_count
-        self.iteration = iteration
-
-    def __str__(self):
-        if self.trx_name is not None:
-            return str(self.iteration) + "." + self.trx_name + " : " + str(self.gql_count) + " GQLs"
-        else:
-            return str(self.iteration) + ".Unassigned : " + str(self.gql_count) + " GQLs"
-
-
-class FeTransaction:
-    def __init__(self, name: str, status: str,
-                 end_time: str = '', error: str = '',
-                 iteration: int = 0, duration: float = 0,
-                 wasted_time: float = 0, think_time: float = 0):
-        self.trx_name = name
-        self.status = status
-        self.duration = duration
-        self.think_time = think_time
-        self.wasted_time = wasted_time
-        self.trx_time = round((duration - wasted_time), 3)
-        self.error = error
-        self.iteration = iteration
-        self.end_time = end_time

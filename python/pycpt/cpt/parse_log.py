@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple, Any
 
-from cpt.common import error_print
+from cpt.configuration import setup_logging, fullname
 from cpt.graphql import OPERATION_NAME
 from cpt.parse_rules import Rule, ParseResults, STATUS_PASS
 from cpt.templates import fe_transaction_html_template
@@ -89,6 +89,12 @@ class LogFile:
         self.lp = lp
         self.test_runs = test_runs
         self.log_origin = log_origin
+        # successfully extracted and saved GQL tests
+        self.gql_tests: List[GqlTest] = []
+        # actual set of GQL tests stored in index.json
+        self.multiplied_gql_tests: List[dict] = []
+        self.n_gql_test: dict = {}
+        self.logger = setup_logging(fullname(self))
         self.create_dir()
 
     def create_dir(self):
@@ -135,9 +141,8 @@ class LogFile:
         self.pr.set_fe_elk_events()
         self.save_elk_events()
 
-    def save_gqls(self):
+    def prepare_gql_tests(self):
         test_tag = datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S")
-        gql_tests: List[GqlTest] = []
         for g in self.pr.fet_iter_gql:
             t_t = test_tag + "_" + str(g.iteration)
             gql_query = g.gql['query']
@@ -147,9 +152,15 @@ class LogFile:
                                variables=gql_variables,
                                gqlQuery=gql_query,
                                operationName=g.gql[OPERATION_NAME])
-            gql_tests.append(gql_test)
-        # save GQL query to output dir, use MD5 hash as subdir
-        for g_t in gql_tests:
+            self.gql_tests.append(gql_test)
+
+    def save_gql_tests(self):
+        """
+        Save GQL query to output dir, use MD5 hash as subdir. If obscure filename (operationName)
+        appears remove that GQL
+        """
+        self.logger.info(f"Saving {len(self.gql_tests)} GQL test to {self.output_dir} dir")
+        for g_t in self.gql_tests:
             gql_file_dir = Path(self.output_dir, f"{g_t.gqlHashMD5}")
             os.makedirs(gql_file_dir, exist_ok=True)
             gql_file_name = Path(gql_file_dir, f"{g_t.operationName}.graphql")
@@ -157,18 +168,57 @@ class LogFile:
                 with open(gql_file_name, 'w') as gql_file:
                     gql_file.write(g_t.gqlQuery)
             except FileNotFoundError as e:  # in case of invalid file name
-                error_print(error=e, message=f"Removing {g_t.operationName}")
+                self.logger.error(f"Removing {g_t.operationName}")
                 # remove gql with invalid operation name from index.json
-                gql_tests.remove(g_t)
-        # run the same GQL multiple times, tests are without gql query
-        tests_multiple_runs = []  # run the same GQL multiple time
-        for g_t in gql_tests:
+                self.gql_tests.remove(g_t)
+
+    def multiply_gql_tests(self):
+        """ Run the same GQL multiple times to get better stats """
+        self.logger.info(f"Multiplying {len(self.gql_tests)} GQL test by {self.test_runs}")
+        for g_t in self.gql_tests:
             for r in range(self.test_runs):
-                g_t.testRun = r + 1  # 1 based
-                g_t_dict = copy(g_t).__dict__
-                # remove GQL query
-                g_t_dict.pop('gqlQuery')
-                tests_multiple_runs.append(g_t_dict)
-        index_file_dir = Path(self.output_dir, "index.json")
-        with open(index_file_dir, "w") as json_file:
-            json.dump(tests_multiple_runs, json_file, indent=4, sort_keys=True)
+                tmp_g_t = copy(g_t)
+                tmp_g_t.testRun = r + 1  # 1 based
+                tmp_dict = tmp_g_t.__dict__
+                tmp_dict.pop('gqlQuery')
+                self.multiplied_gql_tests.append(tmp_g_t.__dict__)
+
+    def save_index(self):
+        index_file = Path(self.output_dir, "index.json")
+        self.logger.info(f"Saving index with {len(self.multiplied_gql_tests)} GQL test to {index_file}")
+        with open(index_file, "w") as json_file:
+            json.dump(self.multiplied_gql_tests, json_file, indent=4, sort_keys=True)
+
+    def count_gql_tests(self):
+        for g_t in self.multiplied_gql_tests:
+            g_hash = g_t["gqlHashMD5"]
+            v_hash = g_t["variablesHashMD5"]
+            v_length = g_t["variablesLength"]
+            o_n = g_t["operationName"]
+            try:
+                self.n_gql_test[g_hash]
+            except KeyError as e:
+                self.n_gql_test[g_hash] = {}
+                self.n_gql_test[g_hash]["operationName"] = o_n
+            try:
+                self.n_gql_test[g_hash][v_length]
+            except KeyError as e:
+                self.n_gql_test[g_hash][v_length] = 0
+            try:
+                self.n_gql_test[g_hash][v_hash]
+            except KeyError as e:
+                self.n_gql_test[g_hash][v_hash] = 0
+
+            self.n_gql_test[g_hash][v_hash] += 1
+            self.n_gql_test[g_hash][v_length] += 1
+
+        index_file = Path(self.output_dir, "gql_counts.json")
+        with open(index_file, "w") as json_file:
+            json.dump(self.n_gql_test, json_file, indent=4)
+
+    def save_gqls(self):
+        self.prepare_gql_tests()
+        self.save_gql_tests()
+        self.multiply_gql_tests()
+        self.count_gql_tests()
+        self.save_index()
