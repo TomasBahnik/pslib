@@ -1,40 +1,41 @@
 import argparse
 import os
+from pathlib import Path
 
-from cpt.common import debug_print, DEBUG_PRINT
-from cpt.kustomize import KubernetesManifest
+from cpt.configuration import Configuration
+from cpt.kustomize import KubernetesManifest, kustomize_build, git_checkout
 
 
 def setup_arg_parser():
     parser = argparse.ArgumentParser(description='Search and replace variables in Kustomize k8s manifets.')
-    parser.add_argument('--kustomize_builds_dir', type=str, required=True,
-                        help='location of file produced by kustomize build')
-    parser.add_argument('--kustomize_git_dir', type=str, required=True,
-                        help='location of Kustomize git working dir with context dependent variables')
     parser.add_argument('--subfolder', type=str, required=True,
                         help='env specific subfolder in kustomize build directory')
-    mutex_group = parser.add_mutually_exclusive_group(required=True)
-    mutex_group.add_argument('-sc', help='switch kubectl context configuration', action='store_true')
-    mutex_group.add_argument("-rv", help="replace variables", action='store_true')
     return parser
 
 
 if __name__ == '__main__':
-    parser = setup_arg_parser()
-    args = parser.parse_args()
+    args = setup_arg_parser().parse_args()
+    test_env = os.getenv("TEST_ENV")
+    subfolder_args = args.subfolder
 
-    builds_dir = args.kustomize_builds_dir
-    subfolder = args.subfolder
-    git_dir = args.kustomize_git_dir
-    debug_print(f"kustomize builds dir:{builds_dir}", DEBUG_PRINT)
-    debug_print(f"kustomize builds subfolder:{subfolder}", DEBUG_PRINT)
-    debug_print(f"kustomize_git_dir:{git_dir}", DEBUG_PRINT)
+    # load properties for given test env
+    # cwd = CPT_HOME
+    p = Configuration(test_env=test_env)
+    p.set_raw_properties()
+    p.set_properties()
 
-    km = KubernetesManifest(builds_dir, git_dir, subfolder, test_env=os.getenv("TEST_ENV"))
-    if args.sc:
-        # does not require other args - complicates redeploy_kust.sh
-        km.switch_loaded_config_map()
-    elif args.rv:
-        km.load_vars()
-        km.load_manifest()
-        km.save_sizing()
+    # get required properties
+    builds_dir = p.get_property('kustomize.build.dir')
+    git_dir = p.get_property('kustomize.git.dir')
+    generic_file = p.get_property('kustomize.generic.file')
+    interpolated_file = p.get_property('kustomize.interpolated.file')
+
+    km = KubernetesManifest(builds_dir, git_dir, subfolder_args,
+                            test_env=test_env, generic_m=generic_file,
+                            interpolated_m=interpolated_file)
+    km.switch_loaded_config_map()
+    kustomize_build(Path(builds_dir), Path(git_dir), subfolder_args, generic_file)
+    git_checkout(Path(git_dir), 'kustomization.yaml')
+    km.load_vars()
+    km.load_manifest()
+    km.save_sizing()

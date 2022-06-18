@@ -1,5 +1,11 @@
+import datetime
 import os
 import re
+import subprocess
+from pathlib import Path
+from typing import List
+
+import typer
 
 START_ITER_REGEXP = r"Starting\siteration\s(\d+)"
 START_ITER = re.compile(START_ITER_REGEXP)
@@ -17,8 +23,6 @@ END_TRX_PASSED_THINK_TIME = \
 LOG_TIMESTAMP_RE = re.compile(r"t=(\d+)ms")
 # Virtual User Script started at : 2020-10-05 11:27:34
 SCRIPT_STARTED_RE = re.compile(r"Virtual User Script.+(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2})")
-ELK_URL_FROM_OS = os.getenv('ELK_BASE_URL') if os.getenv('ELK_BASE_URL') else "http://log01a.do.prg-krl.atc:5050"
-ELK_BASE_URL = ELK_URL_FROM_OS if ELK_URL_FROM_OS.endswith("/") else ELK_URL_FROM_OS + '/'
 # {"operationName":"GetApplicationMode","variables":{}
 # TODO operationName -> OPERATION_NAME const can't escape '\' in f strings use """?
 # OPERATION_NAME_START = r"{\"operationName\":\"(\w+)\",\"variables\":(\{.*\})"
@@ -31,21 +35,29 @@ OPERATION_NAME_START_RE = re.compile(OPERATION_NAME_START)
 SCRIPT_STEP_OUTPUT_RE = r't=(\d+)ms:\sStep\s([\d\.]+):\s([a-zA-Z\s"]+[\w"])\s{4}'
 SCRIPT_STEP_OUTPUT_RE_COMPILED = re.compile(SCRIPT_STEP_OUTPUT_RE)
 
-LR_VUGEN_SCRIPT = os.getenv('LR_VUGEN_SCRIPT')
 
-DEBUG_PRINT = False
-ERROR_PRINT = True
+def list_files(folder: Path, file_type: str = '.txt'):
+    # traverse root directory, and list directories as dirs and files as files
+    file_type_files: List[Path] = []
+    for root, dirs, files in os.walk(folder):
+        for file in files:
+            if file.endswith(file_type):
+                l_f = Path(root, file)
+                file_type_files.append(l_f)
+    return file_type_files
 
 
-def debug_print(message, print_debug):
-    if print_debug:
-        print(message)
-
-
-def error_print(error: Exception, message: str = ''):
-    """error message must be set in order to print error"""
-    error_name = error.__class__.__name__
-    # do not print key errors
-    # is_not_key_error = error_name != 'KeyError'
-    message_is_not_empty = len(message) > 1
-    debug_print(f"{error_name}:{message}", message_is_not_empty and ERROR_PRINT)
+def archive_folder(src_path: Path, dest_path: Path, dest_base_file_name: str):
+    """
+    Create tar gz from 2nd to last dir of src_folder
+    archive file name = dest_file_name + datatime stamp + suffix
+    """
+    dt = datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S")
+    src_parts = src_path.parts
+    os.makedirs(dest_path, exist_ok=True)
+    dest_file_name = Path(str(dest_base_file_name) + "-" + dt + ".tar.gz")
+    typer.echo(f"archive {src_parts[-1]} -> {dest_file_name}")
+    # -C change dir to second to last backup dir and archive only this one
+    cmd = ['tar', '-C', str(Path(*src_parts[:-1])), '-czf', str(Path(dest_path, dest_file_name)), src_parts[-1]]
+    p = subprocess.run(cmd)
+    return p

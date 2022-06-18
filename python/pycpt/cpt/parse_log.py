@@ -3,6 +3,7 @@ import datetime
 import hashlib
 import json
 import os
+import sys
 from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
@@ -96,11 +97,21 @@ class LogFile:
         self.n_gql_test: dict = {}
         self.logger = setup_logging(fullname(self))
         self.create_dir()
+        self.parse_save()
 
     def create_dir(self):
         os.makedirs(self.output_dir, exist_ok=True)
 
+    def parse_save(self):
+        self.parse_all()
+        self.save_fe_transactions()
+        self.save_elk_events()
+        self.save_gqls()
+
     def parse_all(self):
+        if not self.log_file.exists():
+            self.logger.error(f"{self.log_file} does not exist. Exit")
+            sys.exit(1)
         with open(self.log_file, encoding='windows-1252') as input_file:
             for line in input_file.readlines():
                 stripped = line.strip()
@@ -131,15 +142,12 @@ class LogFile:
             html_file.write(html)
 
     def save_elk_events(self):
-        file_name = Path(self.output_dir, f"{self.log_origin}_feElkEvents.json")
-        with open(file_name, "w") as json_file:
-            json.dump(self.pr.fe_elk_events, json_file, indent=4, sort_keys=True)
-
-    def fe_transaction_elk(self):
         """Prepares and sends ELK events for fe transaction"""
         self.pr.set_gql_counts()
         self.pr.set_fe_elk_events()
-        self.save_elk_events()
+        file_name = Path(self.output_dir, f"{self.log_origin}_feElkEvents.json")
+        with open(file_name, "w") as json_file:
+            json.dump(self.pr.fe_elk_events, json_file, indent=4, sort_keys=True)
 
     def prepare_gql_tests(self):
         test_tag = datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S")

@@ -39,12 +39,6 @@ if __name__ == '__main__':
     # TODO oring of parsed file passed as argument from calling shell script
     # e.g. bin/lr_vugen_test.sh:process_vugen_log()
     vugen_script = os.getenv('LR_VUGEN_SCRIPT')
-    pr = ParseResults()
     lp = LineProcessor(request_response_log_rules)
-    lf = LogFile(log_file, output_dir, pr=pr, lp=lp, test_runs=5, log_origin=log_origin)
-
-    lf.parse_all()
-
-    lf.save_fe_transactions()
-    lf.fe_transaction_elk()
-    lf.save_gqls()
+    lf = LogFile(log_file, output_dir, pr=ParseResults(), lp=lp, test_runs=5, log_origin=log_origin)
+    lf.parse_save()

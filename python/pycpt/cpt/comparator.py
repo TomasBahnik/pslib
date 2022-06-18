@@ -5,6 +5,8 @@ from typing import Tuple
 import pandas as pd
 from pandas import DataFrame
 
+from cpt.configuration import setup_logging, fullname
+
 VAR_LENGTH_COLUMN = 'Var Length'
 GQL_HASH_COLUMN = 'GQL Hash'
 
@@ -47,8 +49,10 @@ class Comparator:
         self.output_dir = output_dir
         self.drop_labels_gvo1 = self.m1.df_gvo.columns[drop_cols_gvo1]
         self.drop_labels_gvo2 = self.m2.df_gvo.columns[drop_cols_gvo2]
+        self.logger = setup_logging(fullname(self))
 
     def merger_gqls(self):
+        self.logger.info(f"Comparing {self.m1.gql_varlen_on.resolve()} vs. {self.m2.gql_varlen_on.resolve()}")
         df1 = self.m1.df_gvo.drop(self.drop_labels_gvo1, axis=1, inplace=False)
         df2 = self.m2.df_gvo.drop(self.drop_labels_gvo2, axis=1, inplace=False)
         m = pd.merge(df1, df2, how='outer', on=[GQL_HASH_COLUMN, VAR_LENGTH_COLUMN], suffixes=self.suffixes)
