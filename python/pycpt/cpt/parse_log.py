@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import List, Tuple, Any
 
 from cpt.configuration import setup_logging, fullname
-from cpt.graphql import OPERATION_NAME
 from cpt.parse_rules import Rule, ParseResults, STATUS_PASS
 from cpt.templates import fe_transaction_html_template
 
@@ -78,6 +77,7 @@ class GqlTest:
 
 class LogFile:
     """ keep content of log file in structures """
+    OPERATION_NAME = 'operationName'
 
     def __init__(self, log_file: Path, output_dir: Path,
                  pr: ParseResults,
@@ -129,7 +129,7 @@ class LogFile:
     def print_gqls(self):
         print(f'{len(self.pr.fet_iter_gql)} gqls')
         for t in self.pr.fet_iter_gql:
-            print(f'{t.iteration}: {t.trx_name},{t.gql[OPERATION_NAME]}')
+            print(f'{t.iteration}: {t.trx_name},{t.gql[self.OPERATION_NAME]}')
 
     def save_fe_transactions(self):
         """ Save fe trx as json and html to output dir"""
@@ -159,7 +159,7 @@ class LogFile:
                                uiTransaction=g.trx_name,
                                variables=gql_variables,
                                gqlQuery=gql_query,
-                               operationName=g.gql[OPERATION_NAME])
+                               operationName=g.gql[self.OPERATION_NAME])
             self.gql_tests.append(gql_test)
 
     def save_gql_tests(self):

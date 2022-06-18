@@ -19,7 +19,6 @@ class MMMDbMetrics:
 # GQL_VARIABLES_LENGTH = 'variablesLength'
 # GQL_VARIABLES_HASH_MD5 = 'variablesHashMD5'
 # GQL_FE_TRANSACTION = 'uiTransaction'
-OPERATION_NAME = 'operationName'
 
 
 # loaded from csv from ELK

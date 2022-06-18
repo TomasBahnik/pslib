@@ -53,7 +53,7 @@ class Configuration:
     PROPERTY_PLACEHOLDER_RE = r"\${([\w\.-]+)}"
 
     def __init__(self, test_env: str,
-                 resources: Path = Path('modules', 'api-tests', 'resources').resolve()):
+                 resources: Path = Path('resources').resolve()):
         self.resources = resources
         self.test_env = test_env
         self.raw_properties: dict = {}
