@@ -19,15 +19,17 @@ class FrenchDeck:
         return self._cards[position]
 
     def spades_high(self,card: Card):
-        rank_value = FrenchDeck.ranks.index(card.rank)
-        return rank_value * len(self.suit_values) + self.suit_values[card.suit]
+        rank_value = self.ranks.index(card.rank)
+        # for new rank_value reserve slot of length=len(self.suit_values)
+        ret = rank_value * len(self.suit_values) + self.suit_values[card.suit]
+        return ret
 
 
 def main():
     deck = FrenchDeck()
     print(len(deck))
     for card in sorted(deck, key=deck.spades_high):
-        print(card)
+        print(f"{card}: high={deck.spades_high(card)}")
 
 if __name__ == "__main__":
     main()
