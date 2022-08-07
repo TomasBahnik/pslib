@@ -10,15 +10,18 @@ int main(void)
     scanf("%d", &x);
     int divisor = 20;
     int count = 0;
-    while (x > 1) {
-        if (x < 5 && x > 1) {
-            divisor = 1;
-        }
+    while (x >= 1) {
+//        if (x < 5 && x > 1) {  // work better without this part
+//            divisor = 1;
+//        }
         if (x >= divisor) {
-            x = x - divisor;
             count += 1;
-            if (x < divisor || x == 1) {
+            x = x - divisor;
+            if (x < divisor) {
                 printf("$ %d bills: %d\n", divisor, count);
+                count = 0;
+                if (x == 1)
+                    divisor = 1;
             }
         } else {
             count = 0;

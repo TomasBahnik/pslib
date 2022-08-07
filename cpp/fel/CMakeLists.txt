@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.16)
 project(fel)
 
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(fel
-        HW06/b3b36prg-hw06/queue.c HW06/b3b36prg-hw06/main.c)
+        C_programming/projects/02/dollars.c)
