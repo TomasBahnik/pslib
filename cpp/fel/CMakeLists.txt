@@ -12,7 +12,7 @@ add_executable(queue
 project(cprog)
 set(CMAKE_CXX_STANDARD 14)
 add_executable(cprog
-        C_programming/projects/03/books.h
-        C_programming/projects/03/books.c
-        C_programming/projects/main.c)
+        C_programming/projects/03/03.h
+        C_programming/projects/03/03.c
+        C_programming/projects/main.c )
 
