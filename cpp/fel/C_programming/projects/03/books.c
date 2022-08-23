@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-int main(void) {
+int books_test() {
     int gsi, group, code, item, digit;
     printf("Enter ISBN: ");
     scanf("%d-%d-%d-%d-%d", &gsi, &group, &code, &item, &digit);
