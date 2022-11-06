@@ -1,7 +1,8 @@
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
+import numpy as np
 from numpy import linalg as la
 
 DEBUG_PRINTS = True
@@ -66,6 +67,17 @@ def validate_matrix_data(matrix_data: List[List[str]]):
             assert len(row_items) == cols
 
 
+def np_matrix_data(matrix_data: List[List[str]]) -> List[np.ndarray]:
+    ret: List[np.ndarray] = []
+    for m_d in matrix_data:
+        m_rows = m_d[1:]
+        m_array = [list(map(int, row.split())) for row in m_rows]
+        np_array = np.array(m_array, dtype=int)
+        # print(f"matrix array shape:{np_array.shape}, matrix dims : {m_d[0]}")
+        ret.append(np.array(np_array, dtype=int))
+    return ret
+
+
 def operations_idx(input_file: List[str], operations: List[str]) -> List[int]:
     op_indexes: List[int] = []
     start_idx: int = 0
@@ -82,10 +94,20 @@ if __name__ == '__main__':
     ops = list_operations(i_f)
     ops_idx = operations_idx(input_file=i_f, operations=ops)
     m_data = matrix_data(input_file=i_f, op_indexes=ops_idx)
+    assert len(ops_idx) == len(m_data) - 1
     validate_matrix_data(matrix_data=m_data)
-    print(f"ops: {ops} length of ops : {len(ops)}")
-    print(f"ops_idx: {ops_idx} length of ops_idx : {len(ops_idx)}")
-    print(f"length of matrix data : {len(m_data)}")
+    np_m_d = np_matrix_data(matrix_data=m_data)
+    all_ops = ops + ['']
+    print(f"ops: {all_ops}")
+    x: List[Tuple[np.ndarray, str]] = list(zip(np_m_d, all_ops))
+    for m, o in x:
+        print(f"{m.shape}{o}", end='')
+    result = np.matmul(np_m_d[0], np_m_d[1]) - np_m_d[2] + np.matmul(np_m_d[3], np_m_d[4]) + np_m_d[5]
+    print(f"\n{result.shape}")
+    print(f"{result}")
+    # print(f"ops_idx: {ops_idx} length of ops_idx : {len(ops_idx)}")
+    # print(f"length of matrix data : {len(m_data)}")
+    # print(f"length of np matrix data : {len(np_m_d)}")
     # m_diag = np.diag((1, 2, 3))
     # det_eigenvalues(m_diag)
     # m1 = np.loadtxt(f)
