@@ -3,20 +3,6 @@ from pathlib import Path
 from typing import List, Tuple
 
 import numpy as np
-from numpy import linalg as la
-
-DEBUG_PRINTS = True
-
-
-def det_eigenvalues(matrix):
-    det = la.det(matrix)
-    ev = la.eig(matrix)
-    if DEBUG_PRINTS:
-        print('\nmatrix\n{}\n'.format(matrix))
-        print('\ndeterminant={}'.format(det))
-        # print('eigenvalues={}'.format(ev[0]))
-        # print('right eigenvectors\n{}'.format(ev[1]))
-
 
 ADD = '+'
 SUBTRACT = '-'
@@ -25,14 +11,7 @@ MULTIPLY = '*'
 OPERATIONS = [ADD, SUBTRACT, MULTIPLY]
 
 
-class MatrixExpression:
-    def __init__(self, dims, data, operation=None):
-        self.m_expression = (dims, data, operation)
-
-
 def load_input_file(file: Path) -> List[str]:
-    """ dims, data, operation """
-    m_expressions: List[MatrixExpression]
     with open(file, mode='r') as input_file:
         return [line.strip() for line in input_file.readlines()]
 
@@ -105,12 +84,3 @@ if __name__ == '__main__':
     result = np.matmul(np_m_d[0], np_m_d[1]) - np_m_d[2] + np.matmul(np_m_d[3], np_m_d[4]) + np_m_d[5]
     print(f"\n{result.shape}")
     print(f"{result}")
-    # print(f"ops_idx: {ops_idx} length of ops_idx : {len(ops_idx)}")
-    # print(f"length of matrix data : {len(m_data)}")
-    # print(f"length of np matrix data : {len(np_m_d)}")
-    # m_diag = np.diag((1, 2, 3))
-    # det_eigenvalues(m_diag)
-    # m1 = np.loadtxt(f)
-    # m1.transpose()
-    # det_eigenvalues(m1.transpose())
-    # sys.exit(0)
