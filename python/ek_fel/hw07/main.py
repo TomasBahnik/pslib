@@ -9,6 +9,8 @@ SUBTRACT = '-'
 MULTIPLY = '*'
 
 OPERATIONS = [ADD, SUBTRACT, MULTIPLY]
+OPERATIONS_PRIORITY = [0, 0, 1]
+OP_SIGN_PRIOR = list(zip(OPERATIONS, OPERATIONS_PRIORITY))
 
 
 def load_input_file(file: Path) -> List[str]:
@@ -78,9 +80,36 @@ if __name__ == '__main__':
     np_m_d = np_matrix_data(matrix_data=m_data)
     all_ops = ops + ['']
     print(f"ops: {all_ops}")
-    x: List[Tuple[np.ndarray, str]] = list(zip(np_m_d, all_ops))
-    for m, o in x:
-        print(f"{m.shape}{o}", end='')
+    expression: List[Tuple[np.ndarray, str]] = list(zip(np_m_d, all_ops))
+    ops_prior = [OP_SIGN_PRIOR for o in ops if OP_SIGN_PRIOR[0] == o]
+    operation_sign_priority: List[Tuple[str, int]] = [o_s_p for o in ops for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
+    executed = False
+    stop = len(operation_sign_priority)
+    result = []
+    for i in range(stop):
+        curr_o_p: int = operation_sign_priority[i][1]
+        curr_o_s: str = operation_sign_priority[i][0]
+        max_remaining_priorities = max([x[1] for x in operation_sign_priority[i:]])
+        # typer.echo(f"{i} : {curr_o_s} priority {curr_o_p}")
+        if curr_o_p < max_remaining_priorities:
+            if executed:
+                result = [curr_o_s, f"m{i + 1}"]
+                print(f"save({result} shape {np_m_d[i + 1].shape}")
+            else:
+                result = [curr_o_s]
+                print(f"save({result})")
+            executed = False
+        elif i < stop - 1:
+            result = [f'm{i}', curr_o_s, f'm{i + 1}']
+            if curr_o_s == MULTIPLY:
+                np_r = np.matmul(np_m_d[i], np_m_d[i + 1])
+                print(f"exec+save({result}) shape {np_r.shape}")
+            else:
+                print(f"exec+save({result})")
+            executed = True
+        else:
+            result = [curr_o_s, f'm{i + 1}']
+            print(f"save({result}) shape {np_m_d[i + 1].shape}")
     result = np.matmul(np_m_d[0], np_m_d[1]) - np_m_d[2] + np.matmul(np_m_d[3], np_m_d[4]) + np_m_d[5]
     print(f"\n{result.shape}")
     print(f"{result}")
