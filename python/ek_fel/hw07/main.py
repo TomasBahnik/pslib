@@ -73,32 +73,59 @@ def process_ops(operation_sign_priority, data: List[np.ndarray]):
     stop = len(operation_sign_priority)
     new_ops = []
     new_data = []
+    current_priorities = set([x[1] for x in operation_sign_priority])
+    if len(current_priorities) == 1:
+        # all priorities are the same we can proceed from left to right
+        np_r = data[0]
+        for i in range(stop):
+            current_op_sign: str = operation_sign_priority[i][0]
+            # if current_op_sign == MULTIPLY:
+            #     np_r = np.matmul(data[i], data[i + 1])
+            if current_op_sign == SUBTRACT:
+                np_r = np_r - data[i + 1]
+            if current_op_sign == ADD:
+                np_r = np_r + data[i + 1]
+        return [], [np_r]
+
     for i in range(stop):
         current_op_priority: int = operation_sign_priority[i][1]
         next_op_priority: int = operation_sign_priority[i + 1][1] if i < stop - 1 else None
         same_priority: bool = current_op_priority == next_op_priority
         current_op_sign: str = operation_sign_priority[i][0]
+        current_priorities = ([x[1] for x in operation_sign_priority])
         max_remaining_priorities = max([x[1] for x in operation_sign_priority[i:]])
         if current_op_priority < max_remaining_priorities:
             # if the next operation priority =  current_op_priority  add also f'm{i + 1}'
-            result = [current_op_sign, i + 1] if same_priority else [current_op_sign]
+            res = [current_op_sign, i + 1] if same_priority else [current_op_sign]
             new_ops.append(current_op_sign)
-            new_data.append(data[i + 1])
-            print(f"save({result} shape {data[i + 1].shape}")
+            if same_priority:
+                new_data.append(data[i + 1])
+                print(f"save({res} shape {data[i + 1].shape}")
+            else:
+                print(f"save({res} no data appended")
         elif i < stop - 1:  # not last operation and curr_o_p >= max_remaining_priorities
-            result = [i, current_op_sign, i + 1]
+            res = [i, current_op_sign, i + 1]
+            np_r = None
             if current_op_sign == MULTIPLY:
                 np_r = np.matmul(data[i], data[i + 1])
-                print(f"exec+save({result}) shape {np_r.shape}")
+                print(f"{i} {MULTIPLY} {i + 1} shape {np_r.shape}")
+                new_data.append(np_r)
+            if current_op_sign == SUBTRACT:
+                np_r = data[i] - data[i + 1]
+                print(f"{i} {SUBTRACT} {i + 1} shape {np_r.shape}")
+                new_data.append(np_r)
+            if current_op_sign == ADD:
+                np_r = data[i] + data[i + 1]
+                print(f"{i} {ADD} {i + 1} shape {np_r.shape}")
                 new_data.append(np_r)
             else:
-                print(f"exec+save({result})")
+                print(f"save({res})")
         else:  # current = last operation
-            result = [current_op_sign, i + 1]
+            res = [current_op_sign, i + 1]
             new_ops.append(current_op_sign)
             new_data.append(data[i + 1])
-            print(f"save({result}) shape {data[i + 1].shape}")
-    return new_ops
+            print(f"save({res}) shape {data[i + 1].shape}")
+    return new_ops, new_data
 
 
 if __name__ == '__main__':
@@ -110,10 +137,16 @@ if __name__ == '__main__':
     assert len(ops_idx) == len(m_data) - 1
     validate_matrix_data(matrix_data=m_data)
     np_m_d: List[np.ndarray] = np_matrix_data(matrix_data=m_data)
+    expected_result = np.matmul(np_m_d[0], np_m_d[1]) - np_m_d[2] + np.matmul(np_m_d[3], np_m_d[4]) + np_m_d[5]
     ops_prior = [OP_SIGN_PRIOR for o in ops if OP_SIGN_PRIOR[0] == o]
     op_sign_priority: List[Tuple[str, int]] = [o_s_p for o in ops for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
-    actual_result = process_ops(op_sign_priority, np_m_d)
-    print(actual_result)
-    # expected_result = np.matmul(np_m_d[0], np_m_d[1]) - np_m_d[2] + np.matmul(np_m_d[3], np_m_d[4]) + np_m_d[5]
-    # print(f"\n{result.shape}")
-    # print(f"{result}")
+    ops, np_m_d = process_ops(op_sign_priority, np_m_d)
+    print(f"1st paas: {ops}")
+    op_sign_priority: List[Tuple[str, int]] = [o_s_p for o in ops for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
+    ops, np_m_d = process_ops(op_sign_priority, np_m_d)
+    print(f"2nd paas: {ops}")
+    if len(np_m_d) == 1:
+        result = np_m_d[0]
+        print(f"result: {result}")
+        print(f"expected_result : {expected_result}")
+        print(f"expected_result == result  : {expected_result == result}")
