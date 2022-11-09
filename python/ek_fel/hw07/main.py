@@ -69,6 +69,38 @@ def operations_idx(input_file: List[str], operations: List[str]) -> List[int]:
     return op_indexes
 
 
+def process_ops(operation_sign_priority, data: List[np.ndarray]):
+    stop = len(operation_sign_priority)
+    new_ops = []
+    new_data = []
+    for i in range(stop):
+        current_op_priority: int = operation_sign_priority[i][1]
+        next_op_priority: int = operation_sign_priority[i + 1][1] if i < stop - 1 else None
+        same_priority: bool = current_op_priority == next_op_priority
+        current_op_sign: str = operation_sign_priority[i][0]
+        max_remaining_priorities = max([x[1] for x in operation_sign_priority[i:]])
+        if current_op_priority < max_remaining_priorities:
+            # if the next operation priority =  current_op_priority  add also f'm{i + 1}'
+            result = [current_op_sign, i + 1] if same_priority else [current_op_sign]
+            new_ops.append(current_op_sign)
+            new_data.append(data[i + 1])
+            print(f"save({result} shape {data[i + 1].shape}")
+        elif i < stop - 1:  # not last operation and curr_o_p >= max_remaining_priorities
+            result = [i, current_op_sign, i + 1]
+            if current_op_sign == MULTIPLY:
+                np_r = np.matmul(data[i], data[i + 1])
+                print(f"exec+save({result}) shape {np_r.shape}")
+                new_data.append(np_r)
+            else:
+                print(f"exec+save({result})")
+        else:  # current = last operation
+            result = [current_op_sign, i + 1]
+            new_ops.append(current_op_sign)
+            new_data.append(data[i + 1])
+            print(f"save({result}) shape {data[i + 1].shape}")
+    return new_ops
+
+
 if __name__ == '__main__':
     f = Path(sys.argv[1])
     i_f = load_input_file(f)
@@ -77,39 +109,11 @@ if __name__ == '__main__':
     m_data = matrix_data(input_file=i_f, op_indexes=ops_idx)
     assert len(ops_idx) == len(m_data) - 1
     validate_matrix_data(matrix_data=m_data)
-    np_m_d = np_matrix_data(matrix_data=m_data)
-    all_ops = ops + ['']
-    print(f"ops: {all_ops}")
-    expression: List[Tuple[np.ndarray, str]] = list(zip(np_m_d, all_ops))
+    np_m_d: List[np.ndarray] = np_matrix_data(matrix_data=m_data)
     ops_prior = [OP_SIGN_PRIOR for o in ops if OP_SIGN_PRIOR[0] == o]
-    operation_sign_priority: List[Tuple[str, int]] = [o_s_p for o in ops for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
-    executed = False
-    stop = len(operation_sign_priority)
-    result = []
-    for i in range(stop):
-        curr_o_p: int = operation_sign_priority[i][1]
-        curr_o_s: str = operation_sign_priority[i][0]
-        max_remaining_priorities = max([x[1] for x in operation_sign_priority[i:]])
-        # typer.echo(f"{i} : {curr_o_s} priority {curr_o_p}")
-        if curr_o_p < max_remaining_priorities:
-            if executed:
-                result = [curr_o_s, f"m{i + 1}"]
-                print(f"save({result} shape {np_m_d[i + 1].shape}")
-            else:
-                result = [curr_o_s]
-                print(f"save({result})")
-            executed = False
-        elif i < stop - 1:
-            result = [f'm{i}', curr_o_s, f'm{i + 1}']
-            if curr_o_s == MULTIPLY:
-                np_r = np.matmul(np_m_d[i], np_m_d[i + 1])
-                print(f"exec+save({result}) shape {np_r.shape}")
-            else:
-                print(f"exec+save({result})")
-            executed = True
-        else:
-            result = [curr_o_s, f'm{i + 1}']
-            print(f"save({result}) shape {np_m_d[i + 1].shape}")
-    result = np.matmul(np_m_d[0], np_m_d[1]) - np_m_d[2] + np.matmul(np_m_d[3], np_m_d[4]) + np_m_d[5]
-    print(f"\n{result.shape}")
-    print(f"{result}")
+    op_sign_priority: List[Tuple[str, int]] = [o_s_p for o in ops for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
+    actual_result = process_ops(op_sign_priority, np_m_d)
+    print(actual_result)
+    # expected_result = np.matmul(np_m_d[0], np_m_d[1]) - np_m_d[2] + np.matmul(np_m_d[3], np_m_d[4]) + np_m_d[5]
+    # print(f"\n{result.shape}")
+    # print(f"{result}")
