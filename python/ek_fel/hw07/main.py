@@ -131,7 +131,7 @@ def process_last_operation(op_idx, new_ops, new_data, current_op_sign, data):
     new_data.append(data[op_idx + 1])
 
 
-def process_ops(operations, data: List[np.ndarray]):
+def process_ops(operations, data: List[np.ndarray]) -> Tuple[List[str], List[np.ndarray]]:
     operation_sign_priority: List[Tuple[str, int]] = \
         [o_s_p for o in operations for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
     n_operations = len(operation_sign_priority)
@@ -160,9 +160,7 @@ def process_ops(operations, data: List[np.ndarray]):
                                    current_op_sign=current_op_sign, data=data)
     o, d = process_ops(new_ops, new_data)
     if len(d) == 1:
-        # no operations
-        assert len(o) == 0
-        return d[0]
+        return o, d
 
 
 if __name__ == '__main__':
@@ -171,9 +169,8 @@ if __name__ == '__main__':
     ops, ops_idx = op_sign_idx(input_file=i_f)
     matrices = matrix_data(input_file=i_f, op_indexes=ops_idx)
     assert len(ops_idx) == len(matrices) - 1
-    d = process_ops(ops, matrices)
-    print(f"result\n{d}")
-    expected_result = np.matmul(matrices[0], matrices[1]) - matrices[2] + np.matmul(matrices[3], matrices[4]) + \
-                      matrices[5]
-    print(f"expected_result\n{expected_result}")
-    print(f"expected_result == result\n{expected_result == d}")
+    op, result = process_ops(ops, matrices)
+    print(f"{result[0].shape}\n{result}")
+    # expected_result = np.matmul(matrices[0], matrices[1]) - matrices[2] + np.matmul(matrices[3], matrices[4]) +  matrices[5]
+    # print(f"expected_result\n{expected_result}")
+    # print(f"expected_result == result\n{expected_result == d}")
