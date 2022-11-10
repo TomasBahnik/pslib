@@ -29,31 +29,47 @@ def op_sign_idx(input_file: List[str]):
     return signs, indexes
 
 
-def matrix_data(input_file: List[str], op_indexes: List[int]):
+def to_int_data(m_data_str: List[List[str]]) -> List[np.ndarray]:
+    """ convert string (numerical) matrices to np arrays of type int
+        easy to multiply and sum
+    """
+    ret: List[np.ndarray] = []
+    for m_d in m_data_str:
+        # skip the row with dimensions
+        m_rows = m_d[1:]
+        m_array = [list(map(int, row.split())) for row in m_rows]
+        np_array = np.array(m_array, dtype=int)
+        ret.append(np.array(np_array, dtype=int))
+    return ret
+
+
+def matrix_data(input_file: List[str], op_indexes: List[int]) -> List[np.ndarray]:
     """ reads matrix data from input file
         first line are matrix dimensions rows x cols
         the rest is matrix data
     """
-    ret: List[List[str]] = []
+    m_data_str: List[List[str]] = []
     start_idx: int = 0
     for operation_idx in op_indexes:
         # reads all lines related to matrix i.e.
         # 1. row, cols
         # 2 matrix data  = all lines up to next operation
         m_d: List[str] = input_file[start_idx:operation_idx]
-        ret.append(m_d)
+        m_data_str.append(m_d)
         # move to index just after next operation
         # i.e.  start of the next matrix
         start_idx = operation_idx + 1
     last_m_data = input_file[start_idx:]
-    ret.append(last_m_data)
-    validate_matrix_data(ret)
-    return ret
+    m_data_str.append(last_m_data)
+    validate_matrix_data(m_data_str)
+    # convert to int matrices
+    m_data_int = to_int_data(m_data_str=m_data_str)
+    return m_data_int
 
 
-def validate_matrix_data(matrix_data: List[List[str]]):
+def validate_matrix_data(m_data_str: List[List[str]]):
     """ check the dimensions and actual number of rows and cols"""
-    for m_d in matrix_data:
+    for m_d in m_data_str:
         m_dims = list(map(int, m_d[0].split()))
         assert len(m_dims) == 2
         rows: int = m_dims[0]
@@ -63,20 +79,6 @@ def validate_matrix_data(matrix_data: List[List[str]]):
         for row_str in m_rows:
             row_items = list(map(int, row_str.split()))
             assert len(row_items) == cols
-
-
-def np_matrix_data(matrix_data: List[List[str]]) -> List[np.ndarray]:
-    """ convert string (numerical) matrices to np arrays of type int
-        easy to multiply and sum
-    """
-    ret: List[np.ndarray] = []
-    for m_d in matrix_data:
-        # skip the row with dimensions
-        m_rows = m_d[1:]
-        m_array = [list(map(int, row.split())) for row in m_rows]
-        np_array = np.array(m_array, dtype=int)
-        ret.append(np.array(np_array, dtype=int))
-    return ret
 
 
 def process_equal_priorities(operation_sign_priority, data: List[np.ndarray]):
@@ -167,13 +169,11 @@ if __name__ == '__main__':
     f = Path(sys.argv[1])
     i_f = load_input_file(f)
     ops, ops_idx = op_sign_idx(input_file=i_f)
-    m_data = matrix_data(input_file=i_f, op_indexes=ops_idx)
-    assert len(ops_idx) == len(m_data) - 1
-    np_m_d: List[np.ndarray] = np_matrix_data(matrix_data=m_data)
-    expected_result = np.matmul(np_m_d[0], np_m_d[1]) - np_m_d[2] + np.matmul(np_m_d[3], np_m_d[4]) + np_m_d[5]
-    ops_prior = [OP_SIGN_PRIOR for o in ops if OP_SIGN_PRIOR[0] == o]
-    op_sign_priority: List[Tuple[str, int]] = [o_s_p for o in ops for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
-    d = process_ops(ops, np_m_d)
+    matrices = matrix_data(input_file=i_f, op_indexes=ops_idx)
+    assert len(ops_idx) == len(matrices) - 1
+    d = process_ops(ops, matrices)
     print(f"result\n{d}")
+    expected_result = np.matmul(matrices[0], matrices[1]) - matrices[2] + np.matmul(matrices[3], matrices[4]) + \
+                      matrices[5]
     print(f"expected_result\n{expected_result}")
     print(f"expected_result == result\n{expected_result == d}")
