@@ -129,7 +129,9 @@ def process_last_operation(op_idx, new_ops, new_data, current_op_sign, data):
     new_data.append(data[op_idx + 1])
 
 
-def process_ops(operation_sign_priority, data: List[np.ndarray]):
+def process_ops(operations, data: List[np.ndarray]):
+    operation_sign_priority: List[Tuple[str, int]] = \
+        [o_s_p for o in operations for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
     n_operations = len(operation_sign_priority)
     new_ops = []
     new_data = []
@@ -154,7 +156,11 @@ def process_ops(operation_sign_priority, data: List[np.ndarray]):
         else:
             process_last_operation(op_idx=i, new_ops=new_ops, new_data=new_data,
                                    current_op_sign=current_op_sign, data=data)
-    return new_ops, new_data
+    o, d = process_ops(new_ops, new_data)
+    if len(d) == 1:
+        # no operations
+        assert len(o) == 0
+        return d[0]
 
 
 if __name__ == '__main__':
@@ -167,13 +173,7 @@ if __name__ == '__main__':
     expected_result = np.matmul(np_m_d[0], np_m_d[1]) - np_m_d[2] + np.matmul(np_m_d[3], np_m_d[4]) + np_m_d[5]
     ops_prior = [OP_SIGN_PRIOR for o in ops if OP_SIGN_PRIOR[0] == o]
     op_sign_priority: List[Tuple[str, int]] = [o_s_p for o in ops for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
-    ops, np_m_d = process_ops(op_sign_priority, np_m_d)
-    print(f"1st paas: {ops}")
-    op_sign_priority: List[Tuple[str, int]] = [o_s_p for o in ops for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
-    ops, np_m_d = process_ops(op_sign_priority, np_m_d)
-    print(f"2nd paas: {ops}")
-    if len(np_m_d) == 1:
-        result = np_m_d[0]
-        print(f"result\n{result}")
-        print(f"expected_result\n{expected_result}")
-        print(f"expected_result == result\n{expected_result == result}")
+    d = process_ops(ops, np_m_d)
+    print(f"result\n{d}")
+    print(f"expected_result\n{expected_result}")
+    print(f"expected_result == result\n{expected_result == d}")
