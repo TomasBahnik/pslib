@@ -126,9 +126,46 @@ def process_higher_priority(op_idx, new_data, current_op_sign, data):
         new_data.append(tmp_result)
 
 
+def process_priority(max_prior_ids: List[int], operations, next_data, next_ops,
+                     previous_data):
+    new_size = len(previous_data)
+    for i in range(len(operations)):
+        if i in max_prior_ids:
+            tmp_result = previous_data[i]
+            op_sign = operations[i]
+            if op_sign == MULTIPLY:
+                tmp_result = np.matmul(tmp_result, previous_data[i + 1])
+                new_size -= 1
+            if op_sign == SUBTRACT:
+                tmp_result = tmp_result - previous_data[i + 1]
+                new_size -= 1
+            if op_sign == ADD:
+                tmp_result = tmp_result + previous_data[i + 1]
+                new_size -= 1
+            next_data.append(tmp_result)
+        else:
+            next_ops.append(operations[i])
+
+
 def process_last_operation(op_idx, new_ops, new_data, current_op_sign, data):
     new_ops.append(current_op_sign)
     new_data.append(data[op_idx + 1])
+
+
+def process_expression(operations: List[str],
+                       data: List[np.ndarray]) -> Tuple[List[str], List[np.ndarray]]:
+    operation_sign_priority: List[Tuple[str, int]] = \
+        [o_s_p for o in operations for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
+    priorities = np.array([p[1] for p in operation_sign_priority])
+    max_priority = max(priorities)
+    max_priority_idx = np.where(priorities == max_priority)
+    new_ops = []
+    new_data = []
+    process_priority(max_prior_ids=max_priority_idx[0], operations=operations,
+                     next_data=new_data, next_ops=new_ops, previous_data=data)
+    o, d = process_expression(new_ops, new_data)
+    if len(d) == 1:
+        return o, d
 
 
 def process_ops(operations, data: List[np.ndarray]) -> Tuple[List[str], List[np.ndarray]]:
@@ -163,14 +200,75 @@ def process_ops(operations, data: List[np.ndarray]) -> Tuple[List[str], List[np.
         return o, d
 
 
-if __name__ == '__main__':
+def apply_op(operation: str, operand_1: int, operand_2: int) -> int:
+    match operation:
+        case '+':
+            return operand_1 + operand_2
+        case '-':
+            return operand_1 - operand_2
+        case '*':
+            return operand_1 * operand_2
+        case _:
+            print("unknown operation")
+
+
+def sign_priority(operations: List[str]) -> List[Tuple[str, int]]:
+    return [o_s_p for o in operations for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
+
+
+TEST_OPS: List[str] = [ADD, MULTIPLY, MULTIPLY, SUBTRACT, MULTIPLY]
+TEST_DATA = [10, 18, 5, 8, 21, 6]
+
+
+# 10 + 18 * 5 * 8 - 21 * 6
+
+
+def inner_loop():
+    s_p = sign_priority(TEST_OPS)
+    priorities = np.array([p[1] for p in s_p])
+    max_priority = max(priorities)
+    max_priority_idx = np.where(priorities == max_priority)[0]
+    first_max_idx = max_priority_idx[0]
+    # add all operations and operands preceding first_max_idx
+    new_data = TEST_DATA[:first_max_idx]
+    new_ops = TEST_OPS[:first_max_idx]
+    tmp = TEST_DATA[first_max_idx]
+    for i in range(len(max_priority_idx)):
+        curr_max_idx = max_priority_idx[i]
+        curr_ops = TEST_OPS[curr_max_idx]
+        next_max_idx = max_priority_idx[i + 1]
+        tmp = apply_op(curr_ops, tmp, TEST_DATA[curr_max_idx + 1])
+        # check how far is next max priority idx
+        # if 1 apply again if > 1 update next_data and next_ops
+        delta_idx = next_max_idx - curr_max_idx
+        if delta_idx == 1:
+            curr_max_idx = next_max_idx
+            curr_ops = TEST_OPS[curr_max_idx]
+            # recursion involves next i thus + 2
+            next_max_idx = max_priority_idx[i + 2]
+            tmp = apply_op(curr_ops, tmp, TEST_DATA[curr_max_idx + 1])
+            delta_idx = next_max_idx - curr_max_idx
+            if delta_idx == 1:
+                pass
+            else:
+                new_data.append(tmp)
+                # add ops and data up to next max idx TODO shift + 1
+                new_data = new_data + TEST_DATA[curr_max_idx + 2:next_max_idx]
+                new_ops = new_ops + TEST_OPS[curr_max_idx + 1:next_max_idx]
+                print(new_data)
+                print(new_ops)
+
+
+def matrix_expression():
     f = Path(sys.argv[1])
     i_f = load_input_file(f)
     ops, ops_idx = op_sign_idx(input_file=i_f)
     matrices = matrix_data(input_file=i_f, op_indexes=ops_idx)
     assert len(ops_idx) == len(matrices) - 1
-    op, result = process_ops(ops, matrices)
+    # op, result = process_ops(ops, matrices)
+    op, result = process_expression(ops, matrices)
     print(f"{result[0].shape}\n{result}")
-    # expected_result = np.matmul(matrices[0], matrices[1]) - matrices[2] + np.matmul(matrices[3], matrices[4]) +  matrices[5]
-    # print(f"expected_result\n{expected_result}")
-    # print(f"expected_result == result\n{expected_result == d}")
+
+
+if __name__ == '__main__':
+    inner_loop()
