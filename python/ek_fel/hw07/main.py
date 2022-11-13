@@ -167,7 +167,8 @@ def process_expression(operations: List[str], operands: List[np.ndarray]) -> Tup
             continue
         else:
             new_operands.append(tmp)
-            # id it last max priority operation add everything else only up to next priority position
+            # if it is the last max priority operation add everything
+            # else add all only up to the next priority position
             append_operands = operands[curr_max_idx + 2:] if last_max_idx \
                 else operands[curr_max_idx + 2:next_max_idx]
             new_operands = new_operands + append_operands
@@ -177,9 +178,9 @@ def process_expression(operations: List[str], operands: List[np.ndarray]) -> Tup
             new_ops = new_ops + append_operations
             # prepare for next calculation of max priority expression
             tmp = operands[next_max_idx]
+    # expression is DONE. Only 1 operand remains and NO operations
+    # RETURN results
     if len(new_operands) == 1:
-        result = new_operands[0]
-        # print(f"result = {result}")
         return new_ops, new_operands
     # !! repressively return values to parent function calls
     return process_expression(operations=new_ops, operands=new_operands)
