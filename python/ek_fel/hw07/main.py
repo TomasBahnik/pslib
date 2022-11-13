@@ -74,6 +74,7 @@ def validate_matrix_data(m_data_str: List[List[str]]):
 
 
 def apply_op(operation: str, operand_1: int, operand_2: int) -> int:
+    """ used for integer based operations"""
     match operation:
         case '+':
             return operand_1 + operand_2
@@ -86,12 +87,14 @@ def apply_op(operation: str, operand_1: int, operand_2: int) -> int:
 
 
 def apply_op_nd(operation: str, operand_1: np.ndarray, operand_2: np.ndarray) -> np.ndarray:
+    """ used for matrix based operations. matrix is represented as multidimensional (nd) array"""
     match operation:
         case '+':
             return operand_1 + operand_2
         case '-':
             return operand_1 - operand_2
         case '*':
+            # matmul = matrix multiplication
             return np.matmul(operand_1, operand_2)
         case _:
             print("unknown operation")
