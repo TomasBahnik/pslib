@@ -212,6 +212,18 @@ def apply_op(operation: str, operand_1: int, operand_2: int) -> int:
             print("unknown operation")
 
 
+def apply_op_nd(operation: str, operand_1: np.ndarray, operand_2: np.ndarray) -> np.ndarray:
+    match operation:
+        case '+':
+            return operand_1 + operand_2
+        case '-':
+            return operand_1 - operand_2
+        case '*':
+            return np.matmul(operand_1, operand_2)
+        case _:
+            print("unknown operation")
+
+
 def sign_priority(operations: List[str]) -> List[Tuple[str, int]]:
     return [o_s_p for o in operations for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
 
@@ -225,6 +237,16 @@ def apply_max_priority_op(tmp: int, operations: List[str], operands: List[int], 
     return tmp
 
 
+def apply_max_priority_op_np(tmp: np.ndarray, operations: List[str],
+                             operands: List[np.ndarray], max_priority_idx: int) -> np.ndarray:
+    curr_max_idx = max_priority_idx
+    curr_ops = operations[curr_max_idx]
+    tmp = apply_op_nd(operation=curr_ops, operand_1=tmp, operand_2=operands[curr_max_idx + 1])
+    # check how far is next max priority idx
+    # if 1 apply again if > 1 update next_data and next_ops
+    return tmp
+
+
 def printable_expression(operations: List[str], operands: List[int]):
     for i in range(len(operands) - 1):
         # 10 + 18 * 5 * 8 - 21 * 6
@@ -233,7 +255,7 @@ def printable_expression(operations: List[str], operands: List[int]):
 
 
 # 34 * 10 - 18 + 5 * 8 + 21
-def inner_loop(operations: List[str], operands: List[int]) -> Tuple[List[str], List[int]]:
+def inner_loop(operations: List[str], operands: List[np.ndarray]) -> Tuple[List[str], List[np.ndarray]]:
     s_p = sign_priority(operations)
     priorities = np.array([p[1] for p in s_p])
     # set keeps only unique elements
@@ -247,8 +269,8 @@ def inner_loop(operations: List[str], operands: List[int]) -> Tuple[List[str], L
     tmp = operands[first_max_idx]
     for i in range(len(max_priority_indexes)):
         curr_max_idx = max_priority_indexes[i]
-        tmp = apply_max_priority_op(tmp=tmp, operations=operations, operands=operands,
-                                    max_priority_idx=curr_max_idx)
+        tmp = apply_max_priority_op_np(tmp=tmp, operations=operations, operands=operands,
+                                       max_priority_idx=curr_max_idx)
         # check how far is next max priority idx
         # if 1 apply again if > 1 update next_data and next_ops
         next_max_idx = max_priority_indexes[i + 1] if i + 1 < len(max_priority_indexes) else curr_max_idx
@@ -267,8 +289,9 @@ def inner_loop(operations: List[str], operands: List[int]) -> Tuple[List[str], L
             tmp = operands[next_max_idx]
     if len(new_operands) == 1:
         result = new_operands[0]
-        print(f"result = {result}")
+        # print(f"result = {result}")
         return new_ops, new_operands
+    # !! repressively returns values to parent call
     return inner_loop(operations=new_ops, operands=new_operands)
 
 
@@ -278,9 +301,9 @@ def matrix_expression():
     ops, ops_idx = op_sign_idx(input_file=i_f)
     matrices = matrix_data(input_file=i_f, op_indexes=ops_idx)
     assert len(ops_idx) == len(matrices) - 1
-    # op, result = process_ops(ops, matrices)
-    op, result = process_expression(ops, matrices)
-    print(f"{result[0].shape}\n{result}")
+    last_operations, last_operands = inner_loop(operations=ops, operands=matrices)
+    result = last_operands[0]
+    print(f"{result.shape}\n{result}")
 
 
 # 34 * 10 + 18 * 5 * 8 - 21 * 6 * 5 = 430
@@ -288,17 +311,21 @@ TEST_OPS: List[str] = [MULTIPLY, ADD, MULTIPLY, MULTIPLY, SUBTRACT, MULTIPLY, MU
 TEST_DATA = [34, 10, 18, 5, 8, 21, 6, 5]
 RESULT = 430
 
+
 # 34 * 10 - 18 + 5 * 8 + 21 = 383
 # TEST_OPS: List[str] = [MULTIPLY, SUBTRACT, ADD, MULTIPLY, ADD]
 # TEST_DATA = [34, 10, 18, 5, 8, 21]
 # RESULT = 383
 
-if __name__ == '__main__':
+def int_expression():
     assert len(TEST_OPS) == len(TEST_DATA) - 1
     printable_expression(operations=TEST_OPS, operands=TEST_DATA)
-    operations, operands = inner_loop(operations=TEST_OPS, operands=TEST_DATA)
-    print(f"expected no operations left = {operations}")
-    assert len(operations) == 0
-    print(f"expected {RESULT} = {operands[0]}")
-    assert operands[0] == RESULT
+    last_operations, last_operands = inner_loop(operations=TEST_OPS, operands=TEST_DATA)
+    print(f"expected no operations left = {last_operations}")
+    assert len(last_operations) == 0
+    print(f"expected {RESULT} = {last_operands[0]}")
+    assert last_operands[0] == RESULT
 
+
+if __name__ == '__main__':
+    matrix_expression()
