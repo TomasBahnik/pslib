@@ -216,47 +216,54 @@ def sign_priority(operations: List[str]) -> List[Tuple[str, int]]:
     return [o_s_p for o in operations for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
 
 
-TEST_OPS: List[str] = [ADD, MULTIPLY, MULTIPLY, SUBTRACT, MULTIPLY]
-TEST_DATA = [10, 18, 5, 8, 21, 6]
+def apply_max_priority_op(tmp: int, operations: List[str], operands: List[int], max_priority_idx: int):
+    curr_max_idx = max_priority_idx
+    curr_ops = operations[curr_max_idx]
+    tmp = apply_op(operation=curr_ops, operand_1=tmp, operand_2=operands[curr_max_idx + 1])
+    # check how far is next max priority idx
+    # if 1 apply again if > 1 update next_data and next_ops
+    return tmp
 
 
-# 10 + 18 * 5 * 8 - 21 * 6
+def printable_expression(operations: List[str], operands: List[int]):
+    for i in range(len(operands) - 1):
+        # 10 + 18 * 5 * 8 - 21 * 6
+        print(f'{operands[i]} {operations[i]} ', end='')
+    print(operands[-1])
 
 
-def inner_loop():
-    s_p = sign_priority(TEST_OPS)
+def inner_loop(operations: List[str], operands: List[int]):
+    s_p = sign_priority(operations)
     priorities = np.array([p[1] for p in s_p])
+    # set keeps only unique elements
+    # i.e. if all are the same just one remains
     max_priority = max(priorities)
-    max_priority_idx = np.where(priorities == max_priority)[0]
-    first_max_idx = max_priority_idx[0]
+    max_priority_indexes = np.where(priorities == max_priority)[0]
+    first_max_idx = max_priority_indexes[0]
     # add all operations and operands preceding first_max_idx
-    new_data = TEST_DATA[:first_max_idx]
-    new_ops = TEST_OPS[:first_max_idx]
-    tmp = TEST_DATA[first_max_idx]
-    for i in range(len(max_priority_idx)):
-        curr_max_idx = max_priority_idx[i]
-        curr_ops = TEST_OPS[curr_max_idx]
-        next_max_idx = max_priority_idx[i + 1]
-        tmp = apply_op(curr_ops, tmp, TEST_DATA[curr_max_idx + 1])
+    new_operands = operands[:first_max_idx]
+    new_ops = operations[:first_max_idx]
+    tmp = operands[first_max_idx]
+    for i in range(len(max_priority_indexes)):
+        curr_max_idx = max_priority_indexes[i]
+        tmp = apply_max_priority_op(tmp=tmp, operations=operations, operands=operands,
+                                    max_priority_idx=curr_max_idx)
         # check how far is next max priority idx
         # if 1 apply again if > 1 update next_data and next_ops
+        next_max_idx = max_priority_indexes[i + 1] if i + 1 < len(max_priority_indexes) else curr_max_idx
         delta_idx = next_max_idx - curr_max_idx
         if delta_idx == 1:
-            curr_max_idx = next_max_idx
-            curr_ops = TEST_OPS[curr_max_idx]
-            # recursion involves next i thus + 2
-            next_max_idx = max_priority_idx[i + 2]
-            tmp = apply_op(curr_ops, tmp, TEST_DATA[curr_max_idx + 1])
-            delta_idx = next_max_idx - curr_max_idx
-            if delta_idx == 1:
-                pass
-            else:
-                new_data.append(tmp)
-                # add ops and data up to next max idx TODO shift + 1
-                new_data = new_data + TEST_DATA[curr_max_idx + 2:next_max_idx]
-                new_ops = new_ops + TEST_OPS[curr_max_idx + 1:next_max_idx]
-                print(new_data)
-                print(new_ops)
+            continue
+        else:
+            new_operands.append(tmp)
+            new_operands = new_operands + operands[curr_max_idx + 2:next_max_idx]
+            new_ops = new_ops + operations[curr_max_idx + 1:next_max_idx]
+            tmp = operands[next_max_idx]
+    if len(new_operands) == 1:
+        result = new_operands[0]
+        print(f"result = {result}")
+        return result
+    inner_loop(operations=new_ops, operands=new_operands)
 
 
 def matrix_expression():
@@ -270,5 +277,10 @@ def matrix_expression():
     print(f"{result[0].shape}\n{result}")
 
 
+TEST_OPS: List[str] = [MULTIPLY, ADD, MULTIPLY, MULTIPLY, SUBTRACT, MULTIPLY, MULTIPLY]
+TEST_DATA = [34, 10, 18, 5, 8, 21, 6, 5]
+
 if __name__ == '__main__':
-    inner_loop()
+    assert len(TEST_OPS) == len(TEST_DATA) - 1
+    printable_expression(operations=TEST_OPS, operands=TEST_DATA)
+    inner_loop(operations=TEST_OPS, operands=TEST_DATA)
