@@ -232,7 +232,8 @@ def printable_expression(operations: List[str], operands: List[int]):
     print(operands[-1])
 
 
-def inner_loop(operations: List[str], operands: List[int]):
+# 34 * 10 - 18 + 5 * 8 + 21
+def inner_loop(operations: List[str], operands: List[int]) -> Tuple[List[str], List[int]]:
     s_p = sign_priority(operations)
     priorities = np.array([p[1] for p in s_p])
     # set keeps only unique elements
@@ -252,17 +253,22 @@ def inner_loop(operations: List[str], operands: List[int]):
         # if 1 apply again if > 1 update next_data and next_ops
         next_max_idx = max_priority_indexes[i + 1] if i + 1 < len(max_priority_indexes) else curr_max_idx
         delta_idx = next_max_idx - curr_max_idx
+        last_max_idx = curr_max_idx == max_priority_indexes[-1]
         if delta_idx == 1:
             continue
         else:
             new_operands.append(tmp)
-            new_operands = new_operands + operands[curr_max_idx + 2:next_max_idx]
-            new_ops = new_ops + operations[curr_max_idx + 1:next_max_idx]
+            append_operands = operands[curr_max_idx + 2:next_max_idx] if not last_max_idx \
+                else operands[curr_max_idx + 2:]
+            new_operands = new_operands + append_operands
+            append_operations = operations[curr_max_idx + 1:next_max_idx] if not last_max_idx \
+                else operations[curr_max_idx + 1:]
+            new_ops = new_ops + append_operations
             tmp = operands[next_max_idx]
     if len(new_operands) == 1:
         result = new_operands[0]
         print(f"result = {result}")
-        return result
+        return new_ops, new_operands
     inner_loop(operations=new_ops, operands=new_operands)
 
 
@@ -277,10 +283,19 @@ def matrix_expression():
     print(f"{result[0].shape}\n{result}")
 
 
+# 34 * 10 + 18 * 5 * 8 - 21 * 6 * 5 = 430
 TEST_OPS: List[str] = [MULTIPLY, ADD, MULTIPLY, MULTIPLY, SUBTRACT, MULTIPLY, MULTIPLY]
 TEST_DATA = [34, 10, 18, 5, 8, 21, 6, 5]
+RESULT = 430
+
+# 34 * 10 - 18 + 5 * 8 + 21 = 383
+# TEST_OPS: List[str] = [MULTIPLY, SUBTRACT, ADD, MULTIPLY, ADD]
+# TEST_DATA = [34, 10, 18, 5, 8, 21]
+# RESULT = 383
 
 if __name__ == '__main__':
     assert len(TEST_OPS) == len(TEST_DATA) - 1
     printable_expression(operations=TEST_OPS, operands=TEST_DATA)
     inner_loop(operations=TEST_OPS, operands=TEST_DATA)
+    print(f"expected = {RESULT}")
+    # assert res[0] == RESULT
