@@ -4,14 +4,6 @@ from typing import List, Tuple
 
 import numpy as np
 
-ADD = '+'
-SUBTRACT = '-'
-MULTIPLY = '*'
-
-OPERATIONS = [ADD, SUBTRACT, MULTIPLY]
-OPERATIONS_PRIORITY = [0, 0, 1]
-OP_SIGN_PRIOR = list(zip(OPERATIONS, OPERATIONS_PRIORITY))
-
 
 def load_input_file(file: Path) -> List[str]:
     with open(file, mode='r') as input_file:
@@ -135,18 +127,29 @@ def printable_expression(operations: List[str], operands: List[int]):
     print(operands[-1])
 
 
-# 34 * 10 - 18 + 5 * 8 + 21
-def inner_loop(operations: List[str], operands: List[np.ndarray]) -> Tuple[List[str], List[np.ndarray]]:
+ADD = '+'
+SUBTRACT = '-'
+MULTIPLY = '*'
+
+OPERATIONS = [ADD, SUBTRACT, MULTIPLY]
+OPERATIONS_PRIORITY = [0, 0, 1]
+OP_SIGN_PRIOR = list(zip(OPERATIONS, OPERATIONS_PRIORITY))
+
+
+def process_expression(operations: List[str], operands: List[np.ndarray]) -> Tuple[List[str], List[np.ndarray]]:
+    """ Process expression from left to right. Operations are processed in ordered of decreasing priorities.
+        Operation priorities are set by constants above
+    """
     s_p = sign_priority(operations)
     priorities = np.array([p[1] for p in s_p])
-    # set keeps only unique elements
-    # i.e. if all are the same just one remains
     max_priority = max(priorities)
+    # find positions of max priority operations
     max_priority_indexes = np.where(priorities == max_priority)[0]
     first_max_idx = max_priority_indexes[0]
     # add all operations and operands preceding first_max_idx
     new_operands = operands[:first_max_idx]
     new_ops = operations[:first_max_idx]
+    # first operand of current max priority operation
     tmp = operands[first_max_idx]
     for i in range(len(max_priority_indexes)):
         curr_max_idx = max_priority_indexes[i]
@@ -161,19 +164,22 @@ def inner_loop(operations: List[str], operands: List[np.ndarray]) -> Tuple[List[
             continue
         else:
             new_operands.append(tmp)
-            append_operands = operands[curr_max_idx + 2:next_max_idx] if not last_max_idx \
-                else operands[curr_max_idx + 2:]
+            # id it last max priority operation add everything else only up to next priority position
+            append_operands = operands[curr_max_idx + 2:] if last_max_idx \
+                else operands[curr_max_idx + 2:next_max_idx]
             new_operands = new_operands + append_operands
-            append_operations = operations[curr_max_idx + 1:next_max_idx] if not last_max_idx \
-                else operations[curr_max_idx + 1:]
+
+            append_operations = operations[curr_max_idx + 1:] if last_max_idx \
+                else operations[curr_max_idx + 1:next_max_idx]
             new_ops = new_ops + append_operations
+            # prepare for next calculation of max priority expression
             tmp = operands[next_max_idx]
     if len(new_operands) == 1:
         result = new_operands[0]
         # print(f"result = {result}")
         return new_ops, new_operands
-    # !! repressively returns values to parent call
-    return inner_loop(operations=new_ops, operands=new_operands)
+    # !! repressively return values to parent function calls
+    return process_expression(operations=new_ops, operands=new_operands)
 
 
 def matrix_expression():
@@ -182,7 +188,7 @@ def matrix_expression():
     ops, ops_idx = op_sign_idx(input_file=i_f)
     matrices = matrix_data(input_file=i_f, op_indexes=ops_idx)
     assert len(ops_idx) == len(matrices) - 1
-    last_operations, last_operands = inner_loop(operations=ops, operands=matrices)
+    last_operations, last_operands = process_expression(operations=ops, operands=matrices)
     result = last_operands[0]
     print(f"{result.shape}\n{result}")
 
@@ -201,7 +207,7 @@ RESULT = 430
 def int_expression():
     assert len(TEST_OPS) == len(TEST_DATA) - 1
     printable_expression(operations=TEST_OPS, operands=TEST_DATA)
-    last_operations, last_operands = inner_loop(operations=TEST_OPS, operands=TEST_DATA)
+    last_operations, last_operands = process_expression(operations=TEST_OPS, operands=TEST_DATA)
     print(f"expected no operations left = {last_operations}")
     assert len(last_operations) == 0
     print(f"expected {RESULT} = {last_operands[0]}")
