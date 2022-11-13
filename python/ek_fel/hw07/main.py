@@ -182,7 +182,8 @@ def process_expression(operations: List[str], operands: List[np.ndarray]) -> Tup
     # RETURN results
     if len(new_operands) == 1:
         return new_ops, new_operands
-    # !! repressively return values to parent function calls
+    # We have to recursively return the results to parent function calls
+    # so the first call to process_expression can return it to the main
     return process_expression(operations=new_ops, operands=new_operands)
 
 
