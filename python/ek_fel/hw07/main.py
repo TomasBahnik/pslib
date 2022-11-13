@@ -269,7 +269,7 @@ def inner_loop(operations: List[str], operands: List[int]) -> Tuple[List[str], L
         result = new_operands[0]
         print(f"result = {result}")
         return new_ops, new_operands
-    inner_loop(operations=new_ops, operands=new_operands)
+    return inner_loop(operations=new_ops, operands=new_operands)
 
 
 def matrix_expression():
@@ -296,6 +296,9 @@ RESULT = 430
 if __name__ == '__main__':
     assert len(TEST_OPS) == len(TEST_DATA) - 1
     printable_expression(operations=TEST_OPS, operands=TEST_DATA)
-    inner_loop(operations=TEST_OPS, operands=TEST_DATA)
-    print(f"expected = {RESULT}")
-    # assert res[0] == RESULT
+    operations, operands = inner_loop(operations=TEST_OPS, operands=TEST_DATA)
+    print(f"expected no operations left = {operations}")
+    assert len(operations) == 0
+    print(f"expected {RESULT} = {operands[0]}")
+    assert operands[0] == RESULT
+
