@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Any
 
 import numpy as np
 
@@ -175,12 +175,12 @@ def process_expression(operations: List[str], operands: List[np.ndarray]) -> Tup
         next_max_idx = curr_max_idx if last_max_idx else max_priority_indexes[i + 1]
         delta_idx = next_max_idx - curr_max_idx
         match delta_idx:
-            case 1:
+            case 1:  # next operation is also of max priority so continue
                 continue
-            case 0:  # last max priority idx
+            case 0:  # last max priority idx add the rest up to the end
                 append_operands = operands[curr_max_idx + 2:]
                 append_operations = operations[curr_max_idx + 1:]
-            case _:
+            case _:  # some other max priority is more on the right
                 append_operands = operands[curr_max_idx + 2:next_max_idx]
                 append_operations = operations[curr_max_idx + 1:next_max_idx]
         new_operands.append(tmp)
@@ -218,10 +218,10 @@ RESULT = 430
 # TEST_DATA = [34, 10, 18, 5, 8, 21]
 # RESULT = 383
 
-def int_expression():
-    assert len(TEST_OPS) == len(TEST_DATA) - 1
-    printable_expression(operations=TEST_OPS, operands=TEST_DATA)
-    last_operations, last_operands = process_expression(operations=TEST_OPS, operands=TEST_DATA)
+def int_expression(operations: List[str], operands: List[Any]):
+    assert len(operations) == len(operands) - 1
+    printable_expression(operations=operations, operands=operands)
+    last_operations, last_operands = process_expression(operations=TEST_OPS, operands=operands)
     print(f"expected no operations left = {last_operations}")
     assert len(last_operations) == 0
     print(f"expected {RESULT} = {last_operands[0]}")
