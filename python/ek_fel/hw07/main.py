@@ -174,23 +174,19 @@ def process_expression(operations: List[str], operands: List[np.ndarray]) -> Tup
         last_max_idx = curr_max_idx == max_priority_indexes[-1]
         next_max_idx = curr_max_idx if last_max_idx else max_priority_indexes[i + 1]
         delta_idx = next_max_idx - curr_max_idx
-        if delta_idx == 1:
-            # operation of the same priority follows immediately
-            # like in 8 * 6 * 7, so execute it just now
-            continue
-        else:  # delta is >= 0, 0 means last_max_idx = True
-            new_operands.append(tmp)
-            # if it is the last max priority operation add everything
-            # else add all only up to the next priority position
-            append_operands = operands[curr_max_idx + 2:] if last_max_idx \
-                else operands[curr_max_idx + 2:next_max_idx]
-            new_operands = new_operands + append_operands
-
-            append_operations = operations[curr_max_idx + 1:] if last_max_idx \
-                else operations[curr_max_idx + 1:next_max_idx]
-            new_ops = new_ops + append_operations
-            # prepare for next calculation of max priority expression
-            tmp = operands[next_max_idx]
+        match delta_idx:
+            case 1:
+                continue
+            case 0:  # last max priority idx
+                append_operands = operands[curr_max_idx + 2:]
+                append_operations = operations[curr_max_idx + 1:]
+            case _:
+                append_operands = operands[curr_max_idx + 2:next_max_idx]
+                append_operations = operations[curr_max_idx + 1:next_max_idx]
+        new_operands.append(tmp)
+        new_operands = new_operands + append_operands
+        new_ops = new_ops + append_operations
+        tmp = operands[next_max_idx]
     # expression is DONE. Only 1 operand remains and NO operations
     # RETURN results
     if len(new_operands) == 1:
