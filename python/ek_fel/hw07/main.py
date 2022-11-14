@@ -142,10 +142,7 @@ OPERATIONS_PRIORITY = [0, 0, 1]
 OP_SIGN_PRIOR = list(zip(OPERATIONS, OPERATIONS_PRIORITY))
 
 
-def process_expression(operations: List[str], operands: List[np.ndarray]) -> Tuple[List[str], List[np.ndarray]]:
-    """ Process expression from left to right. Operations are processed in ordered of decreasing priorities.
-        Operation priorities are set by constants above
-    """
+def initial_values(operations: List[str], operands: List[np.ndarray]):
     s_p = sign_priority(operations)
     # use numpy array because we need np.where for index location
     priorities = np.array([p[1] for p in s_p])
@@ -153,6 +150,14 @@ def process_expression(operations: List[str], operands: List[np.ndarray]) -> Tup
     # find positions of max priority operations - very important
     # levering numpy where highly simplifies this task
     max_priority_indexes = np.where(priorities == max_priority)[0]
+    return max_priority_indexes
+
+
+def process_expression(operations: List[str], operands: List[np.ndarray]) -> Tuple[List[str], List[np.ndarray]]:
+    """ Process expression from left to right. Operations are processed in ordered of decreasing priorities.
+        Operation priorities are set by constants above
+    """
+    max_priority_indexes = initial_values(operations=operations, operands=operands)
     first_max_idx = max_priority_indexes[0]
     # add all operations and operands preceding first_max_idx
     # they are of lower priority and will be solved during next recursions
@@ -166,14 +171,14 @@ def process_expression(operations: List[str], operands: List[np.ndarray]) -> Tup
                                        max_priority_idx=curr_max_idx)
         # check how far is next max priority idx
         # if 1 apply again if > 1 update next_data and next_ops
-        next_max_idx = max_priority_indexes[i + 1] if i + 1 < len(max_priority_indexes) else curr_max_idx
-        delta_idx = next_max_idx - curr_max_idx
         last_max_idx = curr_max_idx == max_priority_indexes[-1]
+        next_max_idx = curr_max_idx if last_max_idx else max_priority_indexes[i + 1]
+        delta_idx = next_max_idx - curr_max_idx
         if delta_idx == 1:
             # operation of the same priority follows immediately
             # like in 8 * 6 * 7, so execute it just now
             continue
-        else:
+        else:  # delta is >= 0, 0 means last_max_idx = True
             new_operands.append(tmp)
             # if it is the last max priority operation add everything
             # else add all only up to the next priority position
