@@ -101,6 +101,9 @@ def apply_op_nd(operation: str, operand_1: np.ndarray, operand_2: np.ndarray) ->
 
 
 def sign_priority(operations: List[str]) -> List[Tuple[str, int]]:
+    """Returns list of tuples (operation, priority). Operations might have
+    equal priority but different meaning e.g +/- so we need both of them correlated
+    """
     return [o_s_p for o in operations for o_s_p in OP_SIGN_PRIOR if o_s_p[0] == o]
 
 
@@ -144,12 +147,15 @@ def process_expression(operations: List[str], operands: List[np.ndarray]) -> Tup
         Operation priorities are set by constants above
     """
     s_p = sign_priority(operations)
+    # use numpy array because we need np.where for index location
     priorities = np.array([p[1] for p in s_p])
     max_priority = max(priorities)
-    # find positions of max priority operations
+    # find positions of max priority operations - very important
+    # levering numpy where highly simplifies this task
     max_priority_indexes = np.where(priorities == max_priority)[0]
     first_max_idx = max_priority_indexes[0]
     # add all operations and operands preceding first_max_idx
+    # they are of lower priority and will be solved during next recursions
     new_operands = operands[:first_max_idx]
     new_ops = operations[:first_max_idx]
     # first operand of current max priority operation
@@ -164,6 +170,8 @@ def process_expression(operations: List[str], operands: List[np.ndarray]) -> Tup
         delta_idx = next_max_idx - curr_max_idx
         last_max_idx = curr_max_idx == max_priority_indexes[-1]
         if delta_idx == 1:
+            # operation of the same priority follows immediately
+            # like in 8 * 6 * 7, so execute it just now
             continue
         else:
             new_operands.append(tmp)
