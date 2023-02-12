@@ -1,14 +1,28 @@
-name: pycpt-env
+#`conda env create --file=conda_env.yaml`
+# https://ealizadeh.com/blog/guide-to-python-env-pkg-dependency-using-conda-poetry
+name: pycpt
+
+channels:
+  - default
+  - conda-forge
+
 dependencies:
+  # Could not build wheels for pyarrow with python 3.11
   - python>=3.10,<3.11
-  - pyyaml>=6.0,<7.0
-  - flatten-dict>=0.4.2,<0.5.0
+  - pip>=22.2.2,<22.3.0
+  - typer>=0.6.1,<0.7.0
+  - pydantic==1.10.2
+  - xarray=2022.10.0
+  - scipy>=1.9.3,<2.0.0
   - jinja2>=3.1.2,<4.0.0
-  - pandas>=1.4.2,<2.0.0
-  - numpy>=1.22.4,<2.0.0
-  - requests>=2.28.0,<3.0.0
   - tabulate>=0.8.9,<0.9.0
-  - typer>=0.4.1,<0.5.0
-  - psycopg2>=2.8.6,<3.0.0
-  - pytest==7.1.2
-  - pydantic==1.9.1
+  - pip:
+      - researchpy==0.3.5
+      # installs all required modules, including the Snowflake Connector for Python
+      - "snowflake-connector-python[pandas]"
+      - snowflake-sqlalchemy
+      - ruyaml>=0.90.1
+      - dpath>=2.0.6
+      - psycopg2>=2.8.6,<3.0.0
+      - flatten-dict>=0.4.2,<0.5.0
+
