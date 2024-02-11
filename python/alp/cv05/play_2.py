@@ -78,12 +78,14 @@ class Piskvorky:
         return range(0, 2 * self.row_length() - 1), operator.add
 
     def diagonals(self, shift_range_operator):
+        """Return diagonal indexes of each shift """
         d_r, op = shift_range_operator
+        ret = {}
         for shift in d_r:
-            for i in range(self.row_length()):
-                for j in range(self.row_length()):
-                    if (op(i, j)) == shift:
-                        print(f"shift: {shift}, [{i}, {j}]")
+            diag_idx = [(i, j) for i in range(self.row_length()) for j
+                        in range(self.row_length()) if (op(i, j)) == shift]
+            ret[shift] = diag_idx
+        return ret
 
 
 def check_win(elements, rows: bool):
@@ -96,7 +98,7 @@ def check_win(elements, rows: bool):
 
 if __name__ == "__main__":
     p = Piskvorky(sys.argv[1])
-    # check_win(p.rows(), rows=True)
-    # check_win(p.columns(), rows=False)
-    p.diagonals(shift_range_operator=p.shift_down())
-    p.diagonals(shift_range_operator=p.shift_up())
+    check_win(p.rows(), rows=True)
+    check_win(p.columns(), rows=False)
+    down_diag = p.diagonals(shift_range_operator=p.shift_down())
+    up_diag = p.diagonals(shift_range_operator=p.shift_up())
