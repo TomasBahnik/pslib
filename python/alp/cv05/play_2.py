@@ -103,4 +103,6 @@ if __name__ == "__main__":
     check_win(p.columns(), rows=False)
     down_diag = p.diagonals(shift_range_operator=p.shift_down())
     up_diag = p.diagonals(shift_range_operator=p.shift_up())
+    check_win(down_diag.values(), rows=True)
+    check_win(elements=up_diag.values(), rows=True)
     print("End")
