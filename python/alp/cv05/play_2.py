@@ -1,4 +1,5 @@
 import sys
+import operator
 
 empty = 0
 cross = 1
@@ -64,12 +65,25 @@ class Piskvorky:
         """
         return [[row[i] for row in self.matrix] for i in range(self.row_length())]
 
-    def cols_length(self) -> int:
+    def col_length(self) -> int:
         """All columns have the same length"""
         return len(self.columns()[0])
 
-    def diagonals(self):
-        pass
+    def shift_up(self):
+        """Difference of indexes is equal and can be negative zero (main diag) or positive"""
+        return range(-self.row_length() + 1, self.row_length()), operator.sub
+
+    def shift_down(self):
+        """Sum of indexes is constant"""
+        return range(0, 2 * self.row_length() - 1), operator.add
+
+    def diagonals(self, shift_range_operator):
+        d_r, op = shift_range_operator
+        for shift in d_r:
+            for i in range(self.row_length()):
+                for j in range(self.row_length()):
+                    if (op(i, j)) == shift:
+                        print(f"shift: {shift}, [{i}, {j}]")
 
 
 def check_win(elements, rows: bool):
@@ -82,5 +96,7 @@ def check_win(elements, rows: bool):
 
 if __name__ == "__main__":
     p = Piskvorky(sys.argv[1])
-    check_win(p.rows(), rows=True)
-    check_win(p.columns(), rows=False)
+    # check_win(p.rows(), rows=True)
+    # check_win(p.columns(), rows=False)
+    p.diagonals(shift_range_operator=p.shift_down())
+    p.diagonals(shift_range_operator=p.shift_up())
