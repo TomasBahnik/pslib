@@ -54,21 +54,33 @@ class Piskvorky:
     def rows(self) -> list[list[int]]:
         return self.matrix
 
+    def row_length(self):
+        return len(self.matrix[0])
+
     def columns(self) -> list[list[int]]:
         """Return columns of the matrix.
 
         Each row has the same length as the 1st row in original matrix.
         """
-        return [[row[i] for row in self.matrix] for i in range(len(self.matrix[0]))]
+        return [[row[i] for row in self.matrix] for i in range(self.row_length())]
+
+    def cols_length(self) -> int:
+        """All columns have the same length"""
+        return len(self.columns()[0])
+
+    def diagonals(self):
+        pass
+
+
+def check_win(elements, rows: bool):
+    for idx, values in enumerate(elements):
+        winning_idx = sub_seq_of_length(sequence=values, length=5)
+        if winning_idx:
+            print(f"Winning position : {idx}, {winning_idx}") if rows else \
+                print(f"Winning position : {winning_idx}, {idx}")
 
 
 if __name__ == "__main__":
     p = Piskvorky(sys.argv[1])
-    for row_idx, row in enumerate(p.rows()):
-        winning_col_idx = sub_seq_of_length(sequence=row, length=5)
-        if winning_col_idx is not None:
-            print(f"Winning position : row {row_idx}, column: {winning_col_idx}")
-    for col_idx, col in enumerate(p.columns(), start=0):
-        winning_row_idx = sub_seq_of_length(sequence=col, length=5)
-        if winning_row_idx is not None:
-            print(f"Winning position : row {winning_row_idx}, column: {col_idx}")
+    check_win(p.rows(), rows=True)
+    check_win(p.columns(), rows=False)
