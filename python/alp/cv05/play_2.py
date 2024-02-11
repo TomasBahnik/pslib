@@ -82,10 +82,11 @@ class Piskvorky:
         d_r, op = shift_range_operator
         ret = {}
         for shift in d_r:
-            diag_idx = [(i, j) for i in range(self.row_length()) for j
+            diag_idx = [self.matrix[i][j] for i in range(self.row_length()) for j
                         in range(self.row_length()) if (op(i, j)) == shift]
             ret[shift] = diag_idx
-        return ret
+        filter_elements = {key: value for key, value in ret.items() if len(value) > 4}
+        return filter_elements
 
 
 def check_win(elements, rows: bool):
@@ -102,3 +103,4 @@ if __name__ == "__main__":
     check_win(p.columns(), rows=False)
     down_diag = p.diagonals(shift_range_operator=p.shift_down())
     up_diag = p.diagonals(shift_range_operator=p.shift_up())
+    print("End")
