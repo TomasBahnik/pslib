@@ -33,19 +33,40 @@ def last_cross_missing(sequence: list[int]) -> bool:
         return False
 
 
-def sub_seq_of_length(sequence, length):
-    """Check sub-sequences of given length for winning condition."""
-    l_s = len(sequence)
-    if l_s < length:  # l_s - length < 0
-        # print("ERROR length of sequence < = length. Length = {}, seq length={}".format(length, l_s))
-        return
-    for j in range(0, l_s - length + 1):  # j <= l_s - length
-        sub_seq = sequence[j:j + length]
-        if last_cross_missing(sub_seq):
-            # add j because we need empty idx counted from the original sequence
-            empty_idx = sub_seq.index(empty) + j
-            # print("{} : cross at {} in {} wins! piskvorka = {} ".format(sys.argv[1], empty_idx, sequence, sub_seq))
-            return empty_idx
+class Orthogonal:
+    def __init__(self, coords: list[tuple[int, int]], values: list[int]):
+        self.coords: list[tuple[int, int]] = coords
+        self.values: list[int] = values
+
+    def filter_length(self, min_length: int) -> bool:
+        """Only values with len > min_length"""
+        return len(self.values) > min_length
+
+    def sub_seq_of_length(self, length: int) -> int | None:
+        """Check sub-sequences of given length for winning condition."""
+        l_s = len(self.values)
+        if l_s < length:  # l_s - length < 0
+            # print("ERROR length of sequence < = length. Length = {}, seq length={}".format(length, l_s))
+            return
+        for j in range(0, l_s - length + 1):  # j <= l_s - length
+            sub_seq = self.values[j:j + length]
+            if last_cross_missing(sub_seq):
+                # add j because we need empty idx counted from the original sequence
+                empty_idx = sub_seq.index(empty) + j
+                # print("{} : cross at {} in {} wins! piskvorka = {} ".format(sys.argv[1], empty_idx, sequence, sub_seq))
+                return empty_idx
+
+    def check_win(self):
+        winning_idx = self.sub_seq_of_length(length=5)
+        # explicitly check for None because bool(0) = False
+        if winning_idx is not None:
+            print(f"Winning position : {self.coords[winning_idx]}")
+
+
+class Diagonal(Orthogonal):
+    def __init__(self, shift: int, coords: list[tuple[int, int]], values: list[int]):
+        super().__init__(coords, values)
+        self.shift = shift
 
 
 class Piskvorky:
@@ -77,33 +98,38 @@ class Piskvorky:
         """Sum of indexes is constant"""
         return range(0, 2 * self.row_length() - 1), operator.add
 
-    def diagonals(self, shift_range_operator):
-        """Return diagonal indexes of each shift """
+    def orthogonal(self) -> list[Orthogonal]:
+        rows_coords = [[(i, j) for j in range(self.row_length())] for i in range(self.row_length())]
+        cols_coords = [[(j, i) for j in range(self.row_length())] for i in range(self.row_length())]
+        rows_values: list[list[int]] = self.rows()
+        cols_values: list[list[int]] = self.columns()
+        rows: list[Orthogonal] = [Orthogonal(coords=coords, values=values)
+                                  for coords, values in zip(rows_coords, rows_values)]
+        columns: list[Orthogonal] = [Orthogonal(coords=coords, values=values)
+                                     for coords, values in zip(cols_coords, cols_values)]
+        return rows + columns
+
+    def diagonals(self, shift_range_operator) -> list[Diagonal]:
+        """Return diagonals."""
         d_r, op = shift_range_operator
-        ret = {}
+        diagonals: list[Diagonal] = []
         for shift in d_r:
-            diag_idx = [self.matrix[i][j] for i in range(self.row_length()) for j
-                        in range(self.row_length()) if (op(i, j)) == shift]
-            ret[shift] = diag_idx
-        filter_elements = {key: value for key, value in ret.items() if len(value) > 4}
-        return filter_elements
-
-
-def check_win(elements, rows: bool):
-    for idx, values in enumerate(elements):
-        winning_idx = sub_seq_of_length(sequence=values, length=5)
-        # explicitly check for None because bool(0) = False
-        if winning_idx is not None:
-            print(f"Winning position : {idx}, {winning_idx}") if rows else \
-                print(f"Winning position : {winning_idx}, {idx}")
+            coords = [(i, j) for i in range(self.row_length()) for j
+                      in range(self.row_length()) if (op(i, j)) == shift]
+            values = [self.matrix[i][j] for i in range(self.row_length()) for j
+                      in range(self.row_length()) if (op(i, j)) == shift]
+            diagonal: Diagonal = Diagonal(shift=shift, coords=coords, values=values)
+            diagonals.append(diagonal)
+        filter_diagonals = [diag for diag in diagonals if diag.filter_length(min_length=4)]
+        return filter_diagonals
 
 
 if __name__ == "__main__":
     p = Piskvorky(sys.argv[1])
-    check_win(p.rows(), rows=True)
-    check_win(p.columns(), rows=False)
-    down_diag = p.diagonals(shift_range_operator=p.shift_down())
-    up_diag = p.diagonals(shift_range_operator=p.shift_up())
-    check_win(down_diag.values(), rows=True)
-    check_win(elements=up_diag.values(), rows=True)
+    for o in p.orthogonal():
+        o.check_win()
+    for dd in p.diagonals(shift_range_operator=p.shift_down()):
+        dd.check_win()
+    for ud in p.diagonals(shift_range_operator=p.shift_up()):
+        ud.check_win()
     print("End")
