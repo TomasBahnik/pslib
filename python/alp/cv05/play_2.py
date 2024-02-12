@@ -8,9 +8,10 @@ CIRCLE = 2
 enough_num_of_solutions = 1
 # num_of_solutions <= enough_num_of_solutions
 num_of_solutions = 0
+INTS_2D = list[list[int]]
 
 
-def load_matrix(file) -> list[list[int]]:
+def load_matrix(file) -> INTS_2D:
     """Load 2D array from file"""
     pole = []
     with open(file, 'r') as f:
@@ -35,6 +36,7 @@ def last_cross_missing(sequence: list[int]) -> bool:
 
 class Orthogonal:
     """Columns and rows"""
+
     def __init__(self, coords: list[tuple[int, int]], values: list[int]):
         # coordinates for each value
         self.coords: list[tuple[int, int]] = coords
@@ -66,6 +68,7 @@ class Orthogonal:
 
 class Diagonal(Orthogonal):
     """All diagonals"""
+
     def __init__(self, shift: int, coords: list[tuple[int, int]], values: list[int]):
         super().__init__(coords, values)
         # diagonal is defined by fixed sum or difference of coordinates
@@ -76,13 +79,13 @@ class Piskvorky:
     def __init__(self, file_with_matrix):
         self.matrix = load_matrix(file_with_matrix)
 
-    def rows(self) -> list[list[int]]:
+    def rows(self) -> INTS_2D:
         return self.matrix
 
     def row_length(self):
         return len(self.matrix[0])
 
-    def columns(self) -> list[list[int]]:
+    def columns(self) -> INTS_2D:
         """Return columns of the matrix.
 
         Each row has the same length as the 1st row in original matrix.
@@ -105,8 +108,8 @@ class Piskvorky:
         """List of rows and columns"""
         rows_coords = [[(i, j) for j in range(self.row_length())] for i in range(self.row_length())]
         cols_coords = [[(j, i) for j in range(self.row_length())] for i in range(self.row_length())]
-        rows_values: list[list[int]] = self.rows()
-        cols_values: list[list[int]] = self.columns()
+        rows_values: INTS_2D = self.rows()
+        cols_values: INTS_2D = self.columns()
         rows: list[Orthogonal] = [Orthogonal(coords=coords, values=values)
                                   for coords, values in zip(rows_coords, rows_values)]
         columns: list[Orthogonal] = [Orthogonal(coords=coords, values=values)
