@@ -36,8 +36,10 @@ def last_cross_missing(sequence: list[int]) -> bool:
 class Orthogonal:
     """Columns and rows"""
     def __init__(self, coords: list[tuple[int, int]], values: list[int]):
+        # coordinates for each value
         self.coords: list[tuple[int, int]] = coords
         self.values: list[int] = values
+        assert len(coords) == len(values)
 
     def filter_length(self, min_length: int) -> bool:
         """Only values with len > min_length"""
@@ -66,6 +68,7 @@ class Diagonal(Orthogonal):
     """All diagonals"""
     def __init__(self, shift: int, coords: list[tuple[int, int]], values: list[int]):
         super().__init__(coords, values)
+        # diagonal is defined by fixed sum or difference of coordinates
         self.shift = shift
 
 
@@ -90,11 +93,11 @@ class Piskvorky:
         """All columns have the same length"""
         return len(self.columns()[0])
 
-    def shift_up(self):
+    def diagonal_up(self):
         """Difference of indexes is equal and can be negative zero (main diag) or positive"""
         return range(-self.row_length() + 1, self.row_length()), operator.sub
 
-    def shift_down(self):
+    def diagonal_down(self):
         """Sum of indexes is constant"""
         return range(0, 2 * self.row_length() - 1), operator.add
 
@@ -110,9 +113,9 @@ class Piskvorky:
                                      for coords, values in zip(cols_coords, cols_values)]
         return rows + columns
 
-    def diagonals(self, shift_range_operator) -> list[Diagonal]:
+    def diagonals(self, diagonal_range_operator) -> list[Diagonal]:
         """List of all diagonals."""
-        d_r, op = shift_range_operator
+        d_r, op = diagonal_range_operator
         diagonals: list[Diagonal] = []
         for shift in d_r:
             coords = [(i, j) for i in range(self.row_length()) for j
@@ -129,8 +132,8 @@ if __name__ == "__main__":
     p = Piskvorky(sys.argv[1])
     for o in p.orthogonal():
         o.check_win()
-    for dd in p.diagonals(shift_range_operator=p.shift_down()):
+    for dd in p.diagonals(diagonal_range_operator=p.diagonal_down()):
         dd.check_win()
-    for ud in p.diagonals(shift_range_operator=p.shift_up()):
+    for ud in p.diagonals(diagonal_range_operator=p.diagonal_up()):
         ud.check_win()
     print("End")
