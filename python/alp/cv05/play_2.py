@@ -1,9 +1,9 @@
 import sys
 import operator
 
-empty = 0
-cross = 1
-circle = 2
+EMPTY = 0
+CROSS = 1
+CIRCLE = 2
 # how many solution is enough
 enough_num_of_solutions = 1
 # num_of_solutions <= enough_num_of_solutions
@@ -21,8 +21,8 @@ def load_matrix(file) -> list[list[int]]:
 
 def last_cross_missing(sequence: list[int]) -> bool:
     s = sum(sequence)
-    cnt_empty = sequence.count(empty)
-    cnt_cross = sequence.count(cross)
+    cnt_empty = sequence.count(EMPTY)
+    cnt_cross = sequence.count(CROSS)
     # len must be 5 = 4 crosses (1) and 1 empty (0) and sum must be 4
     # search all sub-sequences of length 5
     if s != 4:
@@ -34,6 +34,7 @@ def last_cross_missing(sequence: list[int]) -> bool:
 
 
 class Orthogonal:
+    """Columns and rows"""
     def __init__(self, coords: list[tuple[int, int]], values: list[int]):
         self.coords: list[tuple[int, int]] = coords
         self.values: list[int] = values
@@ -43,18 +44,16 @@ class Orthogonal:
         return len(self.values) > min_length
 
     def sub_seq_of_length(self, length: int) -> int | None:
-        """Check sub-sequences of given length for winning condition."""
+        """Check all sub-sequences of given length for winning condition."""
         l_s = len(self.values)
         if l_s < length:  # l_s - length < 0
-            # print("ERROR length of sequence < = length. Length = {}, seq length={}".format(length, l_s))
             return
         for j in range(0, l_s - length + 1):  # j <= l_s - length
             sub_seq = self.values[j:j + length]
             if last_cross_missing(sub_seq):
                 # add j because we need empty idx counted from the original sequence
-                empty_idx = sub_seq.index(empty) + j
-                # print("{} : cross at {} in {} wins! piskvorka = {} ".format(sys.argv[1], empty_idx, sequence, sub_seq))
-                return empty_idx
+                winning_idx = sub_seq.index(EMPTY) + j
+                return winning_idx
 
     def check_win(self):
         winning_idx = self.sub_seq_of_length(length=5)
@@ -64,6 +63,7 @@ class Orthogonal:
 
 
 class Diagonal(Orthogonal):
+    """All diagonals"""
     def __init__(self, shift: int, coords: list[tuple[int, int]], values: list[int]):
         super().__init__(coords, values)
         self.shift = shift
@@ -99,6 +99,7 @@ class Piskvorky:
         return range(0, 2 * self.row_length() - 1), operator.add
 
     def orthogonal(self) -> list[Orthogonal]:
+        """List of rows and columns"""
         rows_coords = [[(i, j) for j in range(self.row_length())] for i in range(self.row_length())]
         cols_coords = [[(j, i) for j in range(self.row_length())] for i in range(self.row_length())]
         rows_values: list[list[int]] = self.rows()
@@ -110,7 +111,7 @@ class Piskvorky:
         return rows + columns
 
     def diagonals(self, shift_range_operator) -> list[Diagonal]:
-        """Return diagonals."""
+        """List of all diagonals."""
         d_r, op = shift_range_operator
         diagonals: list[Diagonal] = []
         for shift in d_r:
