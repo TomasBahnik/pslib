@@ -92,7 +92,8 @@ class Piskvorky:
 def check_win(elements, rows: bool):
     for idx, values in enumerate(elements):
         winning_idx = sub_seq_of_length(sequence=values, length=5)
-        if winning_idx:
+        # explicitly check for None because bool(0) = False
+        if winning_idx is not None:
             print(f"Winning position : {idx}, {winning_idx}") if rows else \
                 print(f"Winning position : {winning_idx}, {idx}")
 
