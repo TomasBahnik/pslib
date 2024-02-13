@@ -1,5 +1,5 @@
-import sys
 import operator
+import sys
 from dataclasses import dataclass
 
 EMPTY = 0
@@ -39,7 +39,7 @@ def last_cross_missing(sequence: list[int]) -> bool:
 
 @dataclass(frozen=True)
 class Orthogonal:
-    """Columns and rows"""
+    """Column or row"""
     coords: list[tuple[int, int]]
     values: list[int]
 
@@ -71,7 +71,7 @@ class Orthogonal:
 
 @dataclass(frozen=True)
 class Diagonal(Orthogonal):
-    """All diagonals"""
+    """Diagonal - sum or diff of indexes is fixed"""
     shift: int
 
 
