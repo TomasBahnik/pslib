@@ -43,7 +43,7 @@ class Orthogonal:
     coords: list[tuple[int, int]]
     values: list[int]
 
-    def check_lengths(self):
+    def __post_init__(self):
         assert len(self.coords) == len(self.values)
 
     def filter_length(self, min_length: int) -> bool:
