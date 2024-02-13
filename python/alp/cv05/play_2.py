@@ -1,5 +1,6 @@
 import sys
 import operator
+from dataclasses import dataclass
 
 EMPTY = 0
 CROSS = 1
@@ -16,6 +17,8 @@ def load_matrix(file) -> INTS_2D:
     pole = []
     with open(file, 'r') as f:
         for line in f:
+            if line.startswith("#"):
+                continue
             pole.append(list(map(int, line.split())))
     return pole
 
@@ -34,14 +37,14 @@ def last_cross_missing(sequence: list[int]) -> bool:
         return False
 
 
+@dataclass(frozen=True)
 class Orthogonal:
     """Columns and rows"""
+    coords: list[tuple[int, int]]
+    values: list[int]
 
-    def __init__(self, coords: list[tuple[int, int]], values: list[int]):
-        # coordinates for each value
-        self.coords: list[tuple[int, int]] = coords
-        self.values: list[int] = values
-        assert len(coords) == len(values)
+    def check_lengths(self):
+        assert len(self.coords) == len(self.values)
 
     def filter_length(self, min_length: int) -> bool:
         """Only values with len > min_length"""
@@ -66,13 +69,10 @@ class Orthogonal:
             print(f"Winning position : {self.coords[winning_idx]}")
 
 
+@dataclass(frozen=True)
 class Diagonal(Orthogonal):
     """All diagonals"""
-
-    def __init__(self, shift: int, coords: list[tuple[int, int]], values: list[int]):
-        super().__init__(coords, values)
-        # diagonal is defined by fixed sum or difference of coordinates
-        self.shift = shift
+    shift: int
 
 
 class Piskvorky:
