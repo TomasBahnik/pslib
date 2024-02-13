@@ -52,15 +52,16 @@ class Orthogonal:
 
     def sub_seq_of_length(self, length: int) -> int | None:
         """Check all sub-sequences of given length for winning condition."""
-        l_s = len(self.values)
+        l_s: int = len(self.values)
         if l_s < length:  # l_s - length < 0
-            return
+            return None
         for j in range(0, l_s - length + 1):  # j <= l_s - length
-            sub_seq = self.values[j:j + length]
+            sub_seq: list[int] = self.values[j:j + length]
             if last_cross_missing(sub_seq):
                 # add j because we need empty idx counted from the original sequence
-                winning_idx = sub_seq.index(EMPTY) + j
+                winning_idx: int = sub_seq.index(EMPTY) + j
                 return winning_idx
+        return None
 
     def check_win(self):
         winning_idx = self.sub_seq_of_length(length=5)
